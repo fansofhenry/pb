@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en" data-course="gen-ai">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generative AI For Everyone — Community College Edition</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Outfit:wght@300;400;500;600&family=Fira+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper:   #faf6f0;
+  --cream:   #f0e9dd;
+  --ink:     #1a1512;
+  --magenta: #c2185b;
+  --mag-lt:  #fce4ec;
+  --mag-dk:  #880e4f;
+  --teal:    #00897b;
+  --gold:    #e67e22;
+  --dim:     #5c534a;
+  --rule:    1.5px solid var(--ink);
+  --mono:    'Fira Mono', monospace;
+  --display: 'Playfair Display', serif;
+  --body:    'Outfit', sans-serif;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { background:var(--paper); color:var(--ink); font-family:var(--body); overflow-x:hidden; }
+body::after {
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:9999; opacity:.025;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ── NAV ── */
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  background:rgba(250,246,240,0.92); backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--cream);
+  padding:14px 52px; display:flex; justify-content:space-between; align-items:center;
+}
+.nav-home { font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--magenta); text-decoration:none; }
+.nav-home:hover { color:var(--mag-dk); }
+.nav-label { font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim); }
+
+/* ── MASTHEAD ── */
+.masthead { background:var(--ink); color:var(--paper); border-bottom:4px solid var(--magenta); padding-top:58px; }
+.mast-ticker { padding:10px 52px; border-bottom:1px solid rgba(255,255,255,.08); font-family:var(--mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; opacity:.4; display:flex; justify-content:space-between; }
+.mast-body { padding:52px 52px 40px; display:grid; grid-template-columns:1fr 480px; gap:60px; align-items:center; }
+.mast-kicker { font-family:var(--mono); font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--magenta); margin-bottom:18px; }
+.mast-h1 { font-family:var(--display); font-size:clamp(52px,8vw,110px); line-height:.9; margin-bottom:28px; font-weight:900; }
+.mast-h1 em { font-style:italic; font-weight:400; color:var(--magenta); }
+.mast-deck { font-family:var(--display); font-style:italic; font-size:18px; font-weight:400; line-height:1.75; color:rgba(250,246,240,.65); max-width:520px; margin-bottom:32px; }
+.mast-pills { display:flex; gap:8px; flex-wrap:wrap; }
+.pill { padding:5px 13px; border:1px solid rgba(255,255,255,.12); font-family:var(--mono); font-size:9.5px; letter-spacing:.1em; text-transform:uppercase; color:rgba(250,246,240,.5); }
+.pill.accent { border-color:var(--magenta); color:var(--magenta); }
+
+/* ── TOKEN ANIMATION ── */
+.token-viz { display:flex; flex-direction:column; align-items:flex-start; gap:14px; position:relative; z-index:2; }
+.tv-label { font-family:var(--mono); font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:rgba(250,246,240,.35); }
+.tv-prompt {
+  font-family:var(--mono); font-size:12px; color:rgba(250,246,240,.8);
+  background:rgba(255,255,255,.04); border:1px solid rgba(194,24,91,.2);
+  padding:14px 18px; line-height:1.7; max-width:440px;
+}
+.tv-arrow { font-family:var(--mono); font-size:24px; color:var(--magenta); opacity:.6; }
+.tv-tokens { display:flex; flex-wrap:wrap; gap:6px; max-width:440px; }
+.tok {
+  font-family:var(--mono); font-size:11px; padding:4px 8px;
+  background:rgba(194,24,91,.08); border:1px solid rgba(194,24,91,.2);
+  color:rgba(250,246,240,.7);
+  animation:tok-appear .3s ease both;
+}
+.tok:nth-child(1)  { animation-delay:.2s; }
+.tok:nth-child(2)  { animation-delay:.4s; }
+.tok:nth-child(3)  { animation-delay:.6s; }
+.tok:nth-child(4)  { animation-delay:.8s; }
+.tok:nth-child(5)  { animation-delay:1.0s; }
+.tok:nth-child(6)  { animation-delay:1.2s; }
+.tok:nth-child(7)  { animation-delay:1.4s; }
+.tok:nth-child(8)  { animation-delay:1.6s; }
+.tok:nth-child(9)  { animation-delay:1.8s; }
+.tok:nth-child(10) { animation-delay:2.0s; }
+.tok:nth-child(11) { animation-delay:2.2s; }
+.tok:nth-child(12) { animation-delay:2.4s; background:rgba(194,24,91,.18); border-color:var(--magenta); color:var(--magenta); }
+@keyframes tok-appear { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+.tv-output {
+  font-family:var(--display); font-style:italic; font-size:14px;
+  color:rgba(250,246,240,.5); max-width:440px; line-height:1.65; padding:12px 18px;
+  border-left:2px solid var(--magenta); margin-top:4px;
+}
+
+.mast-stats { padding:22px 52px; background:var(--mag-dk); display:flex; gap:0; }
+.mast-stat { padding:0 32px 0 0; margin-right:32px; border-right:1px solid rgba(255,255,255,.15); }
+.mast-stat:last-child { border-right:none; }
+.stat-n { font-family:var(--display); font-size:42px; font-weight:900; color:var(--paper); line-height:1; }
+.stat-l { font-family:var(--mono); font-size:9px; letter-spacing:.12em; text-transform:uppercase; color:rgba(250,246,240,.4); margin-top:3px; }
+
+/* ── SECTIONS ── */
+.section-rule { border:none; border-top:var(--rule); }
+section { padding:80px 52px; max-width:1280px; margin:0 auto; }
+
+.section-tag { font-family:var(--mono); font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:var(--magenta); margin-bottom:22px; display:flex; align-items:center; gap:10px; }
+.section-tag::after { content:''; width:32px; height:1px; background:var(--magenta); display:inline-block; }
+
+h2 { font-family:var(--display); font-size:clamp(34px,4.5vw,60px); line-height:.95; margin-bottom:20px; font-weight:900; }
+h2 em { color:var(--magenta); font-style:italic; font-weight:400; }
+
+.lead { font-family:var(--display); font-style:italic; font-size:17px; font-weight:400; line-height:1.9; color:var(--dim); max-width:680px; margin-bottom:52px; }
+
+/* ── VERSUS ── */
+.versus { display:grid; grid-template-columns:1fr 1fr; border:var(--rule); margin-bottom:56px; }
+.versus-col { padding:36px 32px; }
+.versus-col.theirs { border-right:var(--rule); background:var(--cream); }
+.versus-col.ours { background:var(--ink); color:var(--paper); }
+.vs-label { font-family:var(--mono); font-size:9px; letter-spacing:.2em; text-transform:uppercase; margin-bottom:14px; }
+.versus-col.theirs .vs-label { color:var(--dim); }
+.versus-col.ours .vs-label { color:var(--magenta); }
+.vs-title { font-family:var(--display); font-size:22px; font-weight:700; margin-bottom:16px; }
+.versus-col.ours .vs-title { color:var(--paper); }
+.versus-col.theirs .vs-title { color:var(--ink); }
+.vs-list { list-style:none; display:flex; flex-direction:column; gap:9px; }
+.vs-list li { display:flex; gap:10px; align-items:flex-start; font-size:14px; line-height:1.65; }
+.versus-col.theirs .vs-list li { color:var(--dim); }
+.versus-col.ours .vs-list li { color:rgba(250,246,240,.72); }
+.vs-list li::before { content:''; width:5px; height:5px; border-radius:50%; flex-shrink:0; margin-top:7px; }
+.versus-col.theirs .vs-list li::before { background:rgba(0,0,0,.2); }
+.versus-col.ours .vs-list li::before { background:var(--magenta); }
+
+/* ── TRACKS ── */
+.tracks { display:flex; flex-direction:column; gap:2px; margin-top:48px; }
+.track { display:grid; grid-template-columns:240px 1fr 1fr; border:var(--rule); background:var(--paper); transition:background .2s; overflow:hidden; }
+.track:hover { background:var(--mag-lt); }
+.track-left { padding:32px 28px; border-right:var(--rule); background:var(--ink); color:var(--paper); display:flex; flex-direction:column; justify-content:space-between; }
+.track-badge { font-family:var(--mono); font-size:8.5px; letter-spacing:.18em; text-transform:uppercase; padding:4px 10px; width:fit-content; margin-bottom:12px; border:1px solid rgba(194,24,91,.4); color:var(--magenta); }
+.t2 .track-badge { border-color:rgba(0,137,123,.4); color:#4dd0c4; }
+.t3 .track-badge { border-color:rgba(230,126,34,.4); color:#f0a164; }
+.track-num { font-family:var(--display); font-size:56px; font-weight:900; line-height:1; margin-bottom:4px; color:var(--magenta); }
+.t2 .track-num { color:#4dd0c4; }
+.t3 .track-num { color:#f0a164; }
+.track-name { font-family:var(--display); font-size:20px; font-style:italic; font-weight:400; color:rgba(250,246,240,.65); line-height:1.2; }
+.track-prereq { font-family:var(--mono); font-size:8px; letter-spacing:.1em; text-transform:uppercase; color:rgba(250,246,240,.2); margin-top:14px; }
+.track-mid, .track-right { padding:28px 24px; }
+.track-mid { border-right:var(--rule); }
+.t-label { font-family:var(--mono); font-size:8.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--dim); margin-bottom:12px; }
+.t-desc { font-family:var(--display); font-style:italic; font-size:14px; font-weight:400; color:var(--dim); line-height:1.8; }
+.proj-list { list-style:none; display:flex; flex-direction:column; gap:8px; }
+.proj-list li { display:flex; gap:10px; font-size:13px; line-height:1.6; align-items:flex-start; color:var(--dim); padding-bottom:8px; border-bottom:1px solid var(--cream); }
+.proj-list li:last-child { border-bottom:none; padding-bottom:0; }
+.pn { font-family:var(--mono); font-size:8px; color:var(--magenta); flex-shrink:0; margin-top:3px; }
+.t2 .pn { color:#4dd0c4; }
+.t3 .pn { color:#f0a164; }
+
+/* ── PROJECT ARC ── */
+.arc-grid { display:grid; grid-template-columns:repeat(4,1fr); border:var(--rule); margin-top:48px; }
+.arc-card { padding:32px 26px; border-right:var(--rule); position:relative; overflow:hidden; transition:background .18s; }
+.arc-card:last-child { border-right:none; }
+.arc-card:hover { background:var(--mag-lt); }
+.arc-card::after { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--magenta); }
+.arc-week { font-family:var(--mono); font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:var(--magenta); margin-bottom:10px; }
+.arc-title { font-family:var(--display); font-size:20px; font-weight:700; margin-bottom:10px; line-height:1.15; }
+.arc-desc { font-size:13px; line-height:1.75; color:var(--dim); font-family:var(--display); font-style:italic; }
+.arc-deliverable { margin-top:16px; padding:10px 12px; background:var(--mag-lt); border-left:2px solid var(--magenta); font-size:11.5px; font-family:var(--mono); line-height:1.5; color:var(--mag-dk); letter-spacing:.02em; }
+
+/* ── CONCEPTS ── */
+.concepts { display:grid; grid-template-columns:repeat(3,1fr); gap:2px; background:var(--cream); margin-top:48px; }
+.concept { background:var(--paper); padding:30px 26px; transition:background .18s; }
+.concept:hover { background:var(--mag-lt); }
+.cn { font-family:var(--mono); font-size:9px; color:var(--magenta); letter-spacing:.18em; margin-bottom:10px; }
+.ct { font-family:var(--display); font-size:20px; font-weight:700; margin-bottom:8px; }
+.cb { font-size:13px; color:var(--dim); line-height:1.7; font-family:var(--display); font-style:italic; }
+
+/* ── CRITICAL LENS ── */
+.critical-strip { background:var(--magenta); color:white; padding:52px 52px; display:grid; grid-template-columns:1fr 1fr; gap:52px; align-items:center; }
+.crit-quote { font-family:var(--display); font-size:clamp(20px,2.5vw,30px); font-style:italic; font-weight:400; line-height:1.45; }
+.crit-source { font-family:var(--mono); font-size:9.5px; letter-spacing:.1em; text-transform:uppercase; color:rgba(255,255,255,.5); margin-top:14px; }
+.crit-items { display:flex; flex-direction:column; gap:12px; }
+.crit-item { padding:16px 18px; border:1px solid rgba(255,255,255,.15); display:flex; gap:14px; }
+.crit-ico { font-size:16px; flex-shrink:0; }
+.crit-body { font-size:14px; line-height:1.65; color:rgba(255,255,255,.78); }
+.crit-body strong { display:block; font-weight:600; color:white; margin-bottom:3px; font-size:14px; }
+
+/* ── THINKERS ── */
+.thinkers { display:grid; grid-template-columns:repeat(4,1fr); border-top:var(--rule); }
+.thinker { padding:24px 24px; border-right:var(--rule); border-bottom:var(--rule); transition:background .18s; }
+.thinker:hover { background:var(--mag-lt); }
+.thinker:nth-child(4n) { border-right:none; }
+.thinker-name { font-family:var(--display); font-size:17px; font-weight:700; margin-bottom:4px; }
+.thinker-tag { font-family:var(--mono); font-size:8px; letter-spacing:.1em; text-transform:uppercase; color:var(--magenta); margin-bottom:8px; }
+.thinker-desc { font-family:var(--display); font-style:italic; font-size:12.5px; font-weight:400; color:var(--dim); line-height:1.7; }
+
+/* ── FOOTER ── */
+footer { background:var(--ink); color:var(--paper); padding:40px 52px; display:flex; justify-content:space-between; align-items:center; border-top:3px solid var(--magenta); }
+.footer-l { font-family:var(--mono); font-size:10px; letter-spacing:.06em; color:rgba(250,246,240,.3); line-height:2; }
+.footer-r { font-family:var(--display); font-size:30px; font-weight:900; color:rgba(250,246,240,.08); }
+
+@media(max-width:1000px){
+  .mast-body { grid-template-columns:1fr; gap:32px; padding:40px 28px; }
+  .token-viz { display:none; }
+  nav,.mast-ticker,.mast-stats,section,.critical-strip { padding-left:28px; padding-right:28px; }
+  .track { grid-template-columns:1fr; }
+  .track-left,.track-mid { border-right:none; border-bottom:var(--rule); }
+  .arc-grid { grid-template-columns:1fr 1fr; }
+  .concepts { grid-template-columns:1fr 1fr; }
+  .versus { grid-template-columns:1fr; }
+  .versus-col.theirs { border-right:none; border-bottom:var(--rule); }
+  .thinkers { grid-template-columns:1fr 1fr; }
+  .thinker:nth-child(2n) { border-right:none; }
+  .critical-strip { grid-template-columns:1fr; }
+  footer { flex-direction:column; gap:14px; text-align:center; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-home" href="index.html">← All Courses</a>
+  <span class="nav-label">Generative AI For Everyone · Community College Edition</span>
+</nav>
+
+<header class="masthead">
+  <div class="mast-ticker">
+    <span>Community College CS</span>
+    <span>Andrew Ng × Critical Pedagogy</span>
+    <span>3 Tracks · Portfolio · No Exams</span>
+  </div>
+  <div class="mast-body">
+    <div>
+      <div class="mast-kicker">Generative AI For Everyone · Reimagined</div>
+      <div class="mast-h1">Prompts<br>are <em>arguments.</em></div>
+      <p class="mast-deck">Andrew Ng's Generative AI for Everyone rebuilt for community college learners. Every image is a choice. Every output reflects the data it was trained on. We use these tools critically, build with them skillfully, and question them rigorously.</p>
+      <div class="mast-pills">
+        <span class="pill accent">No Prereqs (Track I)</span>
+        <span class="pill">3 Tracks</span>
+        <span class="pill">18 Weeks</span>
+        <span class="pill">Portfolio</span>
+        <span class="pill">Free Tools Only</span>
+      </div>
+    </div>
+    <div class="token-viz">
+      <div class="tv-label">Prompt → Tokenization → Prediction</div>
+      <div class="tv-prompt">"Write a job description for a software engineer at a community nonprofit in San Jose."</div>
+      <div class="tv-arrow">↓</div>
+      <div class="tv-tokens">
+        <span class="tok">Write</span>
+        <span class="tok">a</span>
+        <span class="tok">job</span>
+        <span class="tok">description</span>
+        <span class="tok">for</span>
+        <span class="tok">a</span>
+        <span class="tok">software</span>
+        <span class="tok">engineer</span>
+        <span class="tok">at</span>
+        <span class="tok">a</span>
+        <span class="tok">community</span>
+        <span class="tok">nonprofit</span>
+      </div>
+      <div class="tv-output">Each token is a prediction. What does "software engineer" predict next? What assumptions are baked into that prediction?</div>
+    </div>
+  </div>
+  <div class="mast-stats">
+    <div class="mast-stat"><div class="stat-n">0</div><div class="stat-l">Exams</div></div>
+    <div class="mast-stat"><div class="stat-n">0</div><div class="stat-l">Required Textbooks</div></div>
+    <div class="mast-stat"><div class="stat-n">3</div><div class="stat-l">Learning Tracks</div></div>
+    <div class="mast-stat"><div class="stat-n">4</div><div class="stat-l">Portfolio Projects</div></div>
+  </div>
+</header>
+
+<hr class="section-rule">
+
+<section>
+  <div class="section-tag">This vs. Andrew Ng's Original</div>
+  <h2>Richer tools.<br><em>Sharper questions.</em></h2>
+  <p class="lead">Andrew Ng's "Generative AI for Everyone" is an excellent conceptual overview — clear, accessible, and free. We use it as a foundation, then push further: we build with these tools, audit their outputs, and ask whose world they reproduce.</p>
+
+  <div class="versus">
+    <div class="versus-col theirs">
+      <div class="vs-label">Andrew Ng's Version</div>
+      <div class="vs-title">Overview → Quizzes</div>
+      <ul class="vs-list">
+        <li>Video lecture series on generative AI concepts</li>
+        <li>Single path — one depth for everyone</li>
+        <li>Assessment: multiple choice quizzes</li>
+        <li>Limited hands-on building or deployment</li>
+        <li>Minimal treatment of bias in generated outputs</li>
+        <li>No community application or real project requirement</li>
+      </ul>
+    </div>
+    <div class="versus-col ours">
+      <div class="vs-label">This Course</div>
+      <div class="vs-title">Critical Use → Build → Audit</div>
+      <ul class="vs-list">
+        <li>Every concept explored through hands-on prompting and analysis</li>
+        <li>Three tracks: collaborator, creator, critic — you choose</li>
+        <li>Assessment: four portfolio projects you own and can show</li>
+        <li>Track II and III students deploy real gen AI applications</li>
+        <li>Bias in generative outputs is a required project — quantified, not named</li>
+        <li>Capstone must address a real community need you identify</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<hr class="section-rule">
+
+<section>
+  <div class="section-tag">Three Learning Tracks</div>
+  <h2>Use, build, or <em>interrogate.</em></h2>
+  <p class="lead">Choose your depth. All tracks share the same core discussions, readings, and community case studies. They differ in how technically deep you go — and you can change tracks as your confidence grows.</p>
+
+  <div class="tracks">
+    <div class="track t1">
+      <div class="track-left">
+        <div>
+          <div class="track-badge">Track I</div>
+          <div class="track-num">I</div>
+          <div class="track-name">AI<br>Collaborator</div>
+        </div>
+        <div class="track-prereq">Prereq: None · Basic internet use</div>
+      </div>
+      <div class="track-mid">
+        <div class="t-label">Focus</div>
+        <p class="t-desc">Learn to use generative AI tools effectively, critically, and safely. Prompt engineering, fact-checking AI outputs, understanding hallucination, and recognizing when a tool is failing you. Produce a portfolio of real work augmented by AI — with analysis of what the AI got right, wrong, and why.</p>
+      </div>
+      <div class="track-right">
+        <div class="t-label">Projects</div>
+        <ul class="proj-list">
+          <li><span class="pn">P1</span>Prompt Portfolio: 30 prompts across 3 different tools, with analysis</li>
+          <li><span class="pn">P2</span>Fact-Check Challenge: Verify 20 AI-generated claims against primary sources</li>
+          <li><span class="pn">P3</span>AI-Augmented Work: Use AI to complete a real project in your career field</li>
+          <li><span class="pn">P4</span>Critical Review: When did AI help vs. mislead you, and why?</li>
+        </ul>
+      </div>
+    </div>
+    <div class="track t2">
+      <div class="track-left">
+        <div>
+          <div class="track-badge">Track II</div>
+          <div class="track-num">II</div>
+          <div class="track-name">AI<br>Creator</div>
+        </div>
+        <div class="track-prereq">Prereq: Basic Python · Comfortable with APIs</div>
+      </div>
+      <div class="track-mid">
+        <div class="t-label">Focus</div>
+        <p class="t-desc">Build real applications using generative AI APIs. Chain prompts, use RAG, build assistants and content pipelines. Evaluate outputs programmatically. Deploy a working gen AI application for a real community use case. Understand the economics, constraints, and failure modes of building with gen AI.</p>
+      </div>
+      <div class="track-right">
+        <div class="t-label">Projects</div>
+        <ul class="proj-list">
+          <li><span class="pn">P1</span>Prompt Engineering System: Build a multi-step prompt chain for a real task</li>
+          <li><span class="pn">P2</span>RAG Application: Build a document Q&amp;A system on community resources</li>
+          <li><span class="pn">P3</span>Bias Measurement: Quantify output bias across demographic groups using code</li>
+          <li><span class="pn">P4</span>Deployed App: Build and ship a gen AI tool for a real community need</li>
+        </ul>
+      </div>
+    </div>
+    <div class="track t3">
+      <div class="track-left">
+        <div>
+          <div class="track-badge">Track III</div>
+          <div class="track-num">III</div>
+          <div class="track-name">AI<br>Critic</div>
+        </div>
+        <div class="track-prereq">Prereq: Python · Statistics · ML background</div>
+      </div>
+      <div class="track-mid">
+        <div class="t-label">Focus</div>
+        <p class="t-desc">Technically understand and rigorously audit generative AI systems. Probe models for bias, test alignment, examine training data provenance. Write analyses that are both technically precise and publicly legible. Prepare for AI safety, policy, or research roles. Your capstone must be publishable.</p>
+      </div>
+      <div class="track-right">
+        <div class="t-label">Projects</div>
+        <ul class="proj-list">
+          <li><span class="pn">P1</span>Red Team Report: Find 10 failure modes in a widely used gen AI tool</li>
+          <li><span class="pn">P2</span>Image Audit: Quantify bias in 500 AI-generated images using CLIP embeddings</li>
+          <li><span class="pn">P3</span>Training Data Analysis: Trace outputs back to training data provenance</li>
+          <li><span class="pn">P4</span>Publishable Audit: Full technical + ethical audit of a deployed gen AI system</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-rule">
+
+<section>
+  <div class="section-tag">18-Week Project Arc</div>
+  <h2>Four units.<br><em>Four questions.</em></h2>
+  <p class="lead">Each unit is organized around a question you can answer only by doing. The question comes first. The tools come second. By the end, your four projects form a coherent argument about generative AI in your community.</p>
+
+  <div class="arc-grid">
+    <div class="arc-card">
+      <div class="arc-week">Weeks 1–4</div>
+      <div class="arc-title">What is a prompt?</div>
+      <p class="arc-desc">Not just a sentence. A prompt is an argument about what exists, who matters, and what should be said. Explore how small changes in prompts produce radically different outputs. Learn to read outputs critically before learning to write prompts skillfully.</p>
+      <div class="arc-deliverable">Deliverable → Prompt Portfolio + Analysis</div>
+    </div>
+    <div class="arc-card">
+      <div class="arc-week">Weeks 5–9</div>
+      <div class="arc-title">What does it get wrong?</div>
+      <p class="arc-desc">Hallucination, bias, stereotyping, erasure. Systematically document how a gen AI tool fails — particularly for communities underrepresented in training data. Quantify, don't just observe. Failure analysis is the most technically rigorous part of the course.</p>
+      <div class="arc-deliverable">Deliverable → Bias Audit Report</div>
+    </div>
+    <div class="arc-card">
+      <div class="arc-week">Weeks 10–14</div>
+      <div class="arc-title">What can we build?</div>
+      <p class="arc-desc">Design and build a generative AI application that serves a real community need you identified in Unit 2. The tool should address a gap — not replicate something that already exists. Every design decision must be documented and justified.</p>
+      <div class="arc-deliverable">Deliverable → Working Application or Policy Brief</div>
+    </div>
+    <div class="arc-card">
+      <div class="arc-week">Weeks 15–18</div>
+      <div class="arc-title">What should we decide?</div>
+      <p class="arc-desc">Take a position. Should your community use a specific generative AI system? Under what conditions? With what safeguards? Who should be in the room making that decision? Your final project is an argument — technical and civic — that you present publicly.</p>
+      <div class="arc-deliverable">Deliverable → Public Exhibition Portfolio</div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-rule">
+
+<section>
+  <div class="section-tag">Core Concepts</div>
+  <h2>What every track<br><em>will know.</em></h2>
+  <div class="concepts">
+    <div class="concept">
+      <div class="cn">01</div><div class="ct">Tokens, Not Words</div>
+      <p class="cb">Language models don't read words — they process tokens. A token is a statistical unit, not a semantic one. Understanding this changes how you read every output.</p>
+    </div>
+    <div class="concept">
+      <div class="cn">02</div><div class="ct">Next-Token Prediction</div>
+      <p class="cb">All language generation is, at its core, predicting the most likely next token given all previous tokens. Autocomplete, at scale, on all of human text. No understanding required.</p>
+    </div>
+    <div class="concept">
+      <div class="cn">03</div><div class="ct">Hallucination</div>
+      <p class="cb">LLMs generate plausible text. "Plausible" and "true" are different things. The model does not know what it does not know — it will invent confidently. This is a property of the architecture, not a bug to be fixed.</p>
+    </div>
+    <div class="concept">
+      <div class="cn">04</div><div class="ct">Training Data Provenance</div>
+      <p class="cb">The model is its training data. What texts were included? Whose voices were overrepresented? Whose were excluded? The output of any gen AI system is a function of these choices.</p>
+    </div>
+    <div class="concept">
+      <div class="cn">05</div><div class="ct">Prompt Engineering</div>
+      <p class="cb">System prompts, few-shot examples, chain-of-thought, role prompting. Each technique changes what the model "attends to." Prompts are arguments about what to prioritize.</p>
+    </div>
+    <div class="concept">
+      <div class="cn">06</div><div class="ct">Retrieval-Augmented Generation</div>
+      <p class="cb">Ground the model's outputs in real documents. Reduces hallucination for specific domains. Does not eliminate it. Understanding RAG's limits is as important as understanding its power.</p>
+    </div>
+    <div class="concept">
+      <div class="cn">07</div><div class="ct">Diffusion Models</div>
+      <p class="cb">Image generation is not painting from imagination. It is denoising: reverse a diffusion process trained on labeled images. The labels encode human aesthetic choices and power structures.</p>
+    </div>
+    <div class="concept">
+      <div class="cn">08</div><div class="ct">RLHF and Alignment</div>
+      <p class="cb">Reinforcement learning from human feedback trains models to produce outputs that human raters prefer. Who are those raters? What did they find acceptable? This shapes every response.</p>
+    </div>
+    <div class="concept">
+      <div class="cn">09</div><div class="ct">Model Cards</div>
+      <p class="cb">Documentation for AI models: what they were trained on, what they're good at, where they fail, who should not use them. Reading model cards is a professional skill. Writing them is an ethical obligation.</p>
+    </div>
+  </div>
+</section>
+
+<div class="critical-strip">
+  <div>
+    <div class="crit-quote">"A prompt is not a command. It is a negotiation — between what you want, what the model has seen, and what the training data encoded about the world."</div>
+    <div class="crit-source">Course Philosophy · Benjamin, Noble, Ng, Ko, hooks</div>
+  </div>
+  <div class="crit-items">
+    <div class="crit-item"><div class="crit-ico">🔬</div><div class="crit-body"><strong>Measure, Don't Just Name</strong>Saying "AI is biased" is the beginning of the analysis, not the end. We quantify, test, and document — then propose remedies.</div></div>
+    <div class="crit-item"><div class="crit-ico">🛠️</div><div class="crit-body"><strong>Build What You Critique</strong>The best critics understand what they're critiquing from the inside. You will build with these tools before you audit them.</div></div>
+    <div class="crit-item"><div class="crit-ico">🏘️</div><div class="crit-body"><strong>Community as Client</strong>Your capstone must serve a real community need. Not a toy problem. A real person or organization who will use what you build.</div></div>
+    <div class="crit-item"><div class="crit-ico">📣</div><div class="crit-body"><strong>Make It Public</strong>Your portfolio must be legible beyond this classroom. We hold exhibition nights and community presentations every semester.</div></div>
+  </div>
+</div>
+
+<hr class="section-rule">
+
+<section>
+  <div class="section-tag">Intellectual Lineage</div>
+  <h2>Who we're <em>reading.</em></h2>
+  <div class="thinkers">
+    <div class="thinker"><div class="thinker-name">Andrew Ng</div><div class="thinker-tag">DeepLearning.AI</div><p class="thinker-desc">The original "Generative AI for Everyone" — whose conceptual clarity and accessible framing we build on, critique, and extend for community college students.</p></div>
+    <div class="thinker"><div class="thinker-name">Emily Bender</div><div class="thinker-tag">Stochastic Parrots</div><p class="thinker-desc">On the dangers of large language models at scale. What they cannot do. What harms they cause at the margins. Core reading for Unit 2.</p></div>
+    <div class="thinker"><div class="thinker-name">Timnit Gebru</div><div class="thinker-tag">DAIR Institute</div><p class="thinker-desc">Datasheets for datasets. The ethics of large-scale AI training. Whose labor built these systems? Who was erased? Core reading, Weeks 6–8.</p></div>
+    <div class="thinker"><div class="thinker-name">Ruha Benjamin</div><div class="thinker-tag">Race After Technology</div><p class="thinker-desc">When automation appears neutral but encodes and amplifies racial hierarchy. Essential framing for the bias audit project in Unit 2.</p></div>
+    <div class="thinker"><div class="thinker-name">Joy Buolamwini</div><div class="thinker-tag">Unmasking AI</div><p class="thinker-desc">The coded gaze applied to generative image models. Whose face is the default? Whose aesthetic is "beautiful"? Methodology for Track III image audits.</p></div>
+    <div class="thinker"><div class="thinker-name">Amy J. Ko</div><div class="thinker-tag">UW CS Education</div><p class="thinker-desc">Equitable computing education. Agency over anxiety. The three-track structure and portfolio system are built on her pedagogical framework.</p></div>
+    <div class="thinker"><div class="thinker-name">Safiya Umoja Noble</div><div class="thinker-tag">Algorithms of Oppression</div><p class="thinker-desc">Information retrieval as a site of racial bias. The search engine as a mirror of power. Foundational for understanding recommendation and retrieval in gen AI.</p></div>
+    <div class="thinker"><div class="thinker-name">bell hooks</div><div class="thinker-tag">Teaching to Transgress</div><p class="thinker-desc">The classroom as a site of freedom. Education as the practice of freedom. Every student brings knowledge worth centering. Referenced throughout the course.</p></div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-l">Community College Computer Science<br>Andrew Ng's Generative AI for Everyone · Reimagined for Community College<br>All tools free or open-source · Portfolio assessment · No required textbook<br><a href="mailto:henry@henryfan.org" style="color:rgba(245,240,232,.45);text-decoration:underline;text-underline-offset:2px;">henry@henryfan.org</a></div>
+  <div class="footer-r">Gen AI</div>
+</footer>
+
+</body>
+</html>

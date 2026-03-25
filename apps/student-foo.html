@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student FOO — Financial Order of Operations for Community College</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg:       #F2EDE4;
+  --surface:  #FDFAF5;
+  --surface2: #EDE8DE;
+  --surface3: #E4DED2;
+  --navy:     #1B2A4A;
+  --navy-dim: rgba(27,42,74,0.07);
+  --green:    #1A5C38;
+  --green-bg: rgba(26,92,56,0.07);
+  --green-bd: rgba(26,92,56,0.22);
+  --red:      #B52A1C;
+  --red-bg:   rgba(181,42,28,0.07);
+  --red-bd:   rgba(181,42,28,0.22);
+  --amber:    #8C5400;
+  --amber-bg: rgba(140,84,0,0.07);
+  --amber-bd: rgba(140,84,0,0.22);
+  --blue:     #1952B5;
+  --blue-bg:  rgba(25,82,181,0.07);
+  --blue-bd:  rgba(25,82,181,0.22);
+  --text:     #1A1714;
+  --text-2:   #4A4540;
+  --text-3:   #9A9590;
+  --border:   rgba(26,23,20,0.1);
+  --border2:  rgba(26,23,20,0.17);
+  --r: 6px; --r-lg: 14px;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+
+body{
+  background:var(--bg); color:var(--text);
+  font-family:'Plus Jakarta Sans',system-ui,sans-serif;
+  font-size:16px; line-height:1.7; overflow-x:hidden;
+}
+
+/* texture */
+body::after{
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:9999;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+}
+
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:4px;}
+
+h1,h2,h3{font-family:'Syne',sans-serif;line-height:1;letter-spacing:-0.02em;}
+h4{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;letter-spacing:-0.01em;}
+.mono{font-family:'JetBrains Mono',monospace;}
+
+/* ── RAIL ── */
+#rail{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  height:54px; background:rgba(242,237,228,0.94);
+  backdrop-filter:blur(20px); border-bottom:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 2rem;gap:1rem;
+}
+.rail-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:0.88rem;letter-spacing:0.06em;color:var(--navy);text-transform:uppercase;white-space:nowrap;}
+.rail-logo span{color:var(--green);}
+.rail-steps{display:flex;align-items:center;gap:3px;flex:1;justify-content:center;}
+.rdot{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:0.55rem;font-weight:600;color:var(--text-3);cursor:pointer;transition:all .25s;}
+.rdot:hover{border-color:var(--navy);color:var(--navy);}
+.rdot.done{background:var(--green-bg);border-color:var(--green);color:var(--green);}
+.rdot.active{background:var(--navy);border-color:var(--navy);color:#fff;}
+.rconn{width:10px;height:1.5px;background:var(--border2);transition:background .25s;}
+.rconn.done{background:var(--green);}
+.rail-badge{font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:var(--text-3);white-space:nowrap;display:none;}
+@media(min-width:640px){.rail-badge{display:block;}}
+
+/* ── LAYOUT ── */
+.wrap{max-width:900px;margin:0 auto;padding:0 2rem;}
+.sec{padding:5rem 0;}
+.sec-alt{background:var(--surface2);border-top:1px solid var(--border2);border-bottom:1px solid var(--border2);}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:0.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--text-3);margin-bottom:.9rem;display:flex;align-items:center;gap:.6rem;}
+.eyebrow::before{content:'';width:22px;height:1.5px;background:currentColor;display:inline-block;}
+h2.stitle{font-size:clamp(2.2rem,5vw,3.8rem);margin-bottom:2.5rem;color:var(--navy);}
+h2.stitle em{font-style:normal;color:var(--green);}
+h2.stitle .line{display:block;}
+
+/* ── HERO ── */
+.hero{min-height:100vh;padding:80px 2rem 5rem;display:flex;align-items:center;position:relative;overflow:hidden;}
+.hero-wm{position:absolute;right:-2rem;top:50%;transform:translateY(-50%);font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(150px,27vw,340px);line-height:1;color:transparent;-webkit-text-stroke:1.5px var(--surface3);pointer-events:none;user-select:none;letter-spacing:-0.04em;white-space:nowrap;}
+.hero-inner{max-width:720px;position:relative;z-index:2;}
+
+.tag-chip{display:inline-flex;align-items:center;gap:.5rem;padding:.35rem .9rem;border-radius:100px;border:1.5px solid var(--border2);font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text-2);margin-bottom:2rem;}
+.tag-chip .dot{width:6px;height:6px;border-radius:50%;background:var(--green);}
+
+h1.hero-title{font-size:clamp(3.2rem,9vw,6.5rem);margin-bottom:1.75rem;line-height:.95;}
+h1.hero-title .t1{display:block;color:var(--navy);}
+h1.hero-title .t2{display:block;color:var(--green);}
+h1.hero-title .t3{display:block;color:transparent;-webkit-text-stroke:1.5px var(--text-3);}
+
+.hero-lead{font-size:1.1rem;font-weight:400;color:var(--text-2);line-height:1.8;max-width:560px;margin-bottom:2.5rem;}
+.hero-lead strong{color:var(--text);font-weight:600;}
+
+.hero-chips{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:3rem;}
+.chip{padding:.3rem .8rem;border-radius:100px;font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.05em;border:1px solid;}
+.chip-g{border-color:var(--green-bd);color:var(--green);background:var(--green-bg);}
+.chip-r{border-color:var(--red-bd);color:var(--red);background:var(--red-bg);}
+.chip-b{border-color:var(--blue-bd);color:var(--blue);background:var(--blue-bg);}
+
+/* reality check */
+.reality-box{background:var(--surface);border:1.5px solid var(--border2);border-radius:var(--r-lg);padding:2rem;max-width:600px;}
+.rc-eyebrow{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--green);margin-bottom:.75rem;}
+.rc-title{font-family:'Syne',sans-serif;font-size:1.3rem;margin-bottom:1.5rem;color:var(--navy);}
+.rc-block{margin-bottom:1.1rem;}
+.rc-q{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text-2);margin-bottom:.5rem;line-height:1.5;}
+.rc-opts{display:flex;flex-wrap:wrap;gap:.4rem;}
+.rc-opt{padding:.38rem .85rem;border-radius:100px;border:1.5px solid var(--border2);background:transparent;font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.04em;color:var(--text-2);cursor:pointer;transition:all .15s;}
+.rc-opt:hover{border-color:var(--navy);color:var(--navy);}
+.rc-opt.on{background:var(--navy-dim);border-color:var(--navy);color:var(--navy);font-weight:600;}
+.rc-result{margin-top:1.25rem;padding:1.1rem 1.25rem;background:var(--green-bg);border:1.5px solid var(--green-bd);border-radius:var(--r);display:none;}
+.rc-result.show{display:block;}
+.rc-rl{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--green);letter-spacing:.15em;text-transform:uppercase;margin-bottom:.4rem;}
+.rc-rt{font-size:.88rem;color:var(--text);line-height:1.65;}
+.rc-rt strong{color:var(--green);font-weight:700;}
+
+/* ── WHO THIS IS FOR ── */
+.for-section{padding:5rem 0;}
+.for-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1px;background:var(--border2);border:1.5px solid var(--border2);border-radius:var(--r-lg);overflow:hidden;margin-top:2.5rem;}
+.for-card{background:var(--surface);padding:1.75rem 1.5rem;transition:background .2s;}
+.for-card:hover{background:var(--surface2);}
+.for-icon{font-size:1.6rem;margin-bottom:.75rem;}
+.for-pct{font-family:'Syne',sans-serif;font-size:2.4rem;font-weight:800;color:var(--navy);line-height:1;margin-bottom:.2rem;}
+.for-pct span{color:var(--green);}
+.for-label{font-weight:700;font-size:.9rem;color:var(--navy);margin-bottom:.3rem;}
+.for-desc{font-size:.8rem;color:var(--text-2);line-height:1.55;}
+
+.for-intro{font-size:1rem;color:var(--text-2);line-height:1.8;max-width:640px;margin-bottom:.5rem;}
+.for-intro strong{color:var(--text);font-weight:600;}
+
+/* identity pills */
+.identity-list{display:flex;flex-wrap:wrap;gap:.55rem;margin:2rem 0;}
+.id-pill{display:inline-flex;align-items:center;gap:.5rem;padding:.5rem 1rem;border-radius:100px;border:1.5px solid var(--border2);background:var(--surface);font-size:.84rem;color:var(--text-2);font-weight:500;}
+.id-pill .id-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.id-pill .id-dot.g{background:var(--green);}
+.id-pill .id-dot.b{background:var(--blue);}
+.id-pill .id-dot.a{background:var(--amber);}
+.id-pill .id-dot.r{background:var(--red);}
+
+/* ── MYTHS ── */
+.myths-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;margin-top:2.5rem;}
+.myth-card{background:var(--surface);border:1.5px solid var(--border2);border-radius:var(--r-lg);padding:1.5rem;transition:box-shadow .2s,transform .2s;}
+.myth-card:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(26,23,20,.07);}
+.myth-wrong{background:var(--red-bg);border-color:var(--red-bd);border-radius:var(--r);padding:.35rem .75rem;font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin-bottom:.85rem;display:inline-block;}
+.myth-claim{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--text-3);margin-bottom:.65rem;line-height:1.5;font-style:italic;}
+.myth-title{font-family:'Syne',sans-serif;font-size:1.05rem;color:var(--navy);margin-bottom:.5rem;}
+.myth-body{font-size:.82rem;color:var(--text-2);line-height:1.65;}
+.myth-body strong{color:var(--text);font-weight:600;}
+
+/* ── AID STACKING ── */
+.stack-box{background:var(--surface);border:1.5px solid var(--border2);border-radius:var(--r-lg);padding:2rem;margin-top:2rem;}
+.stack-row{display:flex;justify-content:space-between;align-items:center;padding:.75rem 0;border-bottom:1px solid var(--border2);}
+.stack-row:last-of-type{border-bottom:none;}
+.stack-name{font-weight:600;font-size:.9rem;color:var(--navy);}
+.stack-desc{font-size:.76rem;color:var(--text-3);margin-top:.1rem;}
+.stack-amount{font-family:'JetBrains Mono',monospace;font-size:.88rem;font-weight:600;color:var(--green);}
+.stack-total{display:flex;justify-content:space-between;align-items:center;margin-top:1rem;padding-top:1rem;border-top:2px solid var(--green-bd);}
+.stack-total-label{font-family:'Syne',sans-serif;font-size:1.1rem;color:var(--navy);}
+.stack-total-num{font-family:'Syne',sans-serif;font-size:2rem;color:var(--green);font-weight:800;}
+
+.enrollment-box{background:var(--navy-dim);border:1.5px solid rgba(27,42,74,.14);border-radius:var(--r);padding:1.25rem 1.5rem;margin-top:1.25rem;}
+.enrollment-label{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;color:var(--navy);margin-bottom:.85rem;}
+.enroll-row{display:flex;align-items:center;gap:.75rem;margin-bottom:.6rem;}
+.enroll-bar-wrap{flex:1;height:8px;background:rgba(27,42,74,.1);border-radius:8px;overflow:hidden;}
+.enroll-bar{height:100%;background:var(--green);border-radius:8px;transition:width 1s ease;}
+.enroll-units{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--navy);width:68px;flex-shrink:0;}
+.enroll-pct{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--green);width:35px;text-align:right;flex-shrink:0;}
+
+/* ── SAP ── */
+.sap-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--border2);border:1.5px solid var(--border2);border-radius:var(--r-lg);overflow:hidden;margin-top:2rem;}
+@media(max-width:560px){.sap-grid{grid-template-columns:1fr;}}
+.sap-cell{background:var(--surface);padding:1.5rem;}
+.sap-icon{font-size:1.4rem;margin-bottom:.6rem;}
+.sap-label{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--green);margin-bottom:.4rem;}
+.sap-rule{font-family:'Syne',sans-serif;font-size:1.3rem;color:var(--navy);margin-bottom:.3rem;}
+.sap-desc{font-size:.8rem;color:var(--text-2);line-height:1.55;}
+.sap-warn{background:var(--amber-bg);border:1.5px solid var(--amber-bd);border-radius:var(--r);padding:1rem 1.25rem;margin-top:1.25rem;}
+.sap-warn-label{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);margin-bottom:.4rem;}
+.sap-warn p{font-size:.83rem;color:var(--text-2);line-height:1.65;}
+.sap-warn strong{color:var(--text);font-weight:600;}
+
+/* ── GROUND RULES ── */
+.ground-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.25rem;margin-top:2.5rem;}
+.gcard{background:var(--surface);border:1.5px solid var(--border2);border-radius:var(--r-lg);padding:1.75rem;position:relative;overflow:hidden;transition:box-shadow .2s,transform .2s;}
+.gcard:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(26,23,20,.08);}
+.gcard-bg{position:absolute;top:-1rem;right:.75rem;font-family:'Syne',sans-serif;font-weight:800;font-size:5.5rem;color:var(--text);opacity:.04;line-height:1;pointer-events:none;}
+.gcard-icon{font-size:1.6rem;margin-bottom:.75rem;}
+.gcard-title{font-family:'Syne',sans-serif;font-size:1rem;color:var(--navy);margin-bottom:.5rem;}
+.gcard-text{font-size:.84rem;color:var(--text-2);line-height:1.65;}
+
+/* ── STEPS ── */
+.steps-wrap{display:flex;flex-direction:column;gap:.75rem;}
+.step-card{background:var(--surface);border:1.5px solid var(--border2);border-radius:var(--r-lg);overflow:hidden;opacity:0;transform:translateY(14px);transition:opacity .4s ease,transform .4s ease,border-color .25s,box-shadow .25s;}
+.step-card.vis{opacity:1;transform:translateY(0);}
+.step-card.open{border-color:var(--navy);box-shadow:0 4px 24px rgba(27,42,74,.1);}
+.step-hd{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:1.25rem;padding:1.4rem 1.75rem;cursor:pointer;user-select:none;transition:background .15s;}
+.step-hd:hover{background:rgba(27,42,74,.02);}
+.snb-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;}
+.snb{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-weight:600;font-size:.78rem;color:var(--text-3);transition:all .25s;}
+.step-card.open .snb{background:var(--navy);border-color:var(--navy);color:#fff;}
+.snb.sdone{background:var(--green-bg);border-color:var(--green);color:var(--green);}
+.stag{font-family:'JetBrains Mono',monospace;font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:3px;}
+.stag-P{background:var(--blue-bg);color:var(--blue);}
+.stag-B{background:var(--green-bg);color:var(--green);}
+.stag-K{background:var(--red-bg);color:var(--red);}
+.stag-E{background:var(--amber-bg);color:var(--amber);}
+.stag-G{background:var(--green-bg);color:var(--green);border:1px solid var(--green-bd);}
+.stw{flex:1;min-width:0;}
+.s-title{font-family:'Syne',sans-serif;font-size:clamp(1.15rem,2.5vw,1.6rem);color:var(--navy);margin-bottom:.25rem;line-height:1.1;transition:color .2s;}
+.step-card.open .s-title{color:var(--green);}
+.s-sub{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--text-3);letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.schev{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:.65rem;color:var(--text-3);flex-shrink:0;transition:all .25s;}
+.step-card.open .schev{background:var(--navy);border-color:var(--navy);color:#fff;transform:rotate(180deg);}
+.sbody{display:none;border-top:1.5px solid var(--border2);}
+.sbody.open{display:block;}
+.scontent{padding:2rem 1.75rem;display:grid;grid-template-columns:1.4fr 1fr;gap:2rem;}
+@media(max-width:660px){.scontent{grid-template-columns:1fr;}}
+.smain h4{font-size:.95rem;color:var(--navy);margin-bottom:.5rem;margin-top:1.5rem;}
+.smain h4:first-child{margin-top:0;}
+.smain p{font-size:.875rem;color:var(--text-2);line-height:1.8;margin-bottom:.5rem;}
+.smain p strong{color:var(--text);font-weight:600;}
+.cklist{list-style:none;margin-top:.5rem;}
+.cklist li{display:flex;align-items:flex-start;gap:.65rem;font-size:.84rem;color:var(--text-2);margin-bottom:.55rem;line-height:1.55;}
+.cklist li::before{content:'→';color:var(--green);font-family:'JetBrains Mono',monospace;font-size:.7rem;flex-shrink:0;margin-top:2px;}
+.sside{display:flex;flex-direction:column;gap:.85rem;}
+.sbox{border-radius:var(--r);padding:1.15rem 1.3rem;border:1.5px solid;}
+.sbox-g{background:var(--green-bg);border-color:var(--green-bd);}
+.sbox-r{background:var(--red-bg);border-color:var(--red-bd);}
+.sbox-b{background:var(--blue-bg);border-color:var(--blue-bd);}
+.sbox-a{background:var(--amber-bg);border-color:var(--amber-bd);}
+.sbox-n{background:var(--surface2);border-color:var(--border2);}
+.sbox-lbl{font-family:'JetBrains Mono',monospace;font-size:.56rem;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.4rem;}
+.sbox-g .sbox-lbl{color:var(--green);} .sbox-r .sbox-lbl{color:var(--red);} .sbox-b .sbox-lbl{color:var(--blue);} .sbox-a .sbox-lbl{color:var(--amber);} .sbox-n .sbox-lbl{color:var(--text-3);}
+.sbox-num{font-family:'Syne',sans-serif;font-size:2rem;line-height:1;margin-bottom:.2rem;}
+.sbox-g .sbox-num{color:var(--green);} .sbox-r .sbox-num{color:var(--red);} .sbox-a .sbox-num{color:var(--amber);} .sbox-b .sbox-num{color:var(--blue);}
+.sbox-title{font-weight:700;font-size:.88rem;margin-bottom:.3rem;color:var(--text);}
+.sbox-text{font-size:.78rem;color:var(--text-2);line-height:1.6;}
+.sbox-text strong{color:var(--text);font-weight:600;}
+.sfoot{padding:1rem 1.75rem 1.5rem;border-top:1.5px solid var(--border2);background:#F7F3EC;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;}
+.sfgl{font-family:'JetBrains Mono',monospace;font-size:.56rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);margin-bottom:.2rem;}
+.sfgt{font-family:'Syne',sans-serif;font-size:1rem;color:var(--navy);}
+.done-btn{padding:.45rem 1.2rem;border-radius:100px;border:1.5px solid var(--border2);background:transparent;font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text-2);cursor:pointer;transition:all .2s;}
+.done-btn:hover{border-color:var(--green);color:var(--green);background:var(--green-bg);}
+.done-btn.done{border-color:var(--green);color:var(--green);background:var(--green-bg);}
+
+/* ── REFUND FLOW ── */
+.rfbox{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border2);border:1.5px solid var(--border2);border-radius:var(--r-lg);overflow:hidden;margin-top:2.5rem;}
+@media(max-width:700px){.rfbox{grid-template-columns:1fr 1fr;}}
+@media(max-width:440px){.rfbox{grid-template-columns:1fr;}}
+.rfstep{background:var(--surface);padding:1.5rem 1.25rem;transition:background .2s;}
+.rfstep:hover{background:var(--surface2);}
+.rfpct{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;line-height:1;margin-bottom:.2rem;}
+.rfstep:nth-child(1) .rfpct{color:var(--red);}
+.rfstep:nth-child(2) .rfpct{color:var(--amber);}
+.rfstep:nth-child(3) .rfpct{color:var(--amber);}
+.rfstep:nth-child(4) .rfpct{color:var(--green);}
+.rfstep:nth-child(5) .rfpct{color:var(--green);}
+.rflbl{font-family:'JetBrains Mono',monospace;font-size:.57rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-3);margin-bottom:.45rem;}
+.rftitle{font-weight:700;font-size:.88rem;color:var(--navy);margin-bottom:.3rem;}
+.rfdesc{font-size:.76rem;color:var(--text-2);line-height:1.55;}
+
+/* ── CALC ── */
+.calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;margin-top:2.5rem;}
+@media(max-width:640px){.calc-grid{grid-template-columns:1fr;}}
+.calc-inputs{display:flex;flex-direction:column;gap:1.5rem;}
+.ilabel{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-3);margin-bottom:.4rem;display:block;}
+.irow{display:flex;align-items:center;gap:.85rem;}
+input[type=range]{flex:1;appearance:none;height:3px;background:var(--surface3);border-radius:3px;outline:none;cursor:pointer;}
+input[type=range]::-webkit-slider-thumb{appearance:none;width:16px;height:16px;border-radius:50%;background:var(--navy);cursor:pointer;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.2);}
+.ival{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--navy);min-width:76px;text-align:right;font-weight:600;}
+.calc-results{display:flex;flex-direction:column;gap:.85rem;}
+.crbox{border-radius:var(--r);padding:1.2rem;border:1.5px solid var(--border2);background:var(--surface);}
+.crbox.hi-g{background:var(--green-bg);border-color:var(--green-bd);}
+.crbox.hi-r{background:var(--red-bg);border-color:var(--red-bd);}
+.crl{font-family:'JetBrains Mono',monospace;font-size:.57rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:.3rem;}
+.hi-g .crl{color:var(--green);} .hi-r .crl{color:var(--red);} .crbox:not(.hi-g):not(.hi-r) .crl{color:var(--text-3);}
+.crv{font-family:'Syne',sans-serif;line-height:1;margin-bottom:.15rem;}
+.hi-g .crv{color:var(--green);} .hi-r .crv{color:var(--red);} .crbox:not(.hi-g):not(.hi-r) .crv{color:var(--navy);}
+.crs{font-size:.76rem;color:var(--text-3);}
+
+/* ── VISUALIZATIONS ── */
+.viz-nav{display:flex;gap:0;border-bottom:2px solid var(--border2);margin-bottom:3.5rem;overflow-x:auto;scrollbar-width:none;}
+.viz-nav::-webkit-scrollbar{display:none;}
+.vnav-btn{background:none;border:none;border-bottom:3px solid transparent;margin-bottom:-2px;padding:1rem 1.5rem;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:.88rem;color:var(--text-3);cursor:pointer;white-space:nowrap;transition:all .2s;}
+.vnav-btn:hover{color:var(--navy);}
+.vnav-btn.vactive{color:var(--navy);border-bottom-color:var(--navy);}
+.vpanel{display:none;}
+.vpanel.vshow{display:block;}
+.chart-card{background:var(--surface);border:1.5px solid var(--border2);border-radius:var(--r-lg);padding:2rem;margin-bottom:2rem;}
+.chart-hd{font-family:'Syne',sans-serif;font-size:1.3rem;color:var(--navy);margin-bottom:.35rem;}
+.chart-sub{font-size:.83rem;color:var(--text-3);margin-bottom:1.5rem;}
+.chart-wrap{position:relative;height:320px;}
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--border2);border:1.5px solid var(--border2);border-radius:var(--r-lg);overflow:hidden;margin-top:1.5rem;}
+.stat-cell{background:var(--surface);padding:1.25rem;}
+.stat-lbl{font-family:'JetBrains Mono',monospace;font-size:.56rem;letter-spacing:.16em;text-transform:uppercase;color:var(--text-3);margin-bottom:.3rem;}
+.stat-val{font-family:'Syne',sans-serif;font-size:1.7rem;line-height:1;margin-bottom:.15rem;}
+.sv-g{color:var(--green);} .sv-r{color:var(--red);} .sv-b{color:var(--navy);}
+.stat-desc{font-size:.76rem;color:var(--text-2);line-height:1.5;}
+.sim-wrap{display:grid;grid-template-columns:1fr 1fr;gap:2rem;background:var(--surface);border:1.5px solid var(--border2);border-radius:var(--r-lg);padding:2rem;margin-top:2rem;}
+@media(max-width:620px){.sim-wrap{grid-template-columns:1fr;}}
+.sim-title{font-family:'Syne',sans-serif;font-size:1.15rem;color:var(--navy);margin-bottom:1.25rem;}
+.scenario-wrap{display:flex;flex-direction:column;gap:1.25rem;margin-top:1rem;}
+.scenario-card{background:var(--surface2);border:1.5px solid var(--border2);border-radius:var(--r);padding:1.25rem;cursor:pointer;transition:all .2s;}
+.scenario-card:hover{border-color:var(--navy);}
+.scenario-card.sel{background:var(--navy-dim);border-color:var(--navy);}
+.scen-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:.3rem;}
+.scen-name{font-weight:700;font-size:.9rem;color:var(--navy);}
+.scen-rate{font-family:'JetBrains Mono',monospace;font-size:.75rem;}
+.scen-desc{font-size:.78rem;color:var(--text-2);line-height:1.5;}
+.cc-result-big{background:linear-gradient(135deg,#FFF5F5,#FFF0F0);border:1.5px solid var(--red-bd);border-radius:var(--r);padding:1.5rem;text-align:center;}
+.cc-rb-label{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--red);letter-spacing:.15em;text-transform:uppercase;margin-bottom:.35rem;}
+.cc-rb-num{font-family:'Syne',sans-serif;font-size:3rem;color:var(--red);line-height:1;margin-bottom:.25rem;}
+.cc-rb-sub{font-size:.8rem;color:var(--text-2);}
+.cc-vs-box{background:var(--green-bg);border:1.5px solid var(--green-bd);border-radius:var(--r);padding:1rem;margin-top:.85rem;text-align:center;}
+.cc-vs-label{font-family:'JetBrains Mono',monospace;font-size:.56rem;color:var(--green);letter-spacing:.14em;text-transform:uppercase;margin-bottom:.25rem;}
+.cc-vs-num{font-family:'Syne',sans-serif;font-size:1.8rem;color:var(--green);line-height:1;margin-bottom:.15rem;}
+.cc-vs-sub{font-size:.75rem;color:var(--text-2);}
+.auto-compare{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border2);border:1.5px solid var(--border2);border-radius:var(--r-lg);overflow:hidden;margin-top:2rem;}
+@media(max-width:560px){.auto-compare{grid-template-columns:1fr;}}
+.ac-col{background:var(--surface);padding:1.75rem;}
+.ac-col.ac-bad{background:#FFF8F7;}
+.ac-col.ac-good{background:#F5FBF7;}
+.ac-label{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;margin-bottom:.75rem;}
+.ac-bad .ac-label{color:var(--red);}
+.ac-good .ac-label{color:var(--green);}
+.ac-title{font-family:'Syne',sans-serif;font-size:1.2rem;color:var(--navy);margin-bottom:1.25rem;}
+.ac-row{display:flex;justify-content:space-between;padding:.6rem 0;border-bottom:1px solid var(--border2);font-size:.84rem;}
+.ac-row:last-child{border-bottom:none;}
+.ac-row .ak{color:var(--text-2);}
+.ac-row .av{font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:600;}
+.ac-bad .av{color:var(--red);}
+.ac-good .av{color:var(--green);}
+.big-callout{background:var(--navy);border-radius:var(--r-lg);padding:3rem 2rem;text-align:center;margin-top:2rem;color:#fff;}
+.bc-eyebrow{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:.75rem;}
+.bc-num{font-family:'Syne',sans-serif;font-size:clamp(3.5rem,9vw,6rem);color:#7FFFB6;line-height:1;margin-bottom:.5rem;}
+.bc-text{font-size:.95rem;color:rgba(255,255,255,.7);max-width:480px;margin:0 auto;line-height:1.75;}
+.bc-text strong{color:#fff;}
+
+/* ── RESOURCES BOX ── */
+.resources-box{background:var(--surface);border:1.5px solid var(--border2);border-radius:var(--r-lg);padding:2rem;margin-top:2rem;}
+.res-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-top:1.25rem;}
+.res-item{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r);padding:1.1rem;}
+.res-icon{font-size:1.1rem;margin-bottom:.3rem;}
+.res-name{font-weight:700;font-size:.85rem;color:var(--navy);margin-bottom:.2rem;}
+.res-desc{font-size:.75rem;color:var(--text-2);line-height:1.5;}
+
+/* ── FADE UP ── */
+.fu{opacity:0;transform:translateY(22px);transition:opacity .55s ease,transform .55s ease;}
+.fu.vis{opacity:1;transform:translateY(0);}
+
+/* ── FOOTER ── */
+footer{border-top:1.5px solid var(--border2);padding:3.5rem 2rem;max-width:900px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:2rem;}
+.foot-brand{font-family:'Syne',sans-serif;font-size:1.5rem;color:var(--navy);font-weight:800;}
+.foot-brand span{color:var(--green);}
+.foot-tag{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--text-3);line-height:1.7;margin-top:.3rem;}
+.foot-disc{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--text-3);max-width:320px;line-height:1.75;text-align:right;}
+@media(max-width:560px){.foot-disc{text-align:left;}}
+</style>
+</head>
+<body>
+<div style="background:#EDE8DE;border-bottom:1px solid #D4D1C9;padding:8px 20px;font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:12px;display:flex;justify-content:space-between;align-items:center;">
+  <a href="../" style="color:#1A5C38;text-decoration:none;">← Teaching Computing Differently</a>
+  <span style="color:#8C8880;"><a href="../research/" style="color:#8C8880;text-decoration:none;">Research Portfolio</a> · <a href="mailto:henry@henryfan.org" style="color:#8C8880;text-decoration:none;">henry@henryfan.org</a></span>
+</div>
+
+<!-- RAIL -->
+<div id="rail">
+  <div class="rail-logo">Student <span>FOO</span></div>
+  <div class="rail-steps" id="railSteps"></div>
+  <div class="rail-badge" id="railBadge">Step 1 of 9</div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-wm">FOO</div>
+  <div class="hero-inner">
+    <div class="tag-chip"><span class="dot"></span>Community College Edition · Financial Order of Operations</div>
+    <h1 class="hero-title">
+      <span class="t1">Your Money.</span>
+      <span class="t2">Your Rules.</span>
+      <span class="t3">Your Future.</span>
+    </h1>
+    <p class="hero-lead">
+      Financial advice is built for people with stable careers and no real bills. You're <strong>working while studying</strong>, possibly supporting family, navigating financial aid refund checks, and trying to build a future from scratch. This is the playbook written for <strong>exactly that reality.</strong>
+    </p>
+    <div class="hero-chips">
+      <span class="chip chip-g">✓ Works with $50/month</span>
+      <span class="chip chip-g">✓ Financial aid + side income</span>
+      <span class="chip chip-g">✓ Start from zero</span>
+      <span class="chip chip-b">✓ FAFSA · Cal Grant · CCPG · Pell</span>
+      <span class="chip chip-r">✕ BNPL is a trap</span>
+    </div>
+
+    <div class="reality-box">
+      <div class="rc-eyebrow">⚡ 60-second reality check</div>
+      <div class="rc-title">Where Are You Starting From?</div>
+      <div class="rc-block">
+        <div class="rc-q">Do you have any high-interest debt? (Credit card balance, BNPL/Afterpay, payday loan)</div>
+        <div class="rc-opts">
+          <button class="rc-opt" data-q="0" data-v="yes" onclick="rcPick(this)">Yes, I have some</button>
+          <button class="rc-opt" data-q="0" data-v="no" onclick="rcPick(this)">No debt like that</button>
+        </div>
+      </div>
+      <div class="rc-block">
+        <div class="rc-q">Do you have earned income? (Campus job, DoorDash, babysitting, tutoring — anything taxable)</div>
+        <div class="rc-opts">
+          <button class="rc-opt" data-q="1" data-v="yes" onclick="rcPick(this)">Yes, I earn something</button>
+          <button class="rc-opt" data-q="1" data-v="no" onclick="rcPick(this)">Not right now</button>
+        </div>
+      </div>
+      <div class="rc-block">
+        <div class="rc-q">Have you applied for ALL your financial aid? (FAFSA/CADAA, CCPG, Free College, Promise)</div>
+        <div class="rc-opts">
+          <button class="rc-opt" data-q="2" data-v="yes" onclick="rcPick(this)">Yes, all applied</button>
+          <button class="rc-opt" data-q="2" data-v="no" onclick="rcPick(this)">Not sure / not yet</button>
+        </div>
+      </div>
+      <div class="rc-result" id="rcResult">
+        <div class="rc-rl">Your starting priority</div>
+        <div class="rc-rt" id="rcText"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO THIS IS FOR -->
+<section class="for-section sec-alt fu">
+  <div class="wrap">
+    <div class="eyebrow">Who this is for</div>
+    <h2 class="stitle"><span class="line">Built for the student</span><span class="line"><em>nobody else talks to.</em></span></h2>
+    <p class="for-intro">
+      Most financial advice assumes you're a recent high school grad living in a dorm with your parents covering the big bills. Community college students are a completely different story — and the numbers prove it.
+    </p>
+    <div class="identity-list">
+      <div class="id-pill"><span class="id-dot g"></span>Working while studying</div>
+      <div class="id-pill"><span class="id-dot b"></span>Supporting family members</div>
+      <div class="id-pill"><span class="id-dot a"></span>Raising kids while in school</div>
+      <div class="id-pill"><span class="id-dot r"></span>Food or housing insecure</div>
+      <div class="id-pill"><span class="id-dot g"></span>First-generation college student</div>
+      <div class="id-pill"><span class="id-dot b"></span>Undocumented or DACA student</div>
+      <div class="id-pill"><span class="id-dot a"></span>Getting financial aid refunds</div>
+      <div class="id-pill"><span class="id-dot g"></span>Trying to transfer to a 4-year</div>
+    </div>
+
+    <div class="for-grid">
+      <div class="for-card">
+        <div class="for-icon">💼</div>
+        <div class="for-pct">67<span>%</span></div>
+        <div class="for-label">Work while in school</div>
+        <div class="for-desc">And 43% work 40+ hours per week while carrying a full course load.</div>
+      </div>
+      <div class="for-card">
+        <div class="for-icon">🏠</div>
+        <div class="for-pct">49<span>%</span></div>
+        <div class="for-label">Are food insecure</div>
+        <div class="for-desc">Nearly half of CC students don't have reliable access to enough food.</div>
+      </div>
+      <div class="for-card">
+        <div class="for-icon">💸</div>
+        <div class="for-pct">20<span>%</span></div>
+        <div class="for-label">Support parents financially</div>
+        <div class="for-desc">One in five CC students is sending money home while trying to finish school.</div>
+      </div>
+      <div class="for-card">
+        <div class="for-icon">👶</div>
+        <div class="for-pct">13<span>%</span></div>
+        <div class="for-label">Have children</div>
+        <div class="for-desc">Student parents miss class due to childcare gaps more than any other group.</div>
+      </div>
+      <div class="for-card">
+        <div class="for-icon">📉</div>
+        <div class="for-pct">59<span>%</span></div>
+        <div class="for-label">Considered dropping out</div>
+        <div class="for-desc">Financial stress is the #1 reason — not grades, not motivation.</div>
+      </div>
+      <div class="for-card">
+        <div class="for-icon">💰</div>
+        <div class="for-pct">52<span>%</span></div>
+        <div class="for-label">Never applied for aid</div>
+        <div class="for-desc">Think they won't qualify or it's too complicated. Most of them are wrong.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MYTHS -->
+<section class="sec fu">
+  <div class="wrap">
+    <div class="eyebrow">Myth-busting</div>
+    <h2 class="stitle"><span class="line">Wrong beliefs that cost</span><span class="line">students <em>thousands.</em></span></h2>
+    <div class="myths-grid">
+      <div class="myth-card">
+        <div class="myth-wrong">❌ Wrong</div>
+        <div class="myth-claim">"I won't qualify for financial aid"</div>
+        <div class="myth-title">The #1 myth that costs the most</div>
+        <div class="myth-body">Even if you work, have savings, or think your family earns too much — you don't know until you apply. The FAFSA is free and takes 30 minutes. <strong>$10,000+ per hour of your time is the ROI.</strong></div>
+      </div>
+      <div class="myth-card">
+        <div class="myth-wrong">❌ Wrong</div>
+        <div class="myth-claim">"My grades aren't good enough"</div>
+        <div class="myth-title">Aid is about need, not GPA</div>
+        <div class="myth-body">Financial aid eligibility is based on <strong>financial need, not academic performance.</strong> A 2.0 GPA is required to <em>keep</em> aid — but not to initially qualify for it.</div>
+      </div>
+      <div class="myth-card">
+        <div class="myth-wrong">❌ Misleading</div>
+        <div class="myth-claim">"Community college is free — I don't need aid"</div>
+        <div class="myth-title">Aid covers way more than tuition</div>
+        <div class="myth-body">Financial aid pays for books ($500–1,000/semester), transportation, technology, housing, food, and childcare. <strong>Students still get $10,000+ even with free tuition.</strong></div>
+      </div>
+      <div class="myth-card">
+        <div class="myth-wrong">❌ Wrong</div>
+        <div class="myth-claim">"I live alone so I'm independent"</div>
+        <div class="myth-title">FAFSA "independent" has a specific legal definition</div>
+        <div class="myth-body">Supporting yourself doesn't automatically qualify you. You're independent if you're 24+, married, a veteran, a parent, homeless, or emancipated. Otherwise — talk to Financial Aid about a <strong>dependency override.</strong></div>
+      </div>
+      <div class="myth-card">
+        <div class="myth-wrong">❌ Wrong</div>
+        <div class="myth-claim">"I need 6 units to get Pell Grant"</div>
+        <div class="myth-title">You can get Pell with just 1 unit</div>
+        <div class="myth-body">Pell is based on enrollment intensity. 3 units = 25% of max. 6 units = 50%. 12+ units = 100%. Part-time students still get money — <strong>just a proportional amount.</strong></div>
+      </div>
+      <div class="myth-card">
+        <div class="myth-wrong">❌ Wrong</div>
+        <div class="myth-claim">"Submitting my application means I'm done"</div>
+        <div class="myth-title">Submitting ≠ getting your money</div>
+        <div class="myth-body">After submitting, you may need to provide documents. Financial Aid reviews your file. You accept your award. Then money disburses after the census date. <strong>Check your email and portal every single day.</strong></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AID STACKING + SAP -->
+<section class="sec sec-alt fu">
+  <div class="wrap">
+    <div class="eyebrow">Maximize what you get</div>
+    <h2 class="stitle"><span class="line">Stack your grants.</span><span class="line">Protect your <em>eligibility.</em></span></h2>
+
+    <!-- Grant stacking -->
+    <div class="stack-box">
+      <div class="eyebrow" style="margin-bottom:1.25rem;">Grant stacking — what's possible</div>
+      <div class="stack-row">
+        <div><div class="stack-name">Pell Grant</div><div class="stack-desc">Federal · need-based · available to all qualifying students</div></div>
+        <div class="stack-amount">up to $7,395/yr</div>
+      </div>
+      <div class="stack-row">
+        <div><div class="stack-name">Cal Grant B</div><div class="stack-desc">California state grant · financial need · GPA requirement after initial year</div></div>
+        <div class="stack-amount">up to $5,742/yr</div>
+      </div>
+      <div class="stack-row">
+        <div><div class="stack-name">FSEOG</div><div class="stack-desc">Federal Supplemental · exceptional need · limited campus funds</div></div>
+        <div class="stack-amount">up to $1,000/yr</div>
+      </div>
+      <div class="stack-row">
+        <div><div class="stack-name">Student Success &amp; Completion Grant (SSCG)</div><div class="stack-desc">California · full-time enrollment · completion incentive</div></div>
+        <div class="stack-amount">up to $2,000/yr</div>
+      </div>
+      <div class="stack-row">
+        <div><div class="stack-name">CCPG (California College Promise Grant)</div><div class="stack-desc">CA resident · tuition fee waiver · $46/unit saved</div></div>
+        <div class="stack-amount">Full fee waiver</div>
+      </div>
+      <div class="stack-row">
+        <div><div class="stack-name">Scholarships</div><div class="stack-desc">Campus + external · many go unclaimed every year</div></div>
+        <div class="stack-amount">$500–5,000+</div>
+      </div>
+      <div class="stack-total">
+        <div class="stack-total-label">Total potential per year</div>
+        <div class="stack-total-num">$16,000+</div>
+      </div>
+    </div>
+
+    <!-- Enrollment intensity -->
+    <div class="enrollment-box" style="margin-top:1.25rem;">
+      <div class="enrollment-label">Enrollment intensity — how units affect your Pell Grant</div>
+      <div class="enroll-row"><span class="enroll-units">1–2 units</span><div class="enroll-bar-wrap"><div class="enroll-bar" style="width:0" data-w="12.5"></div></div><span class="enroll-pct">~12%</span></div>
+      <div class="enroll-row"><span class="enroll-units">3–5 units</span><div class="enroll-bar-wrap"><div class="enroll-bar" style="width:0" data-w="25"></div></div><span class="enroll-pct">25%</span></div>
+      <div class="enroll-row"><span class="enroll-units">6–8 units</span><div class="enroll-bar-wrap"><div class="enroll-bar" style="width:0" data-w="50"></div></div><span class="enroll-pct">50%</span></div>
+      <div class="enroll-row"><span class="enroll-units">9–11 units</span><div class="enroll-bar-wrap"><div class="enroll-bar" style="width:0" data-w="75"></div></div><span class="enroll-pct">75%</span></div>
+      <div class="enroll-row"><span class="enroll-units">12+ units</span><div class="enroll-bar-wrap"><div class="enroll-bar" style="width:0" data-w="100"></div></div><span class="enroll-pct">100%</span></div>
+    </div>
+
+    <!-- SAP -->
+    <div style="margin-top:3rem;">
+      <div class="eyebrow">Satisfactory Academic Progress (SAP)</div>
+      <p style="font-size:.88rem;color:var(--text-2);line-height:1.75;max-width:640px;margin-bottom:1.5rem;">Getting aid is one thing. Keeping it requires meeting three standards every semester. These aren't hard to hit — but ignoring them costs students their aid entirely.</p>
+      <div class="sap-grid">
+        <div class="sap-cell">
+          <div class="sap-icon">📊</div>
+          <div class="sap-label">GPA requirement</div>
+          <div class="sap-rule">2.0 GPA</div>
+          <div class="sap-desc">Overall GPA, not just one semester. A D average makes you ineligible.</div>
+        </div>
+        <div class="sap-cell">
+          <div class="sap-icon">✅</div>
+          <div class="sap-label">Completion rate</div>
+          <div class="sap-rule">67% of units</div>
+          <div class="sap-desc">Take 12 units? Must pass at least 8. W grades, F, NP, and I all count against you.</div>
+        </div>
+        <div class="sap-cell">
+          <div class="sap-icon">⏱️</div>
+          <div class="sap-label">Time limit</div>
+          <div class="sap-rule">150% max time</div>
+          <div class="sap-desc">60-unit degree = max 90 attempted units. Every repeated or withdrawn class counts toward this limit.</div>
+        </div>
+      </div>
+      <div class="sap-warn">
+        <div class="sap-warn-label">⚠ What hurts your SAP — and what to do</div>
+        <p><strong>W (withdrawal), F, NP, and I grades</strong> all count as attempted but not completed. It's often better to pass with a C than withdraw. If you lose SAP eligibility due to serious illness, job loss, or family crisis — <strong>you can appeal.</strong> Document your circumstances and contact Financial Aid immediately. Prevention is always better: use free tutoring, visit counseling, and drop classes before the deadline if needed.</p>
+      </div>
+    </div>
+
+    <!-- Free resources -->
+    <div class="resources-box" style="margin-top:2rem;">
+      <div class="eyebrow" style="margin-bottom:.75rem;">Free support on campus — use these</div>
+      <p style="font-size:.83rem;color:var(--text-2);margin-bottom:1rem;">Financial aid opens the door to a whole support ecosystem. Completing your FAFSA/CADAA makes you eligible for all of these.</p>
+      <div class="res-grid">
+        <div class="res-item"><div class="res-icon">💰</div><div class="res-name">SparkPoint</div><div class="res-desc">Free 1-on-1 financial coaching, budgeting, credit help, and planning.</div></div>
+        <div class="res-item"><div class="res-icon">📚</div><div class="res-name">EOPS</div><div class="res-desc">Book vouchers, emergency grants, counseling, transfer support.</div></div>
+        <div class="res-item"><div class="res-icon">🎓</div><div class="res-name">TRiO</div><div class="res-desc">Tutoring, study skills workshops, university tours for transfer-bound students.</div></div>
+        <div class="res-item"><div class="res-icon">🏆</div><div class="res-name">Promise Program</div><div class="res-desc">Extra grants, priority registration, counseling — often requires FAFSA on file.</div></div>
+        <div class="res-item"><div class="res-icon">🍎</div><div class="res-name">Campus Food Pantry</div><div class="res-desc">Free groceries and meals. Zero shame. That's exactly what it's there for.</div></div>
+        <div class="res-item"><div class="res-icon">💼</div><div class="res-name">Federal Work-Study</div><div class="res-desc">On-campus jobs, flexible hours, government subsidized wages, resume building.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GROUND RULES -->
+<section class="sec fu">
+  <div class="wrap">
+    <div class="eyebrow">Before the 9 steps</div>
+    <h2 class="stitle"><span class="line">Four rules that</span><span class="line"><em>change everything.</em></span></h2>
+    <div class="ground-grid">
+      <div class="gcard"><div class="gcard-bg">01</div><div class="gcard-icon">⏳</div><div class="gcard-title">Time Is Your Superpower</div><div class="gcard-text">$100/month invested at 18 becomes $1.4M by 67. At 28, same money, same rate — it's $700K. A 10-year delay costs you $700,000. You have time no 40-year-old has.</div></div>
+      <div class="gcard"><div class="gcard-bg">02</div><div class="gcard-icon">🚫</div><div class="gcard-title">Only Borrow What You Need</div><div class="gcard-text">FAFSA will offer you loans even when grants cover everything. You don't have to accept them. Decline every loan dollar you don't genuinely need for school.</div></div>
+      <div class="gcard"><div class="gcard-bg">03</div><div class="gcard-icon">🔁</div><div class="gcard-title">The FOO Is Not Linear</div><div class="gcard-text">An emergency drops you from step 6 back to step 2. That's normal. Direction matters more than perfection. Progress over perfect, always.</div></div>
+      <div class="gcard"><div class="gcard-bg">04</div><div class="gcard-icon">📊</div><div class="gcard-title">Lifestyle Creep Is The Enemy</div><div class="gcard-text">When income grows, your lifestyle will want to grow with it. Resist. Every dollar of lifestyle inflation is a dollar that stops compounding for 40 years.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- STEPS -->
+<section class="sec sec-alt">
+  <div class="wrap">
+    <div class="fu" style="text-align:center;margin-bottom:3.5rem;">
+      <div class="eyebrow" style="justify-content:center;">The Playbook</div>
+      <h2 class="stitle" style="text-align:center;margin-bottom:.75rem;">9 Steps. <em>In This Order.</em></h2>
+      <p style="font-size:.9rem;color:var(--text-3);max-width:500px;margin:0 auto;">Work through each step before moving to the next. Click any step to expand it. Mark complete as you go.</p>
+    </div>
+    <div class="steps-wrap" id="stepsWrap">
+
+<!-- STEP 1 -->
+<div class="step-card" data-step="1" id="sc1">
+  <div class="step-hd" onclick="togS(1)">
+    <div class="snb-wrap"><div class="snb" id="sn1">01</div><span class="stag stag-P">Protect</span></div>
+    <div class="stw"><div class="s-title">Guard Your Aid</div><div class="s-sub">Know grants vs loans · Refuse what you don't need · FAFSA basics</div></div>
+    <div class="schev">▾</div>
+  </div>
+  <div class="sbody" id="sb1">
+    <div class="scontent">
+      <div class="smain">
+        <h4>Your Aid Package Is Your Starting Capital</h4>
+        <p>Stacked correctly, Pell Grant, Cal Grant B, FSEOG, SSCG, and CCPG can total <strong>$16,000+ per year</strong> — money you never repay. This is your foundation. Understand every line item before anything else.</p>
+        <h4>The Refund Check Is Not a Bonus</h4>
+        <p>After your school deducts tuition and fees, excess aid is refunded to you via BankMobile or your school's refund system. This feels like "free money." It's not — it's your living expenses budget for the entire semester. Treat it like a paycheck that must last 4–5 months.</p>
+        <h4>Never Accept Loans You Don't Need</h4>
+        <p>FAFSA will offer loans even when grants cover everything. <strong>You do not have to accept them.</strong> Subsidized loans at 6.53% don't accrue interest while in school, but unsubsidized start compounding day one. Decline what you don't genuinely need.</p>
+        <h4>Set Up Your Refund Account ASAP</h4>
+        <p>Don't wait until disbursement day to set up BankMobile direct deposit. Do it early in the semester so you receive your money the moment it's released — usually around the census date (3–4 weeks in).</p>
+      </div>
+      <div class="sside">
+        <div class="sbox sbox-g"><div class="sbox-lbl">Max Annual Aid (CA)</div><div class="sbox-num">$16,241</div><div class="sbox-text">Pell + Cal Grant + FSEOG + SSCG + CCPG. <strong>None of this is repaid.</strong></div></div>
+        <div class="sbox sbox-r"><div class="sbox-lbl">⚠ Common Mistake</div><div class="sbox-title">Accepting all offered loans</div><div class="sbox-text">Schools offer the maximum by default. You only accept what you actually need. An unneeded $5,000 loan = <strong>$9,000+ repaid</strong> over 10 years.</div></div>
+        <div class="sbox sbox-n"><div class="sbox-lbl">✓ Complete When</div><div class="sbox-text">You know every award type (grant vs loan), have declined unneeded loans, BankMobile is set up, and you have a semester budget.</div></div>
+      </div>
+    </div>
+    <div class="sfoot"><div><div class="sfgl">Your target</div><div class="sfgt">Know your aid — refuse unneeded loans</div></div><button class="done-btn" onclick="markD(1,this)">Mark Complete ✓</button></div>
+  </div>
+</div>
+
+<!-- STEP 2 -->
+<div class="step-card" data-step="2" id="sc2">
+  <div class="step-hd" onclick="togS(2)">
+    <div class="snb-wrap"><div class="snb" id="sn2">02</div><span class="stag stag-B">Build</span></div>
+    <div class="stw"><div class="s-title">Secure Basic Needs First</div><div class="s-sub">CalFresh · Medi-Cal · Campus resources · $500 safety net</div></div>
+    <div class="schev">▾</div>
+  </div>
+  <div class="sbody" id="sb2">
+    <div class="scontent">
+      <div class="smain">
+        <h4>You Can't Build Wealth on an Empty Stomach</h4>
+        <p>Research is clear: 49% of CC students are food insecure, 50% face housing challenges. Before any investing or debt payoff — <strong>secure your foundation.</strong> These programs exist for exactly your situation and using them is not a setback, it's smart.</p>
+        <h4>Claim What's Yours</h4>
+        <ul class="cklist">
+          <li><strong>CalFresh (SNAP):</strong> Up to $292/month in groceries for single students under ~$1,600/month income. Apply at getcalfresh.org.</li>
+          <li><strong>Medi-Cal:</strong> Free health insurance for qualifying students — saves $200–500/month vs private plans.</li>
+          <li><strong>Campus food pantry:</strong> Free groceries and meals, no documentation required at most campuses.</li>
+          <li><strong>Childcare subsidies:</strong> CCFS, CalWORKs, Head Start — if you have kids, these exist.</li>
+        </ul>
+        <h4>Then: Build Your $500 Safety Net</h4>
+        <p>Once basics are covered, your first financial goal is a <strong>$500 firewall</strong> in a High-Yield Savings Account completely separate from your checking account. This single step stops the credit card spiral before it starts. The next time your tire blows out — you have it covered.</p>
+        <h4>Where to Open Your HYSA</h4>
+        <p>SoFi, Ally, or Marcus — all free, no minimums, currently paying 4–5% APY. The physical separation from checking reduces the temptation to spend it.</p>
+      </div>
+      <div class="sside">
+        <div class="sbox sbox-g"><div class="sbox-lbl">Safety Net Target</div><div class="sbox-num">$500</div><div class="sbox-text">Even if it takes 3 months. <strong>This one buffer changes everything.</strong></div></div>
+        <div class="sbox sbox-b"><div class="sbox-lbl">CalFresh Benefit (single)</div><div class="sbox-num" style="color:var(--blue)">$292</div><div class="sbox-text">Per month in groceries. That's real money freed up for your emergency fund. <strong>Apply even if you're unsure you qualify.</strong></div></div>
+        <div class="sbox sbox-n"><div class="sbox-lbl">Best HYSA Options</div><div class="sbox-text"><strong>SoFi</strong> — 4.6% APY, $0 min<br><strong>Ally</strong> — 4.35% APY<br><strong>Marcus</strong> — 4.5% APY<br>All FDIC-insured. All free.</div></div>
+      </div>
+    </div>
+    <div class="sfoot"><div><div class="sfgl">Your target</div><div class="sfgt">Basic needs secured · $500 in separate HYSA</div></div><button class="done-btn" onclick="markD(2,this)">Mark Complete ✓</button></div>
+  </div>
+</div>
+
+<!-- STEP 3 -->
+<div class="step-card" data-step="3" id="sc3">
+  <div class="step-hd" onclick="togS(3)">
+    <div class="snb-wrap"><div class="snb" id="sn3">03</div><span class="stag stag-K">Kill</span></div>
+    <div class="stw"><div class="s-title">Destroy Toxic Debt</div><div class="s-sub">Credit cards · BNPL · Payday loans — highest rate first</div></div>
+    <div class="schev">▾</div>
+  </div>
+  <div class="sbody" id="sb3">
+    <div class="scontent">
+      <div class="smain">
+        <h4>What Counts as Toxic Debt</h4>
+        <p><strong>Credit cards with a carried balance</strong> — average rate is now 24.9% APR. <strong>BNPL apps</strong> (Klarna, Afterpay, Affirm) look like 0% but hit 30%+ on late payments and now appear on all three credit bureau reports since 2023. <strong>Payday-style apps</strong> (Dave, Earnin) carry implied APRs of 300%+. <strong>Rent-to-own schemes</strong> are even worse.</p>
+        <h4>The BNPL Trap Is Designed For You</h4>
+        <p>"4 payments of $25" sounds harmless until you have 6 open plans simultaneously and one missed paycheck cascades into late fees and damaged credit. Late on a $35 Klarna payment? That negative mark follows your credit report for <strong>7 years.</strong></p>
+        <h4>The Avalanche Method</h4>
+        <p>List every toxic debt with its interest rate. Pay minimums on everything except the <strong>highest-rate debt</strong>. Throw every extra dollar at that one. When it's gone, attack the next. This is mathematically optimal.</p>
+        <h4>Federal Student Loans Are Not Step 3</h4>
+        <p>Federal loans at 6.53% are in a gray zone — don't panic-pay them while carrying a 25% credit card balance. High-rate debt first. Federal student loans are addressed in Step 9.</p>
+      </div>
+      <div class="sside">
+        <div class="sbox sbox-r"><div class="sbox-lbl">$5,000 CC Debt · Min Payments</div><div class="sbox-num">$12,200</div><div class="sbox-text">Total paid over 22+ years at 24% APR. <strong>$7,200 is pure interest</strong> that could have been building wealth.</div></div>
+        <div class="sbox sbox-a"><div class="sbox-lbl">⚠ BNPL Warning</div><div class="sbox-title">Now on your credit report</div><div class="sbox-text">Since 2023, Equifax, Experian, and TransUnion all report BNPL activity. One late payment = 7 years of damage.</div></div>
+        <div class="sbox sbox-n"><div class="sbox-lbl">No Toxic Debt?</div><div class="sbox-text">Skip this step entirely and move to Step 4. You're already ahead of most people.</div></div>
+      </div>
+    </div>
+    <div class="sfoot"><div><div class="sfgl">Your target</div><div class="sfgt">Zero CC balances · All BNPL plans closed</div></div><button class="done-btn" onclick="markD(3,this)">Mark Complete ✓</button></div>
+  </div>
+</div>
+
+<!-- STEP 4 -->
+<div class="step-card" data-step="4" id="sc4">
+  <div class="step-hd" onclick="togS(4)">
+    <div class="snb-wrap"><div class="snb" id="sn4">04</div><span class="stag stag-B">Build</span></div>
+    <div class="stw"><div class="s-title">Build Credit the Right Way</div><div class="s-sub">Secured card · Authorized user · Score 700+ in 18 months</div></div>
+    <div class="schev">▾</div>
+  </div>
+  <div class="sbody" id="sb4">
+    <div class="scontent">
+      <div class="smain">
+        <h4>Why Credit Matters Before You Want It To</h4>
+        <p>Your credit score affects <strong>apartment applications</strong>, <strong>car insurance rates</strong> (lower score = higher premium by hundreds per year), future loan interest rates, and some employer background checks. Building it now — while the stakes are low — means you won't be scrambling when it matters.</p>
+        <h4>The Secured Card Strategy</h4>
+        <p>Deposit <strong>$200–$300</strong> as collateral. Use the card for <strong>one small recurring charge per month</strong> (like Spotify at $11). Set up autopay to pay the full balance every month. Never carry a balance. After 6–12 months most issuers upgrade you and return your deposit. <strong>Discover Secured</strong> and <strong>Capital One Quicksilver Secured</strong> are student-friendly with no annual fee.</p>
+        <h4>The Authorized User Fast-Track</h4>
+        <p>If a parent has a card with a good payment history, ask to be added as an authorized user. You don't need to use the card. Their history gets added to your report <strong>immediately</strong> — the fastest legal way to build credit from zero.</p>
+        <ul class="cklist">
+          <li>Pay in FULL every month — carrying a balance doesn't help your score and costs 24%+</li>
+          <li>Keep utilization under 10% (a $300 limit means charge under $30)</li>
+          <li>Never miss a payment — it's 35% of your FICO score</li>
+          <li>Don't apply for multiple cards at once — each hard inquiry drops ~5 points</li>
+          <li>Avoid store cards (Target, Amazon, Best Buy) — 29%+ APR designed to trap new cardholders</li>
+        </ul>
+      </div>
+      <div class="sside">
+        <div class="sbox sbox-g"><div class="sbox-lbl">To Open a Secured Card</div><div class="sbox-num">$200</div><div class="sbox-text">Refundable deposit. One small auto-charge per month. Pay in full. Score builds automatically.</div></div>
+        <div class="sbox sbox-b"><div class="sbox-lbl">Realistic Score Target</div><div class="sbox-title">700+ in 18 months</div><div class="sbox-text">Secured card + authorized user + on-time payments = 700+ FICO is achievable from zero within 18 months.</div></div>
+      </div>
+    </div>
+    <div class="sfoot"><div><div class="sfgl">Your target</div><div class="sfgt">Secured card open · Paid in full monthly</div></div><button class="done-btn" onclick="markD(4,this)">Mark Complete ✓</button></div>
+  </div>
+</div>
+
+<!-- STEP 5 -->
+<div class="step-card" data-step="5" id="sc5">
+  <div class="step-hd" onclick="togS(5)">
+    <div class="snb-wrap"><div class="snb" id="sn5">05</div><span class="stag stag-G">Grow</span></div>
+    <div class="stw"><div class="s-title">Open a Roth IRA</div><div class="s-sub">Your single most powerful move · Even $25/month · Tax-free forever</div></div>
+    <div class="schev">▾</div>
+  </div>
+  <div class="sbody" id="sb5">
+    <div class="scontent">
+      <div class="smain">
+        <h4>The Non-Negotiable Rule: Earned Income First</h4>
+        <p>You can only contribute to a Roth IRA up to the amount you <em>earned</em> that year. <strong>Financial aid — Pell, Cal Grant, CCPG, SSCG — does NOT count as earned income.</strong> You need a job or gig income. If you made $2,800 delivering food this semester, you can contribute up to $2,800.</p>
+        <h4>What Counts as Earned Income</h4>
+        <ul class="cklist">
+          <li><strong>W-2 jobs</strong> — campus job, retail, food service, childcare, lifeguarding</li>
+          <li><strong>Gig work</strong> — DoorDash, Uber Eats, Instacart, TaskRabbit (reported on Schedule C)</li>
+          <li><strong>Freelance</strong> — tutoring, photography, graphic design, web work, social media management</li>
+          <li><strong>Babysitting / odd jobs</strong> — counts even without a 1099 as long as you report it</li>
+        </ul>
+        <h4>Where to Open It — Free, No Minimums</h4>
+        <p><strong>Fidelity</strong> or <strong>Schwab</strong> — both have $0 minimums. Invest in a <strong>Target Date 2060 Fund</strong> (set it and forget it) or <strong>FXAIX / VOO</strong> (S&P 500 index, 0.015% fee). Set up a recurring transfer — even $25/month makes a difference.</p>
+        <h4>Why Starting Now Is the Entire Game</h4>
+        <p>$100/month from ages 18–22, then never again — grows to <strong>~$200,000+ at age 65</strong> at 7% return. Completely tax-free. Starting at 28 with the same $4,800 total gives you ~$46,000. Starting is everything.</p>
+      </div>
+      <div class="sside">
+        <div class="sbox sbox-g"><div class="sbox-lbl">2024 Roth IRA Limit</div><div class="sbox-num">$7,000</div><div class="sbox-text">Per year, or 100% of earned income — whichever is less. <strong>Even $500 at age 18</strong> is a life-changing decision.</div></div>
+        <div class="sbox sbox-a"><div class="sbox-lbl">⚡ The Critical Detail</div><div class="sbox-title">Grant money ≠ earned income</div><div class="sbox-text">Pell, Cal Grant, SSCG, CCPG — none count for Roth IRA purposes. You need a W-2 or gig income to contribute.</div></div>
+        <div class="sbox sbox-n"><div class="sbox-lbl">FAFSA Protection Bonus</div><div class="sbox-text">Roth IRA contributions are <strong>not counted as FAFSA assets</strong>. Money in your name reduces your aid. Money in a Roth does not. Invest there first.</div></div>
+      </div>
+    </div>
+    <div class="sfoot"><div><div class="sfgl">Your target</div><div class="sfgt">Roth IRA open · Auto-investing monthly</div></div><button class="done-btn" onclick="markD(5,this)">Mark Complete ✓</button></div>
+  </div>
+</div>
+
+<!-- STEP 6 -->
+<div class="step-card" data-step="6" id="sc6">
+  <div class="step-hd" onclick="togS(6)">
+    <div class="snb-wrap"><div class="snb" id="sn6">06</div><span class="stag stag-E">Taxes</span></div>
+    <div class="stw"><div class="s-title">Handle Gig Income Taxes</div><div class="s-sub">Self-employment tax · Quarterly payments · Don't get blindsided in April</div></div>
+    <div class="schev">▾</div>
+  </div>
+  <div class="sbody" id="sb6">
+    <div class="scontent">
+      <div class="smain">
+        <h4>Nobody Told You About This — But It's Real</h4>
+        <p>When you work for DoorDash, Uber, Instacart, or do any freelance work, <strong>nobody withholds taxes from your payment.</strong> Earn more than <strong>$400 from self-employment</strong> in a year? You owe self-employment tax (15.3%) plus income tax. Gig workers get hit with huge unexpected bills every April because nobody explained this to them.</p>
+        <h4>The Simple Rule: 25–30% Rule</h4>
+        <p>Every single time you get paid for gig work, move <strong>25–30% into a separate savings account labeled "Taxes."</strong> Do not touch it. In April, this pays your bill. If you get a refund, that becomes savings. If you owe, you're covered.</p>
+        <h4>Quarterly Estimated Payments</h4>
+        <p>If you expect to owe over $1,000 for the year from self-employment, the IRS expects quarterly payments (April 15, June 15, Sept 15, Jan 15). Skipping them adds a penalty. Pay via <strong>IRS Direct Pay</strong> online — free, no account needed.</p>
+        <ul class="cklist">
+          <li>DoorDash/Uber: mileage deduction is $0.67/mile in 2024 — log every mile in an app like MileIQ</li>
+          <li>Freelance tools, subscriptions, software used for work are deductible</li>
+          <li>File free: IRS Free File (under $79K income), VITA campus sites, or IRS Direct Pay for quarterly</li>
+          <li>The $400 self-employment threshold is the tripwire — above it, you must file Schedule SE</li>
+        </ul>
+      </div>
+      <div class="sside">
+        <div class="sbox sbox-a"><div class="sbox-lbl">Self-Employment Tax Rate</div><div class="sbox-num">15.3%</div><div class="sbox-text">On top of income tax. $500/month gig income = <strong>$900+ owed in April</strong> if you don't plan ahead.</div></div>
+        <div class="sbox sbox-r"><div class="sbox-lbl">⚠ The Trigger</div><div class="sbox-title">$400 from self-employment</div><div class="sbox-text">Above this, file Schedule SE. Below it, you're exempt from self-employment tax (but still report the income).</div></div>
+        <div class="sbox sbox-g"><div class="sbox-lbl">Free Tax Help</div><div class="sbox-text"><strong>IRS Free File</strong> — free under $79K<br><strong>VITA campus sites</strong> — free in-person help<br><strong>IRS Direct Pay</strong> — free quarterly filing</div></div>
+      </div>
+    </div>
+    <div class="sfoot"><div><div class="sfgl">Your target</div><div class="sfgt">25–30% of gig income in a separate tax bucket</div></div><button class="done-btn" onclick="markD(6,this)">Mark Complete ✓</button></div>
+  </div>
+</div>
+
+<!-- STEP 7 -->
+<div class="step-card" data-step="7" id="sc7">
+  <div class="step-hd" onclick="togS(7)">
+    <div class="snb-wrap"><div class="snb" id="sn7">07</div><span class="stag stag-B">Build</span></div>
+    <div class="stw"><div class="s-title">Full Emergency Fund</div><div class="s-sub">2–3 months of your real expenses · HYSA only · Never invested</div></div>
+    <div class="schev">▾</div>
+  </div>
+  <div class="sbody" id="sb7">
+    <div class="scontent">
+      <div class="smain">
+        <h4>Now Size It Realistically</h4>
+        <p>The classic "6 months of expenses" advice is for homeowners with mortgages, car payments, and families. Your situation is different — and that's a good thing. For many CC students on CalFresh, Medi-Cal, and with lower rent, <strong>2–3 months might be as little as $1,500–$3,500.</strong> That's achievable in one semester if you plan for it.</p>
+        <h4>Calculate Your Number</h4>
+        <p>Add up your actual monthly fixed expenses: rent or your share, utilities, transportation, phone, food beyond CalFresh. Multiply by 2 or 3. That's your target — based on your real life, not a template built for someone else.</p>
+        <h4>The Hard Rule</h4>
+        <p><strong>Never invest your emergency fund.</strong> It must be in a savings account, instantly accessible. If the stock market drops 30% the same week your car breaks down, you need the cash immediately. Accessibility beats returns for this one bucket.</p>
+      </div>
+      <div class="sside">
+        <div class="sbox sbox-g"><div class="sbox-lbl">Realistic Student Target</div><div class="sbox-num">2–3 mo</div><div class="sbox-text">Calculate your actual expenses. Many students only need <strong>$1,500–$3,500</strong> to complete this step.</div></div>
+        <div class="sbox sbox-n"><div class="sbox-lbl">Best HYSA Options (Free)</div><div class="sbox-text"><strong>SoFi</strong> — 4.6% APY<br><strong>Ally</strong> — 4.35% APY<br><strong>Marcus</strong> — 4.5% APY<br>All FDIC-insured, $0 minimum.</div></div>
+        <div class="sbox sbox-a"><div class="sbox-lbl">Hard Rule</div><div class="sbox-title">Savings account only</div><div class="sbox-text">Not stocks. Not crypto. Not a "high-yield" investment account. A boring bank savings account. Boring is the point.</div></div>
+      </div>
+    </div>
+    <div class="sfoot"><div><div class="sfgl">Your target</div><div class="sfgt">2–3 months of expenses in HYSA</div></div><button class="done-btn" onclick="markD(7,this)">Mark Complete ✓</button></div>
+  </div>
+</div>
+
+<!-- STEP 8 -->
+<div class="step-card" data-step="8" id="sc8">
+  <div class="step-hd" onclick="togS(8)">
+    <div class="snb-wrap"><div class="snb" id="sn8">08</div><span class="stag stag-G">Grow</span></div>
+    <div class="stw"><div class="s-title">Max the Roth IRA &amp; Invest Surplus</div><div class="s-sub">$7,000/year max · Index funds · Taxable brokerage for overflow</div></div>
+    <div class="schev">▾</div>
+  </div>
+  <div class="sbody" id="sb8">
+    <div class="scontent">
+      <div class="smain">
+        <h4>You've Done the Hard Work — Now Accelerate</h4>
+        <p>Steps 1–7 built a solid foundation. Now you get aggressive. If you have earned income, aim to max your Roth IRA ($7,000/year = $583/month). Any surplus beyond that goes into a <strong>taxable brokerage account</strong> with the same low-cost index funds.</p>
+        <h4>What to Invest In — Keep It Simple Forever</h4>
+        <ul class="cklist">
+          <li><strong>FXAIX or VOO</strong> — S&P 500 index fund. 500 largest US companies. 0.015% expense ratio. The single best default for most people.</li>
+          <li><strong>Target Date 2060 Fund</strong> — automatically rebalances as you age. Zero decisions required.</li>
+          <li><strong>VTI</strong> — Total US market. Slightly broader than S&P 500. Also excellent.</li>
+        </ul>
+        <h4>The CC Transfer Superpower</h4>
+        <p>Spending ~$3,500/year at CC vs $43,000/year at a comparable 4-year university = roughly <strong>$79,000 saved over 2 years</strong> in tuition alone. That money doesn't become student loan debt compounding against you — it becomes capital you can invest instead.</p>
+        <h4>Mindset Shift That Changes Everything</h4>
+        <p>Working 30 hours a week to earn more money? Financial aid can replace some of that income so you work <strong>fewer hours and study more</strong>. Students who work under 15–20 hours per week have significantly higher retention and grades. Use aid strategically to reduce hours, not increase spending.</p>
+      </div>
+      <div class="sside">
+        <div class="sbox sbox-g"><div class="sbox-lbl">2024 Roth IRA Maximum</div><div class="sbox-num">$7,000</div><div class="sbox-text">$583/month. Contribute whatever you can. <strong>Partial is infinitely better than zero.</strong></div></div>
+        <div class="sbox sbox-b"><div class="sbox-lbl">CC Transfer Savings</div><div class="sbox-num" style="color:var(--blue)">$79K</div><div class="sbox-text">Average tuition savings over 2 years vs starting at a 4-year. Same degree. Wildly different debt.</div></div>
+      </div>
+    </div>
+    <div class="sfoot"><div><div class="sfgl">Your target</div><div class="sfgt">Max Roth IRA · Invest every surplus dollar</div></div><button class="done-btn" onclick="markD(8,this)">Mark Complete ✓</button></div>
+  </div>
+</div>
+
+<!-- STEP 9 -->
+<div class="step-card" data-step="9" id="sc9">
+  <div class="step-hd" onclick="togS(9)">
+    <div class="snb-wrap"><div class="snb" id="sn9">09</div><span class="stag stag-K">Kill</span></div>
+    <div class="stw"><div class="s-title">Kill All Remaining Debt</div><div class="s-sub">Student loans · Car loans · Enter your 30s completely clean</div></div>
+    <div class="schev">▾</div>
+  </div>
+  <div class="sbody" id="sb9">
+    <div class="scontent">
+      <div class="smain">
+        <h4>Life Gets Expensive Fast After School</h4>
+        <p>The years between graduating and your late 20s pile up fast: rent deposits, car, health insurance, relationships. Every debt you carry into that era directly competes with building your life. The goal is to arrive clean.</p>
+        <h4>Student Loans</h4>
+        <p>Federal at 6.53% (2024). If your Roth IRA earns 7%+ long-term, the math of investing vs paying loans is roughly a coin flip. Do <strong>whichever keeps you most consistent.</strong> Never miss a payment — federal loans offer income-driven repayment if things get tight.</p>
+        <h4>Car Loans — The 20/3/8 Rule</h4>
+        <p>20% down, loan no longer than 3 years, total monthly car cost under 8% of gross monthly income. A $25,000 car on a 72-month loan at 7% costs you $29,400 — and the car is worth ~$12,000 at payoff. Buy used with cash whenever possible.</p>
+        <ul class="cklist">
+          <li>Avoid car loans above 5% APR — buy a cheaper car instead</li>
+          <li>Income-driven repayment (SAVE plan) caps student loan payments at 5% of discretionary income</li>
+          <li>Public Service Loan Forgiveness (PSLF) forgives federal loans after 10 years of public service employment</li>
+          <li>Private student loans are less flexible — prioritize these over federal loans</li>
+        </ul>
+      </div>
+      <div class="sside">
+        <div class="sbox sbox-g"><div class="sbox-lbl">Graduation Point</div><div class="sbox-title">Zero debt · Investing 15%+</div><div class="sbox-text">This is where real wealth acceleration begins — from a clean foundation with no debt competing for your income.</div></div>
+        <div class="sbox sbox-n"><div class="sbox-lbl">Federal Loan Programs</div><div class="sbox-text"><strong>studentaid.gov</strong> — all repayment options<br><strong>SAVE plan</strong> — 5% of discretionary income<br><strong>PSLF</strong> — forgiveness after 10 yrs<br><strong>IBR</strong> — income-based repayment</div></div>
+      </div>
+    </div>
+    <div class="sfoot"><div><div class="sfgl">Your target</div><div class="sfgt">Debt-free · Investing 15%+ of income</div></div><button class="done-btn" onclick="markD(9,this)">Mark Complete ✓</button></div>
+  </div>
+</div>
+
+    </div><!-- /steps-wrap -->
+  </div>
+</section>
+
+<!-- REFUND FLOW -->
+<section class="sec fu">
+  <div class="wrap">
+    <div class="eyebrow">Bonus: The refund check playbook</div>
+    <h2 class="stitle"><span class="line">Refund check hit?</span><span class="line"><em>Exact split.</em></span></h2>
+    <p style="font-size:.88rem;color:var(--text-2);line-height:1.75;max-width:560px;margin-bottom:.25rem;">This is the one decision most students get wrong. The refund check feels like found money. It's not — it's your semester budget arriving all at once.</p>
+    <div class="rfbox">
+      <div class="rfstep"><div class="rflbl">First</div><div class="rfpct">100%</div><div class="rftitle">Assess the Timeline</div><div class="rfdesc">Divide the total by weeks or months left in the semester. That's your spending ceiling per month.</div></div>
+      <div class="rfstep"><div class="rflbl">Priority 1</div><div class="rfpct">50–60%</div><div class="rftitle">Semester Living Expenses</div><div class="rfdesc">Rent, transport, phone, food beyond CalFresh. Set this aside first — don't touch it for anything else.</div></div>
+      <div class="rfstep"><div class="rflbl">Priority 2</div><div class="rfpct">15–20%</div><div class="rftitle">Emergency Fund Top-Up</div><div class="rfdesc">Get your HYSA to target before anything else. This protects every other decision you make.</div></div>
+      <div class="rfstep"><div class="rflbl">Priority 3</div><div class="rfpct">15–20%</div><div class="rftitle">Roth IRA (if eligible)</div><div class="rfdesc">Only if you have earned income this year. Grant money alone doesn't qualify — you need a job or gig income.</div></div>
+      <div class="rfstep"><div class="rflbl">Remainder</div><div class="rfpct">5–10%</div><div class="rftitle">Debt or Sinking Fund</div><div class="rfdesc">Kill any remaining toxic debt, or start a "next semester" savings bucket so you aren't starting from zero again.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- INCOME CALCULATOR -->
+<section class="sec sec-alt fu">
+  <div class="wrap">
+    <div class="eyebrow">Interactive</div>
+    <h2 class="stitle"><span class="line">Your money,</span><span class="line"><em>calculated.</em></span></h2>
+    <div class="calc-grid">
+      <div class="calc-inputs">
+        <div><label class="ilabel">Monthly side income (gig + W-2)</label><div class="irow"><input type="range" id="si" min="0" max="3000" step="50" value="800" oninput="calcUpdate()"><span class="ival" id="siV">$800</span></div></div>
+        <div><label class="ilabel">Annual aid refund (after tuition)</label><div class="irow"><input type="range" id="ai" min="0" max="10000" step="100" value="3000" oninput="calcUpdate()"><span class="ival" id="aiV">$3,000</span></div></div>
+        <div><label class="ilabel">Monthly essential expenses</label><div class="irow"><input type="range" id="ei" min="200" max="2500" step="50" value="700" oninput="calcUpdate()"><span class="ival" id="eiV">$700</span></div></div>
+        <div><label class="ilabel">Years until retirement</label><div class="irow"><input type="range" id="yi" min="20" max="50" step="1" value="40" oninput="calcUpdate()"><span class="ival" id="yiV">40 yrs</span></div></div>
+      </div>
+      <div class="calc-results" id="calcRes"></div>
+    </div>
+  </div>
+</section>
+
+<!-- VISUALIZATIONS -->
+<div class="sec-alt" style="border-top:2px solid var(--border2);">
+<section style="padding:5rem 0 0;">
+  <div class="wrap">
+    <div class="fu">
+      <div class="eyebrow">The math behind every decision</div>
+      <h2 class="stitle"><span class="line">See compound interest,</span><span class="line">debt traps &amp; <em>opportunity cost</em></span><span class="line">in real numbers.</span></h2>
+    </div>
+
+    <div class="viz-nav">
+      <button class="vnav-btn vactive" onclick="showViz('roth',this)">📈 Compound Interest</button>
+      <button class="vnav-btn" onclick="showViz('auto',this)">🚗 Auto Loan Trap</button>
+      <button class="vnav-btn" onclick="showViz('cc',this)">💳 Credit Card Killer</button>
+      <button class="vnav-btn" onclick="showViz('compare',this)">⚖️ Two Paths</button>
+    </div>
+
+    <!-- PANEL: ROTH -->
+    <div class="vpanel vshow" id="vp-roth">
+      <div class="chart-card">
+        <div class="chart-hd">The Roth IRA Snowball</div>
+        <div class="chart-sub">$100/month from ages 18–22 (4 years, $4,800 total) — then never adding another dollar. 7% average annual return. Tax-free forever.</div>
+        <div class="chart-wrap"><canvas id="rothChart"></canvas></div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-cell"><div class="stat-lbl">Total Contributed</div><div class="stat-val sv-b">$4,800</div><div class="stat-desc">$100/mo × 4 years. That's it.</div></div>
+        <div class="stat-cell"><div class="stat-lbl">Value at Age 40</div><div class="stat-val sv-g">$38,400</div><div class="stat-desc">8× your money without adding a dollar</div></div>
+        <div class="stat-cell"><div class="stat-lbl">Value at Age 55</div><div class="stat-val sv-g">$108,600</div><div class="stat-desc">22× your money — still tax-free</div></div>
+        <div class="stat-cell"><div class="stat-lbl">Value at Age 65</div><div class="stat-val sv-g" id="rothFinal">—</div><div class="stat-desc">Every dollar is yours, tax-free</div></div>
+      </div>
+      <div class="sim-wrap">
+        <div>
+          <div class="sim-title">🎛️ Adjust the numbers</div>
+          <div style="display:flex;flex-direction:column;gap:1.2rem;">
+            <div><label class="ilabel">Monthly contribution</label><div class="irow"><input type="range" id="rm" min="25" max="583" step="25" value="100" oninput="updateRoth()"><span class="ival" id="rmV">$100/mo</span></div></div>
+            <div><label class="ilabel">Years contributing</label><div class="irow"><input type="range" id="ry" min="1" max="4" step="1" value="4" oninput="updateRoth()"><span class="ival" id="ryV">4 yrs</span></div></div>
+            <div><label class="ilabel">Annual return rate</label><div class="irow"><input type="range" id="rr" min="4" max="12" step="0.5" value="7" oninput="updateRoth()"><span class="ival" id="rrV">7%</span></div></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:.85rem;justify-content:center;">
+          <div class="crbox"><div class="crl">Total Contributed</div><div class="crv" style="font-size:1.5rem" id="rSimContrib">$4,800</div></div>
+          <div class="crbox hi-g"><div class="crl">Value at Age 65</div><div class="crv" style="font-size:2rem" id="rSimVal">—</div><div class="crs" id="rSimMult">—× your money</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL: AUTO -->
+    <div class="vpanel" id="vp-auto">
+      <div class="chart-card">
+        <div class="chart-hd">$25,000 Auto Loan @ 6% — 60 Months</div>
+        <div class="chart-sub">Loan balance vs car market value vs investing that $483/month instead. The gap between loan balance and car value is the "underwater" zone.</div>
+        <div class="chart-wrap"><canvas id="autoChart"></canvas></div>
+      </div>
+      <div class="auto-compare">
+        <div class="ac-col ac-bad">
+          <div class="ac-label">The Auto Loan Reality</div>
+          <div class="ac-title">$25K @ 6% / 60 months</div>
+          <div class="ac-row"><span class="ak">Monthly payment</span><span class="av">−$483/mo</span></div>
+          <div class="ac-row"><span class="ak">Total repaid</span><span class="av">−$28,999</span></div>
+          <div class="ac-row"><span class="ak">Interest paid</span><span class="av">−$3,999</span></div>
+          <div class="ac-row"><span class="ak">Car value at payoff</span><span class="av">~$12,000</span></div>
+          <div class="ac-row"><span class="ak">Net loss (interest + depreciation)</span><span class="av">−$17,000+</span></div>
+        </div>
+        <div class="ac-col ac-good">
+          <div class="ac-label">If You Invested That $483/mo Instead</div>
+          <div class="ac-title">S&P 500 index, 7% avg return</div>
+          <div class="ac-row"><span class="ak">After 5 years</span><span class="av">+$34,700</span></div>
+          <div class="ac-row"><span class="ak">After 10 years</span><span class="av">+$83,600</span></div>
+          <div class="ac-row"><span class="ak">After 20 years</span><span class="av">+$265,000</span></div>
+          <div class="ac-row"><span class="ak">After 30 years</span><span class="av">+$578,000</span></div>
+        </div>
+      </div>
+      <div class="big-callout">
+        <div class="bc-eyebrow">The real cost of a $25K car loan</div>
+        <div class="bc-num">$595,000</div>
+        <div class="bc-text">The difference in net worth at retirement between the invest-instead path vs the car loan path — including compounding opportunity cost. <strong>The car doesn't cost $25,000. It costs $595,000 in missed wealth.</strong></div>
+      </div>
+    </div>
+
+    <!-- PANEL: CC -->
+    <div class="vpanel" id="vp-cc">
+      <div class="chart-card">
+        <div class="chart-hd">$5,000 Credit Card — 3 Repayment Strategies</div>
+        <div class="chart-sub">24% APR (current average). Watch minimum payments keep you in debt for a decade while fixed payments eliminate it fast.</div>
+        <div class="chart-wrap"><canvas id="ccChart"></canvas></div>
+      </div>
+      <div class="sim-wrap">
+        <div>
+          <div class="sim-title">Select a strategy to see the full breakdown</div>
+          <div class="scenario-wrap">
+            <div class="scenario-card sel" onclick="setCCScene(this,'min')">
+              <div class="scen-hd"><span class="scen-name">Minimum payments (2%)</span><span class="scen-rate" style="color:var(--red)">24% APR</span></div>
+              <div class="scen-desc">The default trap. Feels affordable. Designed to keep you paying forever.</div>
+            </div>
+            <div class="scenario-card" onclick="setCCScene(this,150)">
+              <div class="scen-hd"><span class="scen-name">Fixed $150/month</span><span class="scen-rate" style="color:var(--amber)">24% APR</span></div>
+              <div class="scen-desc">3× the minimum. Still costs thousands in interest but finishes in years, not decades.</div>
+            </div>
+            <div class="scenario-card" onclick="setCCScene(this,300)">
+              <div class="scen-hd"><span class="scen-name">Fixed $300/month</span><span class="scen-rate" style="color:var(--green)">24% APR</span></div>
+              <div class="scen-desc">Aggressive. Paid off in 20 months. Damage minimized.</div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:.85rem;justify-content:center;" id="ccSidePanel"></div>
+      </div>
+      <div class="big-callout" style="background:#3D1A14;">
+        <div class="bc-eyebrow">The opportunity cost of minimum payments</div>
+        <div class="bc-num" style="color:#FF9B8A;">$7,200</div>
+        <div class="bc-text">Total interest paid on $5,000 over 22 years of minimum payments. That $7,200 invested for 30 years at 7% = <strong style="color:#fff;">$55,000</strong>. You don't just pay interest — you permanently lose the wealth that money could have built.</div>
+      </div>
+    </div>
+
+    <!-- PANEL: COMPARE -->
+    <div class="vpanel" id="vp-compare">
+      <div class="chart-card">
+        <div class="chart-hd">Two Paths. Same Starting Point. 40 Years.</div>
+        <div class="chart-sub">Investor path: $4,000/year into Roth IRA during college, no car loan, no CC debt. Debt path: auto loan + credit card balance + all the compounding opportunity cost.</div>
+        <div class="chart-wrap"><canvas id="compareChart"></canvas></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border2);border:1.5px solid var(--border2);border-radius:var(--r-lg);overflow:hidden;margin-top:1.5rem;">
+        <div style="background:#F5FBF7;padding:1.75rem;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--green);margin-bottom:1rem;">✓ The Investor Path</div>
+          <div class="ac-row"><span class="ak">Roth IRA × 4 college years</span><span style="color:var(--green);font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:600;">$16K in</span></div>
+          <div class="ac-row"><span class="ak">Value at 40 years growth (7%)</span><span style="color:var(--green);font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:600;">~$202K</span></div>
+          <div class="ac-row"><span class="ak">No auto loan → invest $483/mo</span><span style="color:var(--green);font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:600;">+$578K</span></div>
+          <div class="ac-row"><span class="ak">No CC interest ($7,200 saved)</span><span style="color:var(--green);font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:600;">+$55K OC</span></div>
+          <div class="ac-row" style="border-top:1.5px solid var(--green-bd);margin-top:.5rem;padding-top:.75rem;"><span style="font-weight:700;">Total potential wealth</span><span style="color:var(--green);font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;">$835K+</span></div>
+        </div>
+        <div style="background:#FFF8F7;padding:1.75rem;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--red);margin-bottom:1rem;">✕ The Debt Path</div>
+          <div class="ac-row"><span class="ak">Auto loan total paid</span><span style="color:var(--red);font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:600;">−$29K</span></div>
+          <div class="ac-row"><span class="ak">Vehicle depreciation loss</span><span style="color:var(--red);font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:600;">−$13K</span></div>
+          <div class="ac-row"><span class="ak">CC debt total paid (min pmt)</span><span style="color:var(--red);font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:600;">−$12.2K</span></div>
+          <div class="ac-row"><span class="ak">Opportunity cost (not invested)</span><span style="color:var(--red);font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:600;">−$780K+</span></div>
+          <div class="ac-row" style="border-top:1.5px solid var(--red-bd);margin-top:.5rem;padding-top:.75rem;"><span style="font-weight:700;">Net vs investor path</span><span style="color:var(--red);font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;">−$835K</span></div>
+        </div>
+      </div>
+      <div class="big-callout">
+        <div class="bc-eyebrow">The total divergence</div>
+        <div class="bc-num">$835,000+</div>
+        <div class="bc-text">The wealth gap between the two paths — traced back entirely to decisions made in college with <strong>grant money that never had to be repaid.</strong> The same starting money. The same time. Compounding is the only difference.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+</div>
+
+<footer>
+  <div>
+    <div class="foot-brand">Student <span>FOO</span></div>
+    <div class="foot-tag">Financial Order of Operations for community college students.<br>Built at Skyline College · Inspired by real student realities.</div>
+  </div>
+  <div class="foot-disc">Educational content only — not financial advice. Aid amounts, interest rates, and tax laws change annually. For personalized help, visit your Financial Aid Office, SparkPoint, or a VITA site on campus.<br><a href="mailto:henry@henryfan.org" style="color:var(--text-2);text-decoration:underline;text-underline-offset:2px;">henry@henryfan.org</a> · <a href="../" style="color:var(--text-2);text-decoration:underline;text-underline-offset:2px;">← Curriculum Site</a> · <a href="../research/" style="color:var(--text-2);text-decoration:underline;text-underline-offset:2px;">Research Portfolio</a></div>
+</footer>
+
+<script>
+// ── STATE ──────────────────────────────────────────
+const done=new Set(); let activeS=null;
+let rothChartObj=null,autoChartObj=null,ccChartObj=null,compareChartObj=null;
+let chartsBuilt={};
+
+// ── RAIL ───────────────────────────────────────────
+function renderRail(){
+  const c=document.getElementById('railSteps'); c.innerHTML='';
+  for(let i=1;i<=9;i++){
+    if(i>1){const cn=document.createElement('div');cn.className='rconn'+(done.has(i-1)?' done':'');c.appendChild(cn);}
+    const d=document.createElement('div');
+    d.className='rdot'+(done.has(i)?' done':'')+(activeS===i?' active':'');
+    d.textContent=i; d.onclick=()=>document.getElementById('sc'+i).scrollIntoView({behavior:'smooth',block:'start'});
+    c.appendChild(d);
+  }
+  document.getElementById('railBadge').textContent=`Step ${Math.min(done.size+1,9)} of 9`;
+}
+
+// ── STEP TOGGLE ────────────────────────────────────
+function togS(n){
+  const isOpen=document.getElementById('sc'+n).classList.contains('open');
+  for(let i=1;i<=9;i++){document.getElementById('sc'+i).classList.remove('open');document.getElementById('sb'+i).classList.remove('open');}
+  if(!isOpen){document.getElementById('sc'+n).classList.add('open');document.getElementById('sb'+n).classList.add('open');activeS=n;}
+  else activeS=null;
+  renderRail();
+}
+function markD(n,btn){
+  if(done.has(n)){done.delete(n);btn.classList.remove('done');btn.textContent='Mark Complete ✓';document.getElementById('sn'+n).classList.remove('sdone');}
+  else{done.add(n);btn.classList.add('done');btn.textContent='✓ Completed';document.getElementById('sn'+n).classList.add('sdone');}
+  renderRail();
+}
+
+// ── REALITY CHECK ──────────────────────────────────
+const rcS={};
+function rcPick(btn){
+  const q=btn.dataset.q,v=btn.dataset.v; rcS[q]=v;
+  btn.closest('.rc-opts').querySelectorAll('.rc-opt').forEach(b=>b.classList.remove('on')); btn.classList.add('on');
+  if(rcS[0]&&rcS[1]&&rcS[2]){
+    let msg='';
+    if(rcS[0]==='yes') msg=`<strong>Start at Step 3.</strong> Your most urgent move is destroying toxic debt. Get the $500 buffer first (Step 2), then throw everything at the highest-rate debt you have.`;
+    else if(rcS[2]==='no') msg=`<strong>Stop here — apply for your aid first.</strong> 30 minutes on FAFSA or CADAA could unlock $10,000+ per year. Even if you think you won't qualify, apply. Then come back and start at Step 1.`;
+    else if(rcS[1]==='no') msg=`<strong>Start at Steps 1–2.</strong> Without earned income you can't open a Roth IRA yet, but you can protect your aid, build the $500 buffer, and establish credit. Finding even a small income source (tutoring, gig work) unlocks Step 5.`;
+    else msg=`<strong>You're in a strong position.</strong> Move to Step 4 to build credit, then open your Roth IRA (Step 5). Use your refund check strategically — expenses first, emergency fund top-up, then Roth contribution.`;
+    document.getElementById('rcText').innerHTML=msg;
+    document.getElementById('rcResult').classList.add('show');
+  }
+}
+
+// ── CALCULATOR ─────────────────────────────────────
+function calcUpdate(){
+  const inc=+document.getElementById('si').value, aid=+document.getElementById('ai').value;
+  const exp=+document.getElementById('ei').value, yrs=+document.getElementById('yi').value;
+  document.getElementById('siV').textContent='$'+inc.toLocaleString();
+  document.getElementById('aiV').textContent='$'+aid.toLocaleString();
+  document.getElementById('eiV').textContent='$'+exp.toLocaleString();
+  document.getElementById('yiV').textContent=yrs+' yrs';
+  const monthly=inc+aid/12, taxSet=inc*0.6*0.28, surplus=Math.max(0,monthly-exp-taxSet);
+  const rothMo=Math.min(surplus,7000/12);
+  let bal=0; const mr=Math.pow(1.07,1/12)-1;
+  for(let m=0;m<yrs*12;m++) bal=(bal+rothMo)*(1+mr);
+  document.getElementById('calcRes').innerHTML=`
+    <div class="crbox"><div class="crl">Monthly Cash Flow</div><div class="crv" style="font-size:1.4rem">$${Math.round(monthly).toLocaleString()}</div><div class="crs">Aid + income combined</div></div>
+    <div class="crbox ${surplus>0?'hi-g':'hi-r'}"><div class="crl">${surplus>0?'Monthly Surplus':'Shortfall'}</div><div class="crv" style="font-size:1.6rem">$${Math.abs(Math.round(surplus)).toLocaleString()}</div><div class="crs">After expenses + tax reserve</div></div>
+    <div class="crbox hi-g"><div class="crl">Roth IRA / Month</div><div class="crv" style="font-size:1.6rem">$${Math.round(rothMo).toLocaleString()}</div><div class="crs">$${Math.round(rothMo*12).toLocaleString()}/year</div></div>
+    <div class="crbox hi-g"><div class="crl">Roth IRA at Retirement</div><div class="crv" style="font-size:2rem">$${Math.round(bal).toLocaleString()}</div><div class="crs">Tax-free after ${yrs} yrs at 7% avg</div></div>
+    ${inc>0?`<div class="crbox hi-r"><div class="crl">Tax Reserve (gig income)</div><div class="crv" style="font-size:1.4rem">$${Math.round(taxSet).toLocaleString()}/mo</div><div class="crs">Keep in separate savings bucket</div></div>`:''}
+  `;
+}
+
+// ── CHART DEFAULTS ─────────────────────────────────
+Chart.defaults.font.family="'Plus Jakarta Sans',sans-serif"; Chart.defaults.color='#9A9590';
+const TTP={backgroundColor:'#1B2A4A',borderColor:'rgba(255,255,255,.1)',borderWidth:1,titleFont:{family:"'Plus Jakarta Sans'",weight:'600'},bodyFont:{family:"'Plus Jakarta Sans'"},padding:12,callbacks:{label:ctx=>` $${ctx.parsed.y.toLocaleString()}`}};
+const GRD={color:'rgba(26,23,20,.06)',drawBorder:false};
+const TKS={color:'#9A9590',font:{size:11}};
+
+// ── ROTH ───────────────────────────────────────────
+function buildRothChart(mc=100,yc=4,rate=0.07){
+  const labels=[],vals=[],invested=[],mr=Math.pow(1+rate,1/12)-1,stop=yc*12,total=47*12;
+  for(let m=0;m<=total;m+=6){
+    let b=0,ti=0;
+    for(let x=0;x<m;x++){if(x<stop){b=(b+mc)*(1+mr);ti+=mc;}else b=b*(1+mr);}
+    labels.push(`Age ${18+Math.floor(m/12)}`); vals.push(Math.round(b)); invested.push(Math.round(Math.min(ti,mc*stop)));
+  }
+  let fb=0; for(let x=0;x<total;x++){if(x<stop)fb=(fb+mc)*(1+mr);else fb=fb*(1+mr);}
+  document.getElementById('rothFinal').textContent='$'+Math.round(fb/1000)+'K';
+  document.getElementById('rSimVal').textContent='$'+Math.round(fb).toLocaleString();
+  document.getElementById('rSimContrib').textContent='$'+Math.round(mc*stop).toLocaleString();
+  document.getElementById('rSimMult').textContent=(fb/(mc*stop)).toFixed(1)+'× your money';
+  const ctx=document.getElementById('rothChart').getContext('2d');
+  if(rothChartObj)rothChartObj.destroy();
+  rothChartObj=new Chart(ctx,{type:'line',data:{labels,datasets:[
+    {label:'Portfolio Value',data:vals,borderColor:'#1A5C38',backgroundColor:'rgba(26,92,56,.08)',fill:true,tension:.4,borderWidth:2.5,pointRadius:0,pointHoverRadius:5},
+    {label:'Total Invested',data:invested,borderColor:'#8C5400',borderDash:[5,4],backgroundColor:'rgba(140,84,0,.04)',fill:true,tension:0,borderWidth:1.5,pointRadius:0}
+  ]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:1000},interaction:{mode:'index',intersect:false},
+  plugins:{legend:{labels:{boxWidth:14,padding:18}},tooltip:TTP},
+  scales:{x:{grid:GRD,ticks:{...TKS,maxTicksLimit:10}},y:{grid:GRD,ticks:{...TKS,callback:v=>'$'+Math.round(v/1000)+'K'}}}}});
+}
+function updateRoth(){
+  const m=+document.getElementById('rm').value,y=+document.getElementById('ry').value,r=+document.getElementById('rr').value/100;
+  document.getElementById('rmV').textContent='$'+m+'/mo';
+  document.getElementById('ryV').textContent=y+' yr'+(y>1?'s':'');
+  document.getElementById('rrV').textContent=(r*100)+'%';
+  buildRothChart(m,y,r);
+}
+
+// ── AUTO ───────────────────────────────────────────
+function buildAutoChart(){
+  const p=25000,r=0.06/12,n=60,pmt=p*(r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1);
+  const labels=[],lb=[],cv=[],inv=[]; let bal=p,ib=0,mr=Math.pow(1.07,1/12)-1;
+  for(let m=0;m<=60;m++){
+    labels.push(`Mo ${m}`); lb.push(Math.max(0,Math.round(bal))); cv.push(Math.round(p*Math.pow(0.85,m/12)));
+    ib=(ib+pmt)*(1+mr); inv.push(Math.round(ib)); bal=bal*(1+r)-pmt;
+  }
+  const ctx=document.getElementById('autoChart').getContext('2d');
+  if(autoChartObj)autoChartObj.destroy();
+  autoChartObj=new Chart(ctx,{type:'line',data:{labels,datasets:[
+    {label:'Loan Balance',data:lb,borderColor:'#B52A1C',backgroundColor:'rgba(181,42,28,.08)',fill:true,tension:.3,borderWidth:2.5,pointRadius:0},
+    {label:'Car Market Value',data:cv,borderColor:'#8C5400',borderDash:[6,4],backgroundColor:'rgba(140,84,0,.04)',fill:false,tension:.3,borderWidth:2,pointRadius:0},
+    {label:'If Invested Instead',data:inv,borderColor:'#1A5C38',backgroundColor:'rgba(26,92,56,.05)',fill:true,tension:.4,borderWidth:2,pointRadius:0}
+  ]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:900},interaction:{mode:'index',intersect:false},
+  plugins:{legend:{labels:{boxWidth:14,padding:18}},tooltip:TTP},
+  scales:{x:{grid:GRD,ticks:{...TKS,maxTicksLimit:12}},y:{grid:GRD,ticks:{...TKS,callback:v=>'$'+Math.round(v/1000)+'K'}}}}});
+}
+
+// ── CREDIT CARD ────────────────────────────────────
+function buildCCChart(){
+  const mr=0.24/12;
+  const strats=[{l:'Minimum (2%)',c:'#B52A1C',s:'min'},{l:'Fixed $150/mo',c:'#8C5400',s:150},{l:'Fixed $300/mo',c:'#1A5C38',s:300}];
+  const labels=Array.from({length:61},(_,i)=>`Mo ${i}`);
+  const datasets=strats.map(st=>{
+    let b=5000; const d=[5000];
+    for(let m=1;m<=60;m++){const i=b*mr,p=st.s==='min'?Math.max(25,b*.02):st.s;b=Math.max(0,b+i-p);d.push(Math.round(b));}
+    return{label:st.l,data:d,borderColor:st.c,backgroundColor:st.c+'22',fill:true,tension:.3,borderWidth:2.5,pointRadius:0};
+  });
+  const ctx=document.getElementById('ccChart').getContext('2d');
+  if(ccChartObj)ccChartObj.destroy();
+  ccChartObj=new Chart(ctx,{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,animation:{duration:900},
+  interaction:{mode:'index',intersect:false},
+  plugins:{legend:{labels:{boxWidth:14,padding:18}},tooltip:{...TTP,callbacks:{label:ctx=>` $${ctx.parsed.y.toLocaleString()} remaining`}}},
+  scales:{x:{grid:GRD,ticks:{...TKS,maxTicksLimit:12}},y:{grid:GRD,ticks:{...TKS,callback:v=>'$'+v.toLocaleString()}}}}});
+  setCCScene(document.querySelector('.scenario-card.sel'),'min');
+}
+function setCCScene(el,strat){
+  document.querySelectorAll('.scenario-card').forEach(c=>c.classList.remove('sel')); el.classList.add('sel');
+  const mr=0.24/12; let b=5000,paid=0,months=0;
+  while(b>0.01&&months<500){const i=b*mr,p=strat==='min'?Math.max(25,b*.02):strat;paid+=p;b=Math.max(0,b+i-p);months++;}
+  const tInt=paid-5000,y=Math.floor(months/12),mo=months%12;
+  const str=y>0?`${y} yr${y>1?'s':''} ${mo>0?mo+' mo':''}`:`${mo} months`;
+  const opp=tInt*Math.pow(1.07,30);
+  document.getElementById('ccSidePanel').innerHTML=`
+    <div class="cc-result-big"><div class="cc-rb-label">Total interest paid</div><div class="cc-rb-num">$${Math.round(tInt).toLocaleString()}</div><div class="cc-rb-sub">Payoff: <strong>${str}</strong></div></div>
+    <div class="crbox"><div class="crl">Total Paid</div><div class="crv" style="font-size:1.4rem;color:var(--navy)">$${Math.round(paid).toLocaleString()}</div><div class="crs">For a $5,000 balance</div></div>
+    <div class="cc-vs-box"><div class="cc-vs-label">That interest invested for 30 yrs</div><div class="cc-vs-num">$${Math.round(opp).toLocaleString()}</div><div class="cc-vs-sub">The true opportunity cost of this debt</div></div>
+  `;
+}
+
+// ── COMPARE ────────────────────────────────────────
+function buildCompareChart(){
+  const labels=['Start'],inv=[0],debt=[0];
+  let ib=0,db=0; const mr=Math.pow(1.07,1/12)-1;
+  for(let m=1;m<=40*12;m++){
+    if(m<=4*12)ib=(ib+4000/12)*(1+mr); else ib=ib*(1+mr);
+    if(m<=60)db-=(483+29000/60*.1); else db-=100/12;
+    if(m%12===0){labels.push(`Yr ${m/12}`);inv.push(Math.round(ib));debt.push(Math.round(db));}
+  }
+  const ctx=document.getElementById('compareChart').getContext('2d');
+  if(compareChartObj)compareChartObj.destroy();
+  compareChartObj=new Chart(ctx,{type:'line',data:{labels,datasets:[
+    {label:'Investor Path',data:inv,borderColor:'#1A5C38',backgroundColor:'rgba(26,92,56,.09)',fill:true,tension:.4,borderWidth:3,pointRadius:0},
+    {label:'Debt Path',data:debt,borderColor:'#B52A1C',backgroundColor:'rgba(181,42,28,.07)',fill:true,tension:.4,borderWidth:2.5,pointRadius:0}
+  ]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:1000},interaction:{mode:'index',intersect:false},
+  plugins:{legend:{labels:{boxWidth:14,padding:18}},tooltip:TTP},
+  scales:{x:{grid:GRD,ticks:{...TKS,maxTicksLimit:12}},y:{grid:GRD,ticks:{...TKS,callback:v=>'$'+Math.round(v/1000)+'K'}}}}});
+}
+
+// ── VIZ SWITCHER ───────────────────────────────────
+function showViz(id,btn){
+  document.querySelectorAll('.vpanel').forEach(p=>p.classList.remove('vshow'));
+  document.querySelectorAll('.vnav-btn').forEach(b=>b.classList.remove('vactive'));
+  document.getElementById('vp-'+id).classList.add('vshow'); btn.classList.add('vactive');
+  if(!chartsBuilt[id]){
+    chartsBuilt[id]=true;
+    setTimeout(()=>{
+      if(id==='roth')buildRothChart();
+      if(id==='auto')buildAutoChart();
+      if(id==='cc')buildCCChart();
+      if(id==='compare')buildCompareChart();
+    },50);
+  }
+}
+
+// ── SCROLL OBSERVER ────────────────────────────────
+const obs=new IntersectionObserver(e=>{
+  e.forEach(en=>{
+    if(en.isIntersecting){en.target.classList.add('vis');const s=parseInt(en.target.dataset.step);if(s){activeS=s;renderRail();}}
+  });
+},{threshold:.08,rootMargin:'-40px 0px'});
+document.querySelectorAll('.fu').forEach(el=>obs.observe(el));
+document.querySelectorAll('.step-card').forEach((c,i)=>{c.style.transitionDelay=`${i*.03}s`;obs.observe(c);});
+
+// Enrollment bars
+const barObs=new IntersectionObserver(e=>{
+  if(e[0].isIntersecting){
+    document.querySelectorAll('.enroll-bar').forEach(b=>{setTimeout(()=>{b.style.width=b.dataset.w+'%';},100);});
+    barObs.disconnect();
+  }
+},{threshold:.3});
+const enrollEl=document.querySelector('.enrollment-box');
+if(enrollEl)barObs.observe(enrollEl);
+
+// Viz section lazy init
+const vizObs=new IntersectionObserver(e=>{
+  if(e[0].isIntersecting&&!chartsBuilt['roth']){chartsBuilt['roth']=true;buildRothChart();vizObs.disconnect();}
+},{threshold:.1});
+const vp=document.getElementById('vp-roth');
+if(vp)vizObs.observe(vp);
+
+// ── INIT ───────────────────────────────────────────
+renderRail(); calcUpdate();
+setTimeout(()=>togS(1),500);
+</script>
+</body>
+</html>

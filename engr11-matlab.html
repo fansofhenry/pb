@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ENGR 11 · Programming & Problem Solving in MATLAB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0b0d0f;
+  --surface: #111418;
+  --surface2: #171c22;
+  --border: rgba(255,255,255,.07);
+  --border2: rgba(255,255,255,.12);
+  --text: #d6dce5;
+  --dim: #7a8899;
+  --amber: #e8a24b;
+  --green: #4ec994;
+  --blue: #5baaf7;
+  --pink: #e06b9a;
+  --teal: #3dd6cc;
+  --red: #e05555;
+  --yellow: #e8d44b;
+  --track-color: var(--amber);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;font-size:15px;line-height:1.7;-webkit-font-smoothing:antialiased}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* SCANLINE TEXTURE */
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.04) 2px,rgba(0,0,0,.04) 4px);pointer-events:none;z-index:999}
+
+/* PROGRESS BAR */
+.progress-bar{position:sticky;top:0;z-index:100;background:var(--surface);border-bottom:1px solid var(--border2);padding:0 24px;display:flex;align-items:center;gap:16px;height:48px}
+.progress-track{flex:1;height:5px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:var(--track-color);border-radius:3px;transition:width .4s ease;width:0%}
+.progress-label{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--dim);white-space:nowrap;letter-spacing:.05em}
+.track-btns{display:flex;gap:6px}
+.track-btn{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:3px;border:1px solid var(--border2);background:transparent;color:var(--dim);cursor:pointer;transition:all .2s}
+.track-btn.active{background:var(--track-color);border-color:var(--track-color);color:#000;font-weight:600}
+
+/* MASTHEAD */
+.masthead{padding:80px 48px 64px;max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 380px;gap:64px;align-items:start}
+.masthead-tag{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);margin-bottom:24px;display:flex;align-items:center;gap:10px}
+.masthead-tag::before{content:'';display:inline-block;width:32px;height:1px;background:var(--amber)}
+.masthead h1{font-size:clamp(2.2rem,4vw,3.4rem);font-weight:700;line-height:1.15;letter-spacing:-.02em;margin-bottom:24px}
+.masthead h1 span{color:var(--amber)}
+.masthead-desc{color:var(--dim);font-size:15px;line-height:1.75;max-width:500px;margin-bottom:32px}
+.masthead-meta{display:flex;flex-wrap:wrap;gap:12px}
+.meta-chip{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.06em;padding:6px 14px;border-radius:3px;border:1px solid var(--border2);color:var(--dim);background:var(--surface)}
+.meta-chip.active{border-color:var(--amber);color:var(--amber);background:rgba(232,162,75,.08)}
+
+/* TERMINAL PANEL */
+.terminal{background:var(--surface);border:1px solid var(--border2);border-radius:8px;overflow:hidden;font-family:'IBM Plex Mono',monospace}
+.terminal-bar{background:#1a1e24;padding:12px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.t-dot{width:10px;height:10px;border-radius:50%}
+.t-dot.red{background:#e05555}
+.t-dot.yellow{background:#e8d44b}
+.t-dot.green{background:#4ec994}
+.terminal-title{font-size:10px;color:var(--dim);letter-spacing:.08em;margin-left:4px}
+.terminal-body{padding:20px;font-size:12px;line-height:1.8;color:#a8c0b0}
+.terminal-body .cmd{color:var(--green)}
+.terminal-body .comment{color:var(--dim)}
+.terminal-body .str{color:var(--amber)}
+.terminal-body .num{color:var(--blue)}
+.terminal-body .kw{color:var(--pink)}
+.terminal-body .out{color:var(--teal)}
+.terminal-body .cursor{display:inline-block;width:8px;height:13px;background:var(--green);animation:blink 1.2s step-end infinite;vertical-align:text-bottom}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* UNITS */
+.unit{max-width:1100px;margin:0 auto 80px;padding:0 48px}
+.unit-header{margin-bottom:40px;padding-bottom:24px;border-bottom:1px solid var(--border)}
+.unit-tag{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);margin-bottom:12px}
+.unit-number{font-size:11px;font-family:'IBM Plex Mono',monospace;letter-spacing:.12em;color:var(--amber);margin-bottom:8px}
+.unit-title{font-size:1.75rem;font-weight:700;letter-spacing:-.01em;margin-bottom:12px}
+.unit-desc{color:var(--dim);font-size:14px;max-width:680px;line-height:1.7}
+
+/* PRIOR KNOWLEDGE BOX */
+.prior-box{background:rgba(78,201,148,.06);border:1px solid rgba(78,201,148,.2);border-radius:6px;padding:20px 24px;margin-bottom:32px}
+.prior-box strong{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--green);display:block;margin-bottom:10px}
+.prior-box p{font-size:13px;color:var(--dim);margin-bottom:10px}
+.prior-box ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+.prior-box li{font-size:13px;color:var(--dim);padding-left:16px;position:relative}
+.prior-box li::before{content:'→';position:absolute;left:0;color:var(--green);font-family:'IBM Plex Mono',monospace}
+
+/* LESSON GRID */
+.lesson-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-radius:6px;overflow:hidden;border:1px solid var(--border)}
+.lesson-cell{background:var(--surface);padding:24px;display:flex;flex-direction:column;gap:12px;transition:background .15s}
+.lesson-cell:hover{background:var(--surface2)}
+.cell-num{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;color:var(--dim)}
+.cell-title{font-size:15px;font-weight:600;letter-spacing:-.01em;line-height:1.3}
+.cell-body{font-size:13px;color:var(--dim);line-height:1.65;flex:1}
+
+/* HEADACHE BOX */
+.headache{background:rgba(232,162,75,.06);border-left:3px solid var(--amber);border-radius:0 4px 4px 0;padding:14px 18px;margin-bottom:12px}
+.headache strong{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:6px}
+.headache p{font-size:12px;color:var(--dim);line-height:1.6;font-style:italic}
+
+/* RECALL */
+.recall-btn{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;padding:6px 12px;border-radius:3px;border:1px solid var(--border2);background:transparent;color:var(--dim);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px;width:fit-content}
+.recall-btn:hover{border-color:var(--amber);color:var(--amber)}
+.recall-box{display:none;margin-top:10px;padding:14px;background:var(--surface2);border-radius:4px;border:1px solid var(--border)}
+.recall-box strong{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);display:block;margin-bottom:8px}
+.recall-box ul{list-style:none;display:flex;flex-direction:column;gap:5px}
+.recall-box li{font-size:12px;color:var(--dim);padding-left:14px;position:relative;line-height:1.55}
+.recall-box li::before{content:'→';position:absolute;left:0;color:var(--amber);font-family:'IBM Plex Mono',monospace}
+.recall-box.open{display:block}
+
+/* CAREER BOX */
+.career-box{margin-top:auto;padding:10px 12px;background:rgba(91,170,247,.06);border-radius:4px;border:1px solid rgba(91,170,247,.15)}
+.career-box strong{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);display:block;margin-bottom:6px}
+.career-box ul{list-style:none;display:flex;flex-wrap:wrap;gap:5px}
+.career-box li{font-size:10px;padding:2px 8px;background:rgba(91,170,247,.08);color:var(--blue);border-radius:2px;font-family:'IBM Plex Mono',monospace}
+
+/* ASSUMPTION BOX */
+.assume-box{background:rgba(224,107,154,.06);border-left:3px solid rgba(224,107,154,.4);border-radius:0 4px 4px 0;padding:14px 18px;margin-top:12px}
+.assume-box strong{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--pink);display:block;margin-bottom:6px}
+.assume-box p{font-size:12px;color:var(--dim);line-height:1.6}
+
+/* COMPLETE BTN */
+.complete-btn{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:7px 14px;border-radius:3px;border:1px solid var(--border2);background:transparent;color:var(--dim);cursor:pointer;transition:all .2s;margin-top:auto}
+.complete-btn.done{background:rgba(78,201,148,.15);border-color:var(--green);color:var(--green)}
+.complete-btn:hover:not(.done){border-color:var(--text);color:var(--text)}
+
+/* PROJECT BLOCK */
+.project-block{background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:32px;margin-bottom:40px;display:grid;grid-template-columns:1fr 300px;gap:40px}
+.project-tag{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--teal);margin-bottom:12px}
+.project-block h3{font-size:1.25rem;font-weight:700;margin-bottom:12px;letter-spacing:-.01em}
+.project-block p{font-size:14px;color:var(--dim);line-height:1.7;margin-bottom:12px}
+.project-steps{display:flex;flex-direction:column;gap:8px}
+.project-step{display:flex;gap:12px;font-size:13px}
+.step-num{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--teal);width:20px;flex-shrink:0;padding-top:3px}
+.step-text{color:var(--dim);line-height:1.6}
+
+/* ITERATION CALLOUT */
+.iteration-box{background:rgba(61,214,204,.06);border:1px solid rgba(61,214,204,.2);border-radius:6px;padding:20px 24px;margin-top:20px}
+.iteration-box strong{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);display:block;margin-bottom:10px}
+.iteration-steps{display:flex;gap:0;margin-top:10px}
+.iter-step{flex:1;text-align:center;padding:12px 8px;font-size:11px;color:var(--dim);position:relative}
+.iter-step::after{content:'→';position:absolute;right:-8px;top:50%;transform:translateY(-50%);color:var(--teal);font-family:'IBM Plex Mono',monospace}
+.iter-step:last-child::after{display:none}
+.iter-step strong{display:block;color:var(--teal);font-size:12px;margin-bottom:4px;font-family:'IBM Plex Mono',monospace}
+
+/* CODE BLOCK */
+.code-block{background:#0d1117;border-radius:6px;border:1px solid var(--border);overflow:hidden;margin:12px 0;font-family:'IBM Plex Mono',monospace;font-size:12px}
+.code-header{background:#141a22;padding:8px 16px;font-size:9px;letter-spacing:.1em;color:var(--dim);border-bottom:1px solid var(--border);display:flex;justify-content:space-between}
+.code-body{padding:16px;line-height:1.8;color:#a8c0b0}
+.kw{color:var(--pink)}
+.str{color:var(--amber)}
+.num{color:var(--blue)}
+.cmt{color:#4a5568;font-style:italic}
+.fn{color:var(--teal)}
+.out{color:var(--green)}
+
+/* SECTION DIVIDER */
+.section-divider{max-width:1100px;margin:0 auto 60px;padding:0 48px}
+.divider-line{border:none;border-top:1px solid var(--border);margin-bottom:40px}
+
+/* HOW TO SUCCEED */
+.succeed-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-radius:6px;overflow:hidden;border:1px solid var(--border)}
+.succeed-cell{background:var(--surface);padding:24px}
+.succeed-icon{font-size:24px;margin-bottom:12px}
+.succeed-cell h4{font-size:14px;font-weight:600;margin-bottom:8px}
+.succeed-cell p{font-size:12px;color:var(--dim);line-height:1.65}
+
+/* MILESTONES */
+.milestones{display:flex;gap:16px;flex-wrap:wrap}
+.badge{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:20px;flex:1;min-width:240px}
+.badge-icon{font-size:28px;margin-bottom:12px}
+.badge h4{font-size:13px;font-weight:600;margin-bottom:6px}
+.badge p{font-size:12px;color:var(--dim);line-height:1.6}
+.badge.earned{border-color:var(--amber);background:rgba(232,162,75,.06)}
+
+/* REPRESENTATIONS */
+.rep-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px}
+.rep-item{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:10px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--dim)}
+.rep-item .rep-icon{font-size:18px;display:block;margin-bottom:4px}
+
+/* CONCEPT MAP */
+.concept-map{background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:32px;text-align:center;margin-bottom:40px}
+.concept-map h3{font-size:13px;font-weight:600;margin-bottom:24px;color:var(--dim);font-family:'IBM Plex Mono',monospace;letter-spacing:.08em;text-transform:uppercase}
+.concept-flow{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
+.concept-node{background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:10px 16px;font-size:12px;font-weight:500}
+.concept-node.active{border-color:var(--amber);color:var(--amber)}
+.concept-arrow{color:var(--dim);font-family:'IBM Plex Mono',monospace}
+
+/* FOOTER */
+footer{max-width:1100px;margin:0 auto;padding:40px 48px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+footer p{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:.06em}
+
+/* TRACK VISIBILITY */
+.track-content{transition:opacity .2s}
+.track-novice .builder-only,.track-novice .architect-only{opacity:.35;pointer-events:none}
+.track-architect .novice-only{opacity:.55}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.masthead>*{animation:fadeUp .6s ease both}
+.masthead>*:nth-child(2){animation-delay:.15s}
+
+/* RESPONSIVE */
+@media(max-width:960px){
+  .masthead{grid-template-columns:1fr;gap:32px;padding:40px 24px}
+  .unit{padding:0 24px}
+  .lesson-grid{grid-template-columns:1fr}
+  .project-block{grid-template-columns:1fr;gap:24px;padding:24px}
+  .succeed-grid{grid-template-columns:1fr}
+  .concept-flow{flex-direction:column}
+  .rep-grid{grid-template-columns:repeat(3,1fr)}
+  footer{flex-direction:column;gap:12px;text-align:center;padding:32px 24px}
+}
+</style>
+</head>
+<body>
+
+<!-- PROGRESS BAR -->
+<nav class="progress-bar" role="navigation" aria-label="Course progress">
+  <div class="track-btns" role="group" aria-label="Learning track">
+    <button class="track-btn active" onclick="setTrack('all')" aria-pressed="true">All</button>
+    <button class="track-btn" onclick="setTrack('novice')" aria-pressed="false">Starter</button>
+    <button class="track-btn" onclick="setTrack('builder')" aria-pressed="false">Builder</button>
+    <button class="track-btn" onclick="setTrack('architect')" aria-pressed="false">Architect</button>
+  </div>
+  <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Completion">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+  <span class="progress-label" id="progressLabel">0 / 18 complete</span>
+</nav>
+
+<!-- MASTHEAD -->
+<header class="masthead">
+  <div>
+    <div class="masthead-tag"><a href="index.html" style="color:var(--dim);text-decoration:none;opacity:.7;transition:opacity .15s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7">&larr; Home</a> &middot; Community College · Engineering Dept</div>
+    <h1>Programming &amp; Problem Solving<br>in <span>MATLAB</span></h1>
+    <p class="masthead-desc">You'll use MATLAB the way engineers actually use it — to model real systems, run real experiments, and check your answers against real data. Along the way, you'll uncover why computers sometimes get arithmetic "wrong," and what that means for the systems we trust with our lives.</p>
+    <div class="masthead-meta">
+      <span class="meta-chip active">ENGR 11</span>
+      <span class="meta-chip">18 Lessons</span>
+      <span class="meta-chip">3 Units</span>
+      <span class="meta-chip">ELSP Project</span>
+      <span class="meta-chip">No Exams · Portfolio</span>
+    </div>
+  </div>
+
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="t-dot red"></div>
+      <div class="t-dot yellow"></div>
+      <div class="t-dot green"></div>
+      <span class="terminal-title">MATLAB R2024b</span>
+    </div>
+    <div class="terminal-body">
+<span class="comment">% What does this course teach you?</span><br>
+<span class="comment">% Let's ask MATLAB itself.</span><br><br>
+<span class="kw">course</span> = struct();<br>
+<span class="kw">course</span>.unit1 = <span class="str">'MATLAB basics'</span>;<br>
+<span class="kw">course</span>.unit2 = <span class="str">'Build a circuit model'</span>;<br>
+<span class="kw">course</span>.unit3 = <span class="str">'How numbers work inside'</span>;<br><br>
+<span class="comment">% The big question we answer:</span><br>
+disp(<span class="str">'Can computers do perfect math?'</span>)<br><br>
+<span class="out">&gt;&gt; ans = 'No. Here is why.'</span><br>
+<span class="cursor"></span>
+    </div>
+  </div>
+</header>
+
+<!-- ==================== UNIT 1 ==================== -->
+<section class="unit">
+  <div class="unit-header">
+    <div class="unit-number">UNIT 1 OF 3</div>
+    <h2 class="unit-title">Introduction to MATLAB</h2>
+    <p class="unit-desc">You'll learn the MATLAB environment by actually using it — not by reading about it. Each lesson starts with a problem that you genuinely can't solve yet. Then we build the tool you need to solve it.</p>
+  </div>
+
+  <div class="prior-box">
+    <strong>What You Already Know (Before Lesson 1)</strong>
+    <p>You don't need to know any MATLAB. But pause for a moment and think about what you <em>do</em> know:</p>
+    <ul>
+      <li>You've used a calculator. MATLAB is a calculator on steroids.</li>
+      <li>You know that algebra uses variables like x and y. So does MATLAB.</li>
+      <li>You've probably copied and pasted text. In programming, we automate that.</li>
+    </ul>
+    <p style="margin-top:10px;font-size:12px">Research on learning shows that connecting new ideas to what you already know is the fastest path to deep understanding (Ambrose et al., 2010). That's why we start here.</p>
+  </div>
+
+  <div class="lesson-grid">
+
+    <!-- L1 -->
+    <div class="lesson-cell">
+      <div class="cell-num">LESSON 1</div>
+      <div class="cell-title">The MATLAB Desktop</div>
+      <div class="headache">
+        <strong>The Problem First</strong>
+        <p>You need to solve 500 equations. Writing them out by hand will take hours. What if there were a workspace that did the bookkeeping for you?</p>
+      </div>
+      <div class="cell-body">You'll orient yourself in MATLAB's four-panel workspace. You'll run your first commands in the Command Window, save variables in the Workspace, and write reusable scripts in the Editor. You'll learn why MATLAB uses a semicolon to suppress output — and what happens when you forget it.</div>
+      <div class="code-block">
+        <div class="code-header"><span>Try in Command Window</span></div>
+        <div class="code-body"><span class="num">3</span> + <span class="num">4</span> * <span class="num">2</span> <span class="cmt">% what do you get?</span><br>x = <span class="num">10</span>;  <span class="cmt">% the ; hides output</span><br>x         <span class="cmt">% now show it</span></div>
+      </div>
+      <button class="recall-btn" onclick="toggleRecall('r1')" aria-expanded="false">▶ Recall Questions</button>
+      <div class="recall-box" id="recall-r1">
+        <strong>Check your understanding</strong>
+        <ul>
+          <li>What is the Command Window for? What is the Editor for?</li>
+          <li>Why would you ever want to suppress output with `;`?</li>
+          <li>Where does MATLAB store the value of a variable between commands?</li>
+          <li>What happens if you close MATLAB? Do your variables survive?</li>
+        </ul>
+      </div>
+      <div class="career-box">
+        <strong>Used In</strong>
+        <ul><li>Circuit simulation</li><li>Signal processing</li><li>Robotics control</li></ul>
+      </div>
+      <button class="complete-btn" onclick="toggleComplete(this,'l1')">Mark Complete</button>
+    </div>
+
+    <!-- L2 -->
+    <div class="lesson-cell">
+      <div class="cell-num">LESSON 2</div>
+      <div class="cell-title">Create Arrays</div>
+      <div class="headache">
+        <strong>The Problem First</strong>
+        <p>You need to store the voltage measurements from 1,000 sensors. Making 1,000 individual variables is absurd. What's the better way?</p>
+      </div>
+      <div class="cell-body">Arrays are MATLAB's core data structure — everything is a matrix. You'll create row vectors, column vectors, and 2D matrices. You'll use the colon operator (<code>1:10</code>) to generate sequences and <code>linspace</code> to make evenly-spaced grids. You'll see why element-wise operations (<code>.*</code>) are different from matrix operations (<code>*</code>).</div>
+      <div class="code-block">
+        <div class="code-header"><span>Try It</span></div>
+        <div class="code-body">t = <span class="num">0</span>:<span class="num">0.1</span>:<span class="num">2</span>;<span class="cmt">  % time values</span><br>v = t.^<span class="num">2</span>;  <span class="cmt">% voltage squared</span><br>plot(t, v) <span class="cmt">% visualize it</span></div>
+      </div>
+      <button class="recall-btn" onclick="toggleRecall('r2')" aria-expanded="false">▶ Recall Questions</button>
+      <div class="recall-box" id="recall-r2">
+        <strong>Check your understanding</strong>
+        <ul>
+          <li>What's the difference between <code>A * B</code> and <code>A .* B</code>?</li>
+          <li>How would you create a list of 100 evenly spaced values between 0 and 1?</li>
+          <li>Why does MATLAB treat everything as a matrix, even a single number?</li>
+          <li>Can you have a matrix where each row has a different length? Why or why not?</li>
+        </ul>
+      </div>
+      <div class="assume-box">
+        <strong>Assumption to Notice</strong>
+        <p>When you use <code>linspace(0,1,100)</code>, you're assuming the quantity you're modeling is <em>continuous</em>. Is that always true? What if it's discrete?</p>
+      </div>
+      <button class="complete-btn" onclick="toggleComplete(this,'l2')">Mark Complete</button>
+    </div>
+
+    <!-- L3 -->
+    <div class="lesson-cell">
+      <div class="cell-num">LESSON 3</div>
+      <div class="cell-title">Logical Data</div>
+      <div class="headache">
+        <strong>The Problem First</strong>
+        <p>You have sensor readings from a circuit. You only want the ones above a safety threshold. How do you filter 10,000 numbers down to just the ones that matter?</p>
+      </div>
+      <div class="cell-body">Computers think in true/false. In MATLAB, every comparison returns a <em>logical array</em> of 1s and 0s. You'll use logical indexing — one of MATLAB's most powerful features — to select, filter, and replace data without writing a single loop. This is not a shortcut; it's the professional approach.</div>
+      <div class="code-block">
+        <div class="code-header"><span>Filtering Without a Loop</span></div>
+        <div class="code-body">readings = [<span class="num">2.1</span>, <span class="num">5.3</span>, <span class="num">1.8</span>, <span class="num">6.0</span>, <span class="num">4.4</span>];<br>safe = readings(readings &gt; <span class="num">3.0</span>);<br><span class="cmt">% safe = [5.3, 6.0, 4.4]</span></div>
+      </div>
+      <button class="recall-btn" onclick="toggleRecall('r3')" aria-expanded="false">▶ Recall Questions</button>
+      <div class="recall-box" id="recall-r3">
+        <strong>Check your understanding</strong>
+        <ul>
+          <li>What does <code>readings > 3.0</code> return on its own?</li>
+          <li>Why is logical indexing faster than a for-loop for large datasets?</li>
+          <li>How would you replace all values below 0 with 0 (clipping)?</li>
+          <li>What is the difference between <code>&amp;</code> (element-wise AND) and <code>&amp;&amp;</code> (short-circuit AND)?</li>
+        </ul>
+      </div>
+      <div class="career-box">
+        <strong>Used In</strong>
+        <ul><li>Data cleaning</li><li>Fault detection</li><li>Image processing</li></ul>
+      </div>
+      <button class="complete-btn" onclick="toggleComplete(this,'l3')">Mark Complete</button>
+    </div>
+
+    <!-- L4 -->
+    <div class="lesson-cell">
+      <div class="cell-num">LESSON 4</div>
+      <div class="cell-title">Control Flow</div>
+      <div class="headache">
+        <strong>The Problem First</strong>
+        <p>Your code needs to behave differently depending on the situation — apply one formula for a resistor, a different one for a capacitor. How do you teach a program to make decisions?</p>
+      </div>
+      <div class="cell-body">You'll write <code>if/elseif/else</code> blocks that branch on conditions, <code>for</code> loops that repeat over arrays, and <code>while</code> loops that keep going until a condition changes. The key insight: loops are powerful but slow. By the end of Unit 1, you'll know when to use a loop — and when to avoid one entirely.</div>
+      <div class="code-block">
+        <div class="code-header"><span>Decision Making</span></div>
+        <div class="code-body"><span class="kw">if</span> voltage &gt; <span class="num">5.0</span><br>  component = <span class="str">'capacitor'</span>;<br><span class="kw">elseif</span> voltage &gt; <span class="num">2.0</span><br>  component = <span class="str">'resistor'</span>;<br><span class="kw">else</span><br>  component = <span class="str">'check wiring'</span>;<br><span class="kw">end</span></div>
+      </div>
+      <button class="recall-btn" onclick="toggleRecall('r4')" aria-expanded="false">▶ Recall Questions</button>
+      <div class="recall-box" id="recall-r4">
+        <strong>Check your understanding</strong>
+        <ul>
+          <li>When does a <code>while</code> loop make more sense than a <code>for</code> loop?</li>
+          <li>What happens if a <code>while</code> loop condition is never false? What do you do?</li>
+          <li>Why is a vectorized solution (using arrays) usually faster than a loop?</li>
+          <li>Write a loop that computes the sum of 1 + 2 + 3 + ... + 100. Then do it in one line without a loop.</li>
+        </ul>
+      </div>
+      <button class="complete-btn" onclick="toggleComplete(this,'l4')">Mark Complete</button>
+    </div>
+
+    <!-- L5 -->
+    <div class="lesson-cell">
+      <div class="cell-num">LESSON 5</div>
+      <div class="cell-title">Function Files</div>
+      <div class="headache">
+        <strong>The Problem First</strong>
+        <p>You've written the same resistance calculation three times in three different scripts. When you find a mistake, you'll have to fix it in three places. There's a better way.</p>
+      </div>
+      <div class="cell-body">Functions let you write code once and reuse it everywhere. You'll write your own <code>.m</code> function files, pass in inputs, and get outputs back. You'll learn about local scope — why a variable inside a function can't accidentally overwrite one outside. Functions are the building blocks of every large engineering project.</div>
+      <div class="code-block">
+        <div class="code-header"><span>Your First Function (resistance.m)</span></div>
+        <div class="code-body"><span class="kw">function</span> R = resistance(V, I)<br>  <span class="cmt">% Ohm's Law: V = IR, so R = V/I</span><br>  R = V / I;<br><span class="kw">end</span><br><br><span class="cmt">% Call it from Command Window:</span><br>R = <span class="fn">resistance</span>(<span class="num">12</span>, <span class="num">0.5</span>);</div>
+      </div>
+      <button class="recall-btn" onclick="toggleRecall('r5')" aria-expanded="false">▶ Recall Questions</button>
+      <div class="recall-box" id="recall-r5">
+        <strong>Check your understanding</strong>
+        <ul>
+          <li>What does it mean for a variable to be "local" to a function?</li>
+          <li>How do you make a function return more than one output?</li>
+          <li>What's the difference between a script and a function?</li>
+          <li>Why is it good practice to add a comment explaining what your function does?</li>
+        </ul>
+      </div>
+      <div class="career-box">
+        <strong>Used In</strong>
+        <ul><li>Every serious codebase</li><li>Libraries & toolboxes</li><li>Team collaboration</li></ul>
+      </div>
+      <button class="complete-btn" onclick="toggleComplete(this,'l5')">Mark Complete</button>
+    </div>
+
+    <!-- L6 -->
+    <div class="lesson-cell">
+      <div class="cell-num">LESSON 6</div>
+      <div class="cell-title">Program Design</div>
+      <div class="headache">
+        <strong>The Problem First</strong>
+        <p>You've got a big project coming. How do you break a complex problem into pieces you can actually code — and then put them back together?</p>
+      </div>
+      <div class="cell-body">Good programs don't happen by accident. You'll practice top-down decomposition — starting from the big goal and breaking it into smaller functions. You'll learn to test each piece separately before combining them. This is how professional engineers avoid the nightmare of debugging a 500-line script that doesn't work for an unknown reason.</div>
+      <div class="rep-grid" style="margin:10px 0">
+        <div class="rep-item"><span class="rep-icon">📋</span>Pseudocode</div>
+        <div class="rep-item"><span class="rep-icon">📊</span>Flowchart</div>
+        <div class="rep-item"><span class="rep-icon">💻</span>MATLAB code</div>
+        <div class="rep-item"><span class="rep-icon">🧪</span>Test cases</div>
+        <div class="rep-item"><span class="rep-icon">📝</span>Written explanation</div>
+      </div>
+      <p style="font-size:11px;color:var(--dim)">For each solution you build, try representing it in at least 3 of these 5 forms. This deepens your understanding significantly.</p>
+      <button class="recall-btn" onclick="toggleRecall('r6')" aria-expanded="false">▶ Recall Questions</button>
+      <div class="recall-box" id="recall-r6">
+        <strong>Check your understanding</strong>
+        <ul>
+          <li>What does "decomposition" mean in software design?</li>
+          <li>How do you know if a function is small enough to test easily?</li>
+          <li>What would a good test case for your <code>resistance()</code> function look like?</li>
+          <li>Describe a real problem you care about. How would you break it into functions?</li>
+        </ul>
+      </div>
+      <button class="complete-btn" onclick="toggleComplete(this,'l6')">Mark Complete</button>
+    </div>
+
+  </div>
+</section>
+
+<!-- ==================== UNIT 2: ELSP PROJECT ==================== -->
+<section class="unit">
+  <div class="unit-header">
+    <div class="unit-number">UNIT 2 OF 3 · PROJECT</div>
+    <h2 class="unit-title">Build a Real Circuit Model</h2>
+    <p class="unit-desc">The Electrify Linear-Systems Problem (ELSP) is the centerpiece of the course. You'll build a physical resistor circuit, measure voltages and currents yourself, model it as a linear system, solve it with MATLAB, and compare your computed answers against your measured data.</p>
+  </div>
+
+  <div class="project-block">
+    <div>
+      <div class="project-tag">THE ELSP PROJECT</div>
+      <h3>From Ohm's Law to Linear Algebra</h3>
+      <p>A circuit is just a system of equations. Kirchhoff's laws give you the equations; MATLAB solves them. But here's what makes this project real: you'll collect the measured data yourself, and you'll find out whether your model is right.</p>
+      <p>This is the verification principle in action — you can check your own work without asking the instructor if your answer is correct. The circuit tells you.</p>
+      <div class="project-steps">
+        <div class="project-step"><span class="step-num">01</span><span class="step-text">Build a resistor network using components you can hold in your hand</span></div>
+        <div class="project-step"><span class="step-num">02</span><span class="step-text">Measure voltage and current at each branch with a multimeter</span></div>
+        <div class="project-step"><span class="step-num">03</span><span class="step-text">Write down Kirchhoff's laws as a matrix equation <code>Ax = b</code></span></div>
+        <div class="project-step"><span class="step-num">04</span><span class="step-text">Solve with MATLAB using <code>x = A\b</code></span></div>
+        <div class="project-step"><span class="step-num">05</span><span class="step-text">Compare computed values to measured values — how close are they?</span></div>
+        <div class="project-step"><span class="step-num">06</span><span class="step-text">Investigate the discrepancy. Where did error come from?</span></div>
+      </div>
+      <div class="assume-box" style="margin-top:20px">
+        <strong>Assumptions We're Making — Discuss These</strong>
+        <p>Resistors follow Ohm's Law exactly. Temperature doesn't change resistance. Wires have zero resistance. Measurement instruments are perfect. Which of these is most likely to be wrong? How could you test that?</p>
+      </div>
+    </div>
+    <div>
+      <div class="iteration-box">
+        <strong>This Project Uses Iteration — Not Submission</strong>
+        <div class="iteration-steps">
+          <div class="iter-step"><strong>Build</strong>Make the circuit</div>
+          <div class="iter-step"><strong>Measure</strong>Collect data</div>
+          <div class="iter-step"><strong>Model</strong>Write equations</div>
+        </div>
+        <div class="iteration-steps" style="margin-top:8px">
+          <div class="iter-step"><strong>Solve</strong>Use MATLAB</div>
+          <div class="iter-step"><strong>Compare</strong>Model vs. data</div>
+          <div class="iter-step"><strong>Revise</strong>Fix & repeat</div>
+        </div>
+        <p style="font-size:11px;color:var(--dim);margin-top:12px">Modeling is not a one-shot activity. Engineers revise their models many times. Your first attempt is supposed to be imperfect. That's the point.</p>
+      </div>
+      <div class="prior-box" style="margin-top:16px">
+        <strong>What You'll Need from Unit 1</strong>
+        <ul>
+          <li>Arrays — to store multiple voltages and currents</li>
+          <li>Matrix operations — to set up <code>Ax = b</code></li>
+          <li>Functions — to organize your solution code</li>
+          <li>Plotting — to visualize measured vs. computed</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Project lessons -->
+  <div class="lesson-grid">
+    <div class="lesson-cell">
+      <div class="cell-num">PROJECT LESSON 1</div>
+      <div class="cell-title">Build the Circuit</div>
+      <div class="cell-body">Assemble a resistor network on a breadboard. Label every node. Draw a schematic by hand — not as a formality, but because drawing forces you to understand the topology.</div>
+      <button class="recall-btn" onclick="toggleRecall('rp1')" aria-expanded="false">▶ Recall Questions</button>
+      <div class="recall-box" id="recall-rp1"><strong>Think about this</strong><ul><li>What is Kirchhoff's Current Law in plain English?</li><li>How many independent equations does an n-node circuit produce?</li></ul></div>
+      <button class="complete-btn" onclick="toggleComplete(this,'lp1')">Mark Complete</button>
+    </div>
+    <div class="lesson-cell">
+      <div class="cell-num">PROJECT LESSON 2</div>
+      <div class="cell-title">Collect Measurements</div>
+      <div class="cell-body">Use a multimeter to measure voltage at every node and current through every branch. Record everything in a MATLAB script. This is your ground truth — everything else gets compared to this.</div>
+      <button class="recall-btn" onclick="toggleRecall('rp2')" aria-expanded="false">▶ Recall Questions</button>
+      <div class="recall-box" id="recall-rp2"><strong>Think about this</strong><ul><li>How precise is your multimeter? What is its uncertainty?</li><li>If you measure the same voltage twice and get different results, what does that tell you?</li></ul></div>
+      <button class="complete-btn" onclick="toggleComplete(this,'lp2')">Mark Complete</button>
+    </div>
+    <div class="lesson-cell">
+      <div class="cell-num">PROJECT LESSON 3</div>
+      <div class="cell-title">Set Up & Solve the System</div>
+      <div class="cell-body">Translate Kirchhoff's laws into a matrix equation <code>Ax = b</code>. Solve with MATLAB's backslash operator. Then write a function that automates this for any circuit of the same topology.</div>
+      <button class="recall-btn" onclick="toggleRecall('rp3')" aria-expanded="false">▶ Recall Questions</button>
+      <div class="recall-box" id="recall-rp3"><strong>Think about this</strong><ul><li>What does it mean for a matrix to be singular? What does that mean physically for the circuit?</li><li>Why is <code>A\b</code> preferred over <code>inv(A)*b</code> in MATLAB?</li></ul></div>
+      <button class="complete-btn" onclick="toggleComplete(this,'lp3')">Mark Complete</button>
+    </div>
+    <div class="lesson-cell">
+      <div class="cell-num">PROJECT LESSON 4</div>
+      <div class="cell-title">Compare & Reflect</div>
+      <div class="cell-body">Plot measured vs. computed values on the same graph. Calculate the error for each branch. Write a paragraph in your Live Script explaining what you see. Where is the model good? Where does it break down?</div>
+      <div class="assume-box" style="margin-top:0">
+        <strong>Model Validity</strong>
+        <p>Your model will not be perfect. That's expected. The question to answer: is the error small enough to be useful? For what applications would this model be "good enough"?</p>
+      </div>
+      <button class="complete-btn" onclick="toggleComplete(this,'lp4')">Mark Complete</button>
+    </div>
+    <div class="lesson-cell">
+      <div class="cell-num">PROJECT LESSON 5</div>
+      <div class="cell-title">Extend the Model</div>
+      <div class="cell-body">Add more resistors to make your circuit more complex. Does the model still hold? Try adding a non-resistive element (a capacitor or LED). What breaks? Why? This is the "high ceiling" of the project — you can keep going indefinitely.</div>
+      <button class="recall-btn" onclick="toggleRecall('rp5')" aria-expanded="false">▶ Recall Questions</button>
+      <div class="recall-box" id="recall-rp5"><strong>Think about this</strong><ul><li>What physical assumptions does the linear model make that would break with non-linear components?</li><li>How would you model a circuit with both DC and AC components?</li></ul></div>
+      <button class="complete-btn" onclick="toggleComplete(this,'lp5')">Mark Complete</button>
+    </div>
+    <div class="lesson-cell">
+      <div class="cell-num">PROJECT LESSON 6</div>
+      <div class="cell-title">Portfolio Write-Up</div>
+      <div class="cell-body">Write a clear, honest account of your project in your Learning Portfolio. Include: what you built, what worked, what didn't, what surprised you, and what you'd do differently. The goal is reflection, not polish.</div>
+      <div class="career-box">
+        <strong>This Is Real Engineering</strong>
+        <ul><li>Model → Test → Revise is how products get built</li><li>Documenting failures is valued in industry</li></ul>
+      </div>
+      <button class="complete-btn" onclick="toggleComplete(this,'lp6')">Mark Complete</button>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== UNIT 3 ==================== -->
+<section class="unit">
+  <div class="unit-header">
+    <div class="unit-number">UNIT 3 OF 3</div>
+    <h2 class="unit-title">How Computers Think About Numbers</h2>
+    <p class="unit-desc">This unit answers a question most programmers never ask: how does a computer actually store the number 0.1? The answer is stranger — and more important — than you think. If you write code that involves money, navigation, or medical data, you need to know this.</p>
+  </div>
+
+  <div class="prior-box">
+    <strong>What You Already Know</strong>
+    <ul>
+      <li>You know that computers store data as 0s and 1s</li>
+      <li>You know that 1/3 = 0.333... never ends as a decimal</li>
+      <li>You may know that calculators sometimes give weird results like 0.1 + 0.2 = 0.30000000000000004</li>
+    </ul>
+    <p style="margin-top:10px;font-size:12px">In this unit, you'll understand <em>exactly</em> why that last one happens — and how to protect your code from it.</p>
+  </div>
+
+  <div class="lesson-grid">
+
+    <!-- U3L1 -->
+    <div class="lesson-cell">
+      <div class="cell-num">UNIT 3 · LESSON 1</div>
+      <div class="cell-title">Unsigned Integers & Binary</div>
+      <div class="headache">
+        <strong>The Problem First</strong>
+        <p>You have 8 light switches. Each is either ON (1) or OFF (0). How many different combinations can you make? And what numbers can you represent that way?</p>
+      </div>
+      <div class="cell-body">Everything in a computer is binary — 0s and 1s. You'll learn to convert between decimal and binary by hand, understand what "8-bit" means, and see why a <code>uint8</code> variable can only hold values 0–255. You'll also see what happens when you go one higher than 255 — overflow — and why that matters.</div>
+      <div class="code-block">
+        <div class="code-header"><span>Overflow in Action</span></div>
+        <div class="code-body">x = <span class="fn">uint8</span>(<span class="num">255</span>);  <span class="cmt">% maximum for uint8</span><br>y = x + <span class="fn">uint8</span>(<span class="num">1</span>);<br>disp(y)   <span class="cmt">% What do you expect?</span><br><span class="out">ans = 255  % Not 256. Why?</span></div>
+      </div>
+      <button class="recall-btn" onclick="toggleRecall('r31')" aria-expanded="false">▶ Recall Questions</button>
+      <div class="recall-box" id="recall-r31"><strong>Check your understanding</strong><ul><li>Convert 42 to binary by hand. Then verify with MATLAB: <code>dec2bin(42)</code></li><li>What is the largest number an 8-bit unsigned integer can hold?</li><li>Name a real situation where overflow in embedded code has caused a safety problem.</li></ul></div>
+      <div class="career-box"><strong>Used In</strong><ul><li>Embedded systems</li><li>Image data (0–255)</li><li>Network protocols</li></ul></div>
+      <button class="complete-btn" onclick="toggleComplete(this,'l31')">Mark Complete</button>
+    </div>
+
+    <!-- U3L2 -->
+    <div class="lesson-cell">
+      <div class="cell-num">UNIT 3 · LESSON 2</div>
+      <div class="cell-title">Signed Integers & Two's Complement</div>
+      <div class="headache">
+        <strong>The Problem First</strong>
+        <p>You need to represent negative numbers in binary. You can't just add a minus sign — computers only have 0s and 1s. How do you encode the idea of "negative"?</p>
+      </div>
+      <div class="cell-body">Two's complement is the clever trick computers use to represent negative numbers without wasting a bit on a sign symbol. You'll learn the conversion rule by hand, understand why <code>int8</code> goes from −128 to +127 (not −127 to +127), and see how subtraction becomes addition in binary — which is why it's such an elegant solution.</div>
+      <div class="code-block">
+        <div class="code-header"><span>Signed vs Unsigned</span></div>
+        <div class="code-body"><span class="fn">int8</span>(<span class="num">127</span>) + <span class="fn">int8</span>(<span class="num">1</span>)  <span class="cmt">% what happens?</span><br><span class="out">ans = 127  % Saturates, doesn't wrap</span><br><span class="fn">typecast</span>(<span class="fn">int8</span>(-<span class="num">1</span>), <span class="str">'uint8'</span>)<br><span class="out">ans = 255  % Same bits, different meaning</span></div>
+      </div>
+      <button class="recall-btn" onclick="toggleRecall('r32')" aria-expanded="false">▶ Recall Questions</button>
+      <div class="recall-box" id="recall-r32"><strong>Check your understanding</strong><ul><li>Convert −5 to 8-bit two's complement by hand.</li><li>Why does two's complement make addition hardware simpler?</li><li>Why is the range −128 to +127 asymmetric (127 ≠ 128)?</li></ul></div>
+      <button class="complete-btn" onclick="toggleComplete(this,'l32')">Mark Complete</button>
+    </div>
+
+    <!-- U3L3 -->
+    <div class="lesson-cell">
+      <div class="cell-num">UNIT 3 · LESSON 3</div>
+      <div class="cell-title">Fixed-Point Numbers</div>
+      <div class="headache">
+        <strong>The Problem First</strong>
+        <p>Integers can't represent 3.14. Floating-point numbers are slow on cheap hardware. What do you do when you need decimals but you're programming a small sensor with limited compute power?</p>
+      </div>
+      <div class="cell-body">Fixed-point arithmetic places the decimal point at a fixed location in the bit pattern. It's faster than floating-point, uses less memory, and is totally predictable. You'll see how MATLAB's <code>ufixed</code> data type works, understand the trade-off between range and precision, and learn why GPS chips and audio processors often use fixed-point math.</div>
+      <div class="assume-box">
+        <strong>The Key Assumption in Fixed-Point</strong>
+        <p>You're assuming your numbers will always stay within a known range. If they don't, you get overflow. Is that assumption safe for the application you're building?</p>
+      </div>
+      <button class="recall-btn" onclick="toggleRecall('r33')" aria-expanded="false">▶ Recall Questions</button>
+      <div class="recall-box" id="recall-r33"><strong>Check your understanding</strong><ul><li>What is the trade-off between integer bits and fractional bits in a fixed-point format?</li><li>Why is fixed-point preferred over floating-point in real-time control systems?</li><li>Give an example of an application where fixed-point arithmetic would cause a serious problem if not designed carefully.</li></ul></div>
+      <div class="career-box"><strong>Used In</strong><ul><li>DSP chips</li><li>Motor controllers</li><li>IoT sensors</li></ul></div>
+      <button class="complete-btn" onclick="toggleComplete(this,'l33')">Mark Complete</button>
+    </div>
+
+    <!-- U3L4 -->
+    <div class="lesson-cell">
+      <div class="cell-num">UNIT 3 · LESSON 4</div>
+      <div class="cell-title">Floating-Point Numbers</div>
+      <div class="headache">
+        <strong>The Problem First</strong>
+        <p>Try this in MATLAB: <code>0.1 + 0.2 == 0.3</code>. You'll get <code>false</code>. Why? And should you be worried?</p>
+      </div>
+      <div class="cell-body">Floating-point is like scientific notation in binary: a mantissa and an exponent, both stored in binary. Most decimal fractions can't be stored exactly — so the computer rounds to the nearest representable value. You'll learn to measure and account for this rounding error, and why testing with <code>==</code> on floating-point numbers is almost always a mistake.</div>
+      <div class="code-block">
+        <div class="code-header"><span>The Classic Surprise</span></div>
+        <div class="code-body"><span class="num">0.1</span> + <span class="num">0.2</span> == <span class="num">0.3</span>   <span class="cmt">% false!</span><br>abs((<span class="num">0.1</span>+<span class="num">0.2</span>) - <span class="num">0.3</span>) &lt; <span class="fn">eps</span>  <span class="cmt">% true</span><br><br><span class="cmt">% eps is machine epsilon</span><br><span class="cmt">% the smallest number where 1+eps ≠ 1</span></div>
+      </div>
+      <button class="recall-btn" onclick="toggleRecall('r34')" aria-expanded="false">▶ Recall Questions</button>
+      <div class="recall-box" id="recall-r34"><strong>Check your understanding</strong><ul><li>Why can't 0.1 be stored exactly in binary floating-point?</li><li>What is machine epsilon (<code>eps</code>) and what does it measure?</li><li>How should you test if two floating-point numbers are "equal"?</li><li>Find a real-world example where floating-point error caused a serious bug.</li></ul></div>
+      <div class="career-box"><strong>Used In</strong><ul><li>All numerical software</li><li>Finance (be careful!)</li><li>Scientific computing</li></ul></div>
+      <button class="complete-btn" onclick="toggleComplete(this,'l34')">Mark Complete</button>
+    </div>
+
+    <!-- U3L5 -->
+    <div class="lesson-cell">
+      <div class="cell-num">UNIT 3 · LESSON 5</div>
+      <div class="cell-title">The IEEE 754 Standard</div>
+      <div class="headache">
+        <strong>The Problem First</strong>
+        <p>Before 1985, every computer manufacturer stored floating-point numbers differently. Code from one machine wouldn't give the same answers on another. Scientists couldn't reproduce each other's results. How did we fix this?</p>
+      </div>
+      <div class="cell-body">IEEE 754 is the international standard that defines exactly how floating-point numbers are stored and computed. You'll learn the bit layout of a 64-bit <code>double</code> (1 sign bit, 11 exponent bits, 52 mantissa bits), understand special values like <code>Inf</code>, <code>-Inf</code>, and <code>NaN</code>, and use an online IEEE 754 calculator to explore edge cases. This is one of the most important technical standards in computing history.</div>
+      <div class="code-block">
+        <div class="code-header"><span>Special Values</span></div>
+        <div class="code-body"><span class="num">1</span>/<span class="num">0</span>       <span class="cmt">% Inf  (not an error!)</span><br>-<span class="num">1</span>/<span class="num">0</span>      <span class="cmt">% -Inf</span><br><span class="num">0</span>/<span class="num">0</span>       <span class="cmt">% NaN  (Not a Number)</span><br><span class="fn">isnan</span>(<span class="num">0</span>/<span class="num">0</span>)  <span class="cmt">% true</span><br><span class="fn">isinf</span>(<span class="num">1</span>/<span class="num">0</span>)  <span class="cmt">% true</span></div>
+      </div>
+      <button class="recall-btn" onclick="toggleRecall('r35')" aria-expanded="false">▶ Recall Questions</button>
+      <div class="recall-box" id="recall-r35"><strong>Check your understanding</strong><ul><li>How many bits does a double-precision float use for the exponent? For the mantissa?</li><li>What does <code>NaN</code> mean and when does it appear?</li><li>Why is <code>NaN != NaN</code> evaluating to <em>true</em> not a bug, but a feature?</li><li>What's the largest finite number a double can represent?</li></ul></div>
+      <div class="career-box"><strong>Used In</strong><ul><li>All modern CPUs</li><li>GPU computation</li><li>Numerical libraries</li></ul></div>
+      <button class="complete-btn" onclick="toggleComplete(this,'l35')">Mark Complete</button>
+    </div>
+
+    <!-- U3L6 -->
+    <div class="lesson-cell">
+      <div class="cell-num">UNIT 3 · LESSON 6</div>
+      <div class="cell-title">Precision, Accuracy & Numerical Analysis</div>
+      <div class="headache">
+        <strong>The Problem First</strong>
+        <p>You've built a model that gives an answer. But how wrong could that answer be? And does the error grow or shrink as your computation gets bigger?</p>
+      </div>
+      <div class="cell-body">Precision and accuracy are different things. A clock that always reads 12:00 is precise (consistent) but not accurate (not right). You'll measure absolute error, relative error, and rounding error in MATLAB computations. You'll also see numerical instability — cases where tiny initial errors grow catastrophically through repeated calculation. This is the foundation of numerical analysis.</div>
+      <div class="iteration-box">
+        <strong>Investigate This Yourself</strong>
+        <div style="font-size:12px;color:var(--dim);margin-top:8px;line-height:1.7">
+          Compute the sum 1/1 + 1/2 + 1/3 + ... + 1/1000000 in two ways:<br>
+          <strong style="color:var(--teal)">Forward:</strong> start from 1/1 and add small terms last<br>
+          <strong style="color:var(--amber)">Backward:</strong> start from 1/1000000 and add large terms last<br>
+          Do you get the same answer? If not, which is more accurate and why?
+        </div>
+      </div>
+      <button class="recall-btn" onclick="toggleRecall('r36')" aria-expanded="false">▶ Recall Questions</button>
+      <div class="recall-box" id="recall-r36"><strong>Check your understanding</strong><ul><li>What is the difference between absolute error and relative error?</li><li>What makes a numerical algorithm "stable" vs "unstable"?</li><li>How does Lloyd Trefethen define numerical analysis? Why is that definition interesting?</li><li>If your ELSP project gave an error of 0.05 volts, is that good or bad? (What does it depend on?)</li></ul></div>
+      <div class="career-box"><strong>Used In</strong><ul><li>Finite element analysis</li><li>Climate modeling</li><li>Machine learning</li></ul></div>
+      <button class="complete-btn" onclick="toggleComplete(this,'l36')">Mark Complete</button>
+    </div>
+
+  </div>
+</section>
+
+<!-- CONCEPT MAP -->
+<section class="section-divider">
+  <hr class="divider-line">
+  <div class="concept-map">
+    <h3>How This Course Fits Together</h3>
+    <div class="concept-flow">
+      <div class="concept-node active">MATLAB Basics</div>
+      <span class="concept-arrow">→</span>
+      <div class="concept-node">Arrays & Logic</div>
+      <span class="concept-arrow">→</span>
+      <div class="concept-node">Functions</div>
+      <span class="concept-arrow">→</span>
+      <div class="concept-node active">Circuit Model (ELSP)</div>
+      <span class="concept-arrow">→</span>
+      <div class="concept-node">Verify vs. Data</div>
+    </div>
+    <div class="concept-flow" style="margin-top:12px">
+      <div class="concept-node">Binary</div>
+      <span class="concept-arrow">→</span>
+      <div class="concept-node">Integers</div>
+      <span class="concept-arrow">→</span>
+      <div class="concept-node">Fixed-Point</div>
+      <span class="concept-arrow">→</span>
+      <div class="concept-node active">Floating-Point</div>
+      <span class="concept-arrow">→</span>
+      <div class="concept-node">Error Analysis</div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW TO SUCCEED -->
+<section class="unit">
+  <div class="unit-header">
+    <h2 class="unit-title">How to Get the Most Out of This Course</h2>
+    <p class="unit-desc">These strategies come from research on how people actually learn — not from myth or habit.</p>
+  </div>
+  <div class="succeed-grid">
+    <div class="succeed-cell">
+      <div class="succeed-icon">🤔</div>
+      <h4>Ask "Why?" before "How?"</h4>
+      <p>Every lesson starts with a headache — a problem you can't yet solve. Sit with that discomfort before reaching for the solution. The frustration is productive; it means your brain is building a connection.</p>
+    </div>
+    <div class="succeed-cell">
+      <div class="succeed-icon">🔄</div>
+      <h4>Retrieve, Don't Reread</h4>
+      <p>After you finish a lesson, close your notes and write down everything you remember. This feels harder than rereading, but research consistently shows it produces stronger, longer-lasting memory (Roediger & Karpicke, 2006).</p>
+    </div>
+    <div class="succeed-cell">
+      <div class="succeed-icon">🧪</div>
+      <h4>Break Your Code on Purpose</h4>
+      <p>Take working code and deliberately change something to see what breaks. Ask: "what if I remove the semicolon? What if this array is empty?" Breaking things teaches you the boundaries of your understanding.</p>
+    </div>
+    <div class="succeed-cell">
+      <div class="succeed-icon">✏️</div>
+      <h4>Write Before You Code</h4>
+      <p>Pseudocode and flowcharts aren't busywork — they're thinking on paper. Students who write out their plan first write better code faster, because they've already solved the logic problem before the syntax gets in the way.</p>
+    </div>
+    <div class="succeed-cell">
+      <div class="succeed-icon">🔗</div>
+      <h4>Connect Every Lesson to Something You Care About</h4>
+      <p>Motivation isn't something you wait to feel — it's something you build. After each lesson, write one sentence: "This connects to [something in my life] because..." The more specific, the more powerful.</p>
+    </div>
+    <div class="succeed-cell">
+      <div class="succeed-icon">📋</div>
+      <h4>Use Your Portfolio as a Mirror, Not an Archive</h4>
+      <p>Your Learning Portfolio isn't a scrapbook of completed work. It's a record of your thinking over time. Include what confused you, what you tried that didn't work, and what changed your mind. That's what real learning looks like.</p>
+    </div>
+  </div>
+</section>
+
+<!-- MILESTONES -->
+<section class="unit">
+  <div class="unit-header">
+    <h2 class="unit-title">Learning Milestones</h2>
+    <p class="unit-desc">These aren't grades — they're descriptions of what you can do. Use them to understand where you are and where you're headed.</p>
+  </div>
+  <div class="milestones">
+    <div class="badge">
+      <div class="badge-icon">🌱</div>
+      <h4>MATLAB User</h4>
+      <p>You can navigate the MATLAB desktop, create arrays, use logical indexing, write control flow, and call functions. You can solve a small problem from scratch in a Live Script.</p>
+    </div>
+    <div class="badge">
+      <div class="badge-icon">⚡</div>
+      <h4>Circuit Modeler</h4>
+      <p>You built a physical circuit, collected your own data, set up a linear system, solved it with MATLAB, and compared computed to measured. You explained the discrepancy in writing.</p>
+    </div>
+    <div class="badge earned">
+      <div class="badge-icon">🔢</div>
+      <h4>Numerical Thinker</h4>
+      <p>You can explain why 0.1 + 0.2 ≠ 0.3 in binary. You understand overflow, two's complement, fixed-point trade-offs, and IEEE 754. You can measure and reason about floating-point error in your own code.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>ENGR 11 · Programming &amp; Problem Solving in MATLAB</p>
+  <p>Jeff Anderson · <a href="https://www.appliedlinearalgebra.com">appliedlinearalgebra.com</a></p>
+</footer>
+
+<script>
+// ── TRACK SYSTEM ──
+function setTrack(track) {
+  document.body.className = track === 'all' ? '' : 'track-' + track;
+  document.querySelectorAll('.track-btn').forEach(btn => {
+    btn.classList.remove('active');
+    btn.setAttribute('aria-pressed', 'false');
+  });
+  const active = [...document.querySelectorAll('.track-btn')]
+    .find(b => b.textContent.toLowerCase().startsWith(track === 'novice' ? 'start' : track));
+  if (active) { active.classList.add('active'); active.setAttribute('aria-pressed','true'); }
+  const colors = {all:'#e8a24b', novice:'#4ec994', builder:'#5baaf7', architect:'#e06b9a'};
+  document.documentElement.style.setProperty('--track-color', colors[track] || colors.all);
+}
+
+// ── RECALL TOGGLE ──
+function toggleRecall(id) {
+  const box = document.getElementById('recall-' + id);
+  const btn = document.querySelector(`[onclick="toggleRecall('${id}')"]`);
+  if (!box) return;
+  const isOpen = box.classList.toggle('open');
+  btn.setAttribute('aria-expanded', isOpen);
+  btn.textContent = isOpen ? '▼ Recall Questions' : '▶ Recall Questions';
+}
+
+// ── COMPLETION TRACKING ──
+const completed = new Set();
+const total = document.querySelectorAll('.complete-btn').length;
+
+function toggleComplete(btn, id) {
+  if (completed.has(id)) {
+    completed.delete(id);
+    btn.classList.remove('done');
+    btn.textContent = 'Mark Complete';
+  } else {
+    completed.add(id);
+    btn.classList.add('done');
+    btn.textContent = '✓ Complete';
+  }
+  updateProgress();
+}
+
+function updateProgress() {
+  const pct = total > 0 ? (completed.size / total) * 100 : 0;
+  const fill = document.getElementById('progressFill');
+  const label = document.getElementById('progressLabel');
+  if (fill) fill.style.width = pct + '%';
+  if (label) label.textContent = `${completed.size} / ${total} complete`;
+  const bar = document.querySelector('.progress-track');
+  if (bar) bar.setAttribute('aria-valuenow', Math.round(pct));
+}
+</script>
+<div style="background:#0a0a12;padding:28px 40px;border-top:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;color:rgba(245,240,232,.3);">
+  <span>ENGR 11 · Programming &amp; Problem Solving in MATLAB · All resources free<br><a href="index.html" style="color:rgba(245,240,232,.45);text-decoration:underline;text-underline-offset:2px;">&larr; Teaching Computing Differently</a> · <a href="mailto:henry@henryfan.org" style="color:rgba(245,240,232,.45);">henry@henryfan.org</a></span>
+  <span style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:rgba(245,240,232,.1);letter-spacing:.05em;">ENGR 11</span>
+</div>
+</body>
+</html>

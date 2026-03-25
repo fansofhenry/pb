@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teaching — Henry Fan</title>
+  <meta name="description" content="Teaching philosophy, curriculum design, and course portfolio for introductory CS at California community colleges. Constructionism, productive failure, ungrading, and physical computing.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="site-nav" aria-label="Main navigation">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-name">Henry Fan</a>
+    <button class="nav-toggle" aria-label="Toggle navigation" onclick="document.querySelector('.nav-links').classList.toggle('open')">☰</button>
+    <ul class="nav-links">
+      <li><a href="../">← Curriculum</a></li>
+      <li><a href="research.html">Research</a></li>
+      <li><a href="projects.html">Projects</a></li>
+      <li><a href="teaching.html" class="active">Teaching</a></li>
+      <li><a href="writing.html">Writing</a></li>
+      <li><a href="tools.html">Prototypes</a></li>
+      <li><a href="background.html">Background</a></li>
+      <li><a href="cv.pdf">CV</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="page-container">
+  <div class="page-header">
+    <p class="label">Teaching</p>
+    <h1>Derive Before Compute</h1>
+    <p class="subtitle">
+      I teach introductory CS at two California community colleges. The courses on this page are built on a single conviction: students learn CS best when they build real things, earn abstractions through struggle, and understand that every algorithm encodes a set of values about the world. No exams. No required textbooks. Every concept earned by building.
+    </p>
+  </div>
+
+  <!-- ============================================
+       PHILOSOPHY
+       ============================================ -->
+
+  <h2>Teaching Philosophy</h2>
+
+  <p>
+    Three principles, each grounded in research, each enacted in every course I teach:
+  </p>
+
+  <div class="rq-block">
+    <p class="rq-id">Principle 1</p>
+    <p class="rq-title">Derive Before Compute</p>
+    <p class="rq-text">
+      Every concept arrives as the answer to a question the student already owns. Formalism before need creates what Harel (1998) calls motivational debt — students memorize without understanding. In my courses, every module begins with a problem students can't yet solve, and the week's content is the tool that resolves it. Students experience the headache before receiving the medicine.
+    </p>
+  </div>
+
+  <div class="rq-block">
+    <p class="rq-id">Principle 2</p>
+    <p class="rq-title">Build Before Import</p>
+    <p class="rq-text">
+      Students implement data structures, algorithms, and circuits from scratch before using libraries, frameworks, or pre-built tools. You earn the abstraction by understanding its interior. A student who has built a register from D flip-flops understands register architecture in a way that no textbook diagram can provide. This is Papert's constructionism (1980) applied to the full stack: the artifact is both the learning product and the assessment.
+    </p>
+  </div>
+
+  <div class="rq-block">
+    <p class="rq-id">Principle 3</p>
+    <p class="rq-title">Equity as Design</p>
+    <p class="rq-text">
+      The social implications of technical systems are part of understanding what those systems do — not a module added at the end. Students who build PageRank analyze whose content the algorithm surfaces and whose it buries. Students who build a facial recognition pipeline measure its accuracy across skin tones. Bias is measurable, so we measure it. This follows Ko (2022), Freire (1968), and hooks (1994): knowledge is liberatory only when connected to the world the student actually inhabits.
+    </p>
+  </div>
+
+  <hr>
+
+  <!-- ============================================
+       ASSESSMENT
+       ============================================ -->
+
+  <h2>Assessment Philosophy</h2>
+
+  <p>
+    Following Jeff Anderson's (Foothill College) antiracist learning science framework and ungrading practice: timed exams measure anxiety and test-taking strategy, not understanding. They are strong predictors of racial and socioeconomic factors and weak predictors of genuine learning. My courses use portfolio-based assessment with student-proposed grades.
+  </p>
+
+  <p>
+    Every course has a public "List of Final Deliverables" visible from Day 1. Students know exactly what they need to produce and propose their own grades with evidence from their learning portfolio. Mid-term and final self-reflection activities structure metacognitive growth — learning how to learn is a technical outcome, not a soft skill.
+  </p>
+
+  <p>
+    The three-track system (Novice / Builder / Architect) provides genuine student autonomy: tracks are chosen weekly, there is no grade penalty for Track I, and Track I is a complete, serious outcome — not consolation. This follows Deci &amp; Ryan's self-determination theory: intrinsic motivation requires autonomy, competence, and relatedness, and all three must be structurally guaranteed.
+  </p>
+
+  <hr>
+
+  <!-- ============================================
+       SIGNATURE PROJECT
+       ============================================ -->
+
+  <h2>Signature Project</h2>
+
+  <div class="card" style="border-color:var(--color-accent);">
+    <p class="card-label">20 Weeks · Team-Based · Cross-STEM · Completed Curriculum Design</p>
+    <p class="card-title">Build a Computer from Scratch</p>
+    <p class="card-desc">
+      Teams of community college students build a working, programmable 8-bit computer on breadboards — starting from logic gates and ending with a machine that runs real programs. Inspired by Ben Eater's design. Grounded in seven bodies of learning science research: constructionism (Papert), productive failure (Kapur), experiential learning (Kolb), self-determination theory (Deci &amp; Ryan), transfer theory (Perkins &amp; Salomon), situated learning (Lave &amp; Wenger), and intellectual need (Harel).
+    </p>
+    <p class="card-desc" style="margin-top:var(--space-sm);">
+      Every module includes an explicit "STEM Bridge Moment" where the instructor names the connection to physics, mathematics, linear algebra, differential equations, or chemistry — bridging from the breadboard to the student's next math or science course. High road transfer doesn't happen automatically; it must be designed for.
+    </p>
+    <p class="card-desc" style="margin-top:var(--space-sm);">
+      Assessment: Build Journal (30%), Working Module (25%), Integration &amp; Debugging (20%), Public Exhibition (15%), Self-Evaluation (10%). No exams. The computer itself is the most honest assessment — it works or it doesn't.
+    </p>
+    <p style="margin-top:var(--space-md);">
+      <a href="../build-a-computer.html">Open the full project page →</a>
+    </p>
+  </div>
+
+  <hr>
+
+  <!-- ============================================
+       COURSE PORTFOLIO
+       ============================================ -->
+
+  <h2>Course Portfolio</h2>
+
+  <p>
+    Six courses forming a coherent pathway from introductory CS through AI and machine learning, plus supporting mathematics and engineering courses. All courses are open-access, require no purchased textbooks, and use portfolio assessment. Full course pages with weekly plans, project descriptions, and learning science grounding are available at the curriculum site.
+  </p>
+
+  <div class="writing-item">
+    <p class="writing-type">CS 180 · 3 Units · Currently Taught</p>
+    <p class="writing-title">Introduction to Artificial Intelligence</p>
+    <p class="writing-desc">Search, knowledge representation, planning, machine learning fundamentals, and the ethics of AI systems. Three tracks. Capstone: students build and critically evaluate a system that makes decisions about people.</p>
+  </div>
+
+  <div class="writing-item">
+    <p class="writing-type">CS 185 · 3 Units · Currently Taught</p>
+    <p class="writing-title">Introduction to Machine Learning</p>
+    <p class="writing-desc">Supervised and unsupervised learning, neural networks, bias auditing, and model interpretability. Every algorithm is a choice about what to optimize, and that choice has a politics. Capstone: bias audit of a production ML system.</p>
+  </div>
+
+  <div class="writing-item">
+    <p class="writing-type">CS 210 · 4 Units · In Development</p>
+    <p class="writing-title">Data Structures and Algorithms</p>
+    <p class="writing-desc">Build-before-import throughout: students implement every major data structure from scratch before reaching for a library. A mini-project for every structure. Grounded in Ko, Knuth, Anderson, Freire, Noble, and Benjamin.</p>
+  </div>
+
+  <div class="writing-item">
+    <p class="writing-type">CS 175 · 3 Units · In Development</p>
+    <p class="writing-title">How Things Work: PageRank, GPS, and the Phone in Your Pocket</p>
+    <p class="writing-desc">Three technologies reverse-engineered from first principles. Students don't just learn that these systems work — they understand why. Includes the Build a Computer signature project.</p>
+  </div>
+
+  <div class="writing-item">
+    <p class="writing-type">Math 2B · 3 Units · Currently Taught</p>
+    <p class="writing-title">Applied Linear Algebra</p>
+    <p class="writing-desc">Built on Jeff Anderson's ALAF textbook and twelve modeling criteria. Six fundamental problems. Twenty-nine lessons. Derive before compute — the math is useful the moment it's introduced.</p>
+  </div>
+
+  <div class="writing-item">
+    <p class="writing-type">ENGR 11 · 3 Units · Currently Taught</p>
+    <p class="writing-title">Programming and Problem Solving in MATLAB</p>
+    <p class="writing-desc">MATLAB the way engineers actually use it: model real circuits, understand IEEE 754 floating-point, learn why 0.1 + 0.2 ≠ 0.3 and what that means for the systems we trust with our lives.</p>
+  </div>
+
+  <p style="font-size:0.88rem;margin-top:var(--space-lg);">
+    <a href="../">See the full curriculum site with weekly plans and project descriptions →</a>
+  </p>
+
+  <hr>
+
+  <!-- ============================================
+       CONNECTION TO RESEARCH
+       ============================================ -->
+
+  <h2>Teaching as Research</h2>
+
+  <p>
+    I don't maintain separate identities as "researcher" and "instructor." Every course I teach is a potential research site, and every research finding reshapes the courses:
+  </p>
+
+  <div class="writing-item">
+    <p class="writing-title">The Build a Computer project is a research instrument.</p>
+    <p class="writing-desc">When this project is piloted, it creates a natural site for studying help-seeking behavior (Q1), belonging (P5), and the effects of physical computing on persistence (Q3). The build journal entries are a qualitative data source. The milestone completion patterns are a quantitative data source. The research and the teaching are the same activity.</p>
+  </div>
+
+  <div class="writing-item">
+    <p class="writing-title">SyllabusAudit (P2) was born from my own syllabi.</p>
+    <p class="writing-desc">The annotation scheme for motivational debt began as a self-audit of my own course materials. I found violations of the necessity principle in my own syllabi — places where I introduced formalism before students had the headache. The research tool I'm building is a tool I already use on my own work.</p>
+  </div>
+
+  <div class="writing-item">
+    <p class="writing-title">The three-track system is a structural belonging intervention.</p>
+    <p class="writing-desc">If Walton &amp; Brady are right that belonging is structural — communicated by the design of the course, not just the warmth of the instructor — then the track system is a testable belonging intervention. A student who chooses Track I and completes it successfully has received a structural signal that they belong. This is measurable (P5).</p>
+  </div>
+
+  <hr>
+
+  <!-- ============================================
+       INTELLECTUAL LINEAGE
+       ============================================ -->
+
+  <h2>Intellectual Lineage</h2>
+
+  <p>The teaching practice on this page is built on the work of:</p>
+
+  <div class="detail-grid" style="margin-top:var(--space-md);">
+    <div>
+      <dt>Jeff Anderson</dt>
+      <dd>Antiracist learning science, ungrading, strategic deep learning, five learner-centered objectives. The foundational influence on everything I build as an instructor.</dd>
+    </div>
+    <div>
+      <dt>Seymour Papert</dt>
+      <dd>Constructionism. Students learn most deeply by building public, shareable artifacts. The Build a Computer project is a direct application.</dd>
+    </div>
+    <div>
+      <dt>Amy J. Ko</dt>
+      <dd>Critically conscious computing. Equitable, joyous CS education. Read-before-write sequencing. Student agency as a precondition for learning.</dd>
+    </div>
+    <div>
+      <dt>Manu Kapur</dt>
+      <dd>Productive failure. Struggle before instruction produces deeper understanding. The debugging sessions in the Build a Computer project are the instruction.</dd>
+    </div>
+    <div>
+      <dt>Paulo Freire</dt>
+      <dd>The banking model of education reproduces passivity. Knowledge is liberatory when connected to lived experience. Every capstone is student-chosen.</dd>
+    </div>
+    <div>
+      <dt>bell hooks</dt>
+      <dd>The classroom as a site of freedom. Bringing the full self to learning. Reflective writing alongside every project.</dd>
+    </div>
+  </div>
+
+  <p class="font-sans text-small text-muted mt-xl">Last updated: March 2026</p>
+</main>
+
+<footer class="site-footer" style="text-align:center;">
+  <p>© 2026 Henry Fan · SJSU McNair Scholar · Foothill College Science Learning Institute</p>
+  <p style="margin-top:0.25rem;"><a href="mailto:henry@henryfan.org" style="color:var(--color-text-muted);">henry@henryfan.org</a> · <a href="../" style="color:var(--color-text-muted);">← Curriculum Site</a></p>
+</footer>
+
+</body>
+</html>

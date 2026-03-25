@@ -1,14 +1,603 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="ProjectBridge — Find campus projects, build real work, and connect with collaborators at Foothill College." />
-    <title>ProjectBridge — Foothill College</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23E8850C'/><text x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='serif' font-weight='bold' font-size='20' fill='white'>P</text></svg>" />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teaching Computing Differently — Community College CS</title>
+<meta name="description" content="A project-based, equity-centered CS curriculum for community college students. No exams. No required textbooks. Every concept earned through building.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@300;400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root { --ink:#0d0d0d;--paper:#f5f0e8;--cream:#ede8d8;--red:#c1121f;--orange:#e36414;--teal:#0a7c6e;--gold:#d4a017;--dim:#5a5a5a; }
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--paper);color:var(--ink);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+.site-nav{position:sticky;top:0;z-index:100;background:var(--ink);border-bottom:1px solid rgba(255,255,255,.08);padding:0 60px;display:flex;align-items:center;justify-content:space-between;height:52px;}
+.nav-brand{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(245,240,232,.5);text-decoration:none;}
+.nav-brand strong{color:var(--red);font-weight:400;}
+.nav-links{display:flex;list-style:none;}
+.nav-links a{display:block;padding:0 18px;height:52px;line-height:52px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(245,240,232,.4);text-decoration:none;transition:color .15s;border-left:1px solid rgba(255,255,255,.05);}
+.nav-links a:hover{color:var(--paper);}
+.masthead{background:var(--ink);color:var(--paper);border-bottom:5px solid var(--red);}
+.mast-top{padding:12px 60px;border-bottom:1px solid rgba(255,255,255,.1);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;opacity:.5;display:flex;justify-content:space-between;}
+.mast-main{padding:64px 60px 56px;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:end;max-width:1300px;}
+.mast-kicker{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--red);margin-bottom:20px;animation:fadeUp .5s ease .1s both;}
+.mast-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(60px,9vw,120px);letter-spacing:.02em;line-height:.88;margin-bottom:28px;animation:fadeUp .6s ease .25s both;}
+.mast-title span{color:var(--red);}
+.mast-desc{font-size:15px;line-height:1.9;color:rgba(245,240,232,.6);max-width:520px;font-weight:300;animation:fadeUp .6s ease .4s both;}
+.mast-pills{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px;animation:fadeUp .6s ease .55s both;}
+.pill{padding:5px 14px;border:1px solid rgba(255,255,255,.15);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(245,240,232,.5);}
+.mast-aside{border-left:1px solid rgba(255,255,255,.1);padding-left:60px;padding-bottom:8px;}
+.aside-label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(245,240,232,.3);margin-bottom:28px;}
+.aside-principle{margin-bottom:28px;padding-bottom:28px;border-bottom:1px solid rgba(255,255,255,.06);}
+.aside-principle:last-child{border-bottom:none;margin-bottom:0;}
+.aside-principle-num{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:.12em;color:var(--red);margin-bottom:6px;}
+.aside-principle-title{font-family:'DM Serif Display',serif;font-size:19px;font-style:italic;color:var(--paper);margin-bottom:6px;}
+.aside-principle-body{font-size:12.5px;line-height:1.75;color:rgba(245,240,232,.45);}
+.problem-section{border-bottom:2px solid var(--ink);background:var(--cream);}
+.problem-inner{max-width:1300px;margin:0 auto;padding:80px 60px;display:grid;grid-template-columns:280px 1fr;gap:80px;}
+.section-label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--red);display:flex;align-items:flex-start;gap:10px;padding-top:4px;}
+.section-label::before{content:'//';color:var(--ink);opacity:.25;}
+.problem-text p{font-size:16px;line-height:1.9;color:var(--ink);margin-bottom:20px;}
+.problem-text p:last-child{margin-bottom:0;}
+.problem-text strong{font-weight:500;}
+.problem-text em{font-family:'DM Serif Display',serif;font-style:italic;font-size:17px;}
+.philosophy-section{border-bottom:2px solid var(--ink);}
+.philosophy-inner{max-width:1300px;margin:0 auto;padding:80px 60px;}
+.philosophy-header{display:grid;grid-template-columns:280px 1fr;gap:80px;margin-bottom:64px;}
+.philosophy-intro{font-size:15px;line-height:1.85;color:var(--dim);max-width:620px;}
+.philosophy-grid{display:grid;grid-template-columns:repeat(3,1fr);border:2px solid var(--ink);}
+.philosophy-card{border-right:2px solid var(--ink);padding:44px 40px;}
+.philosophy-card:last-child{border-right:none;}
+.phil-num{font-family:'Bebas Neue',sans-serif;font-size:80px;line-height:.85;color:var(--cream);margin-bottom:24px;display:block;}
+.phil-title{font-family:'DM Serif Display',serif;font-size:24px;font-style:italic;margin-bottom:16px;line-height:1.2;}
+.phil-body{font-size:13.5px;line-height:1.85;color:var(--dim);margin-bottom:20px;}
+.phil-example{font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.7;color:var(--red);padding:14px 16px;border-left:3px solid var(--red);background:rgba(193,18,31,.05);}
+.phil-example-label{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);margin-bottom:5px;display:block;}
+.phil-citation{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--dim);opacity:.6;margin-top:14px;line-height:1.6;border-top:1px solid var(--cream);padding-top:10px;}
+.courses{padding:80px 60px;max-width:1300px;margin:0 auto;}
+.courses-label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--red);margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.courses-label::before{content:'//';color:var(--cream);}
+.courses-subhead{font-size:14px;line-height:1.75;color:var(--dim);max-width:680px;margin-bottom:48px;}
+.pathway{display:flex;align-items:center;margin-bottom:16px;overflow-x:auto;padding-bottom:4px;gap:0;}
+.pathway-node{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;}
+.pathway-dot{width:44px;height:44px;border:2px solid var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.03em;background:var(--paper);text-align:center;line-height:1.2;}
+.pathway-dot.filled{background:var(--ink);color:var(--paper);}
+.pathway-dot.accent{background:var(--red);border-color:var(--red);color:white;}
+.pathway-dot.branch{background:var(--teal);border-color:var(--teal);color:white;}
+.pathway-label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);text-align:center;max-width:72px;line-height:1.4;}
+.pathway-arrow{width:36px;height:2px;background:var(--cream);flex-shrink:0;position:relative;}
+.pathway-arrow::after{content:'';position:absolute;right:-1px;top:-3px;width:0;height:0;border-left:6px solid var(--cream);border-top:4px solid transparent;border-bottom:4px solid transparent;}
+.pathway-note{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--dim);opacity:.6;margin-top:8px;margin-bottom:36px;line-height:1.7;}
+.course-grid{display:grid;grid-template-columns:repeat(3,1fr);border:2px solid var(--ink);}
+.course-card{border-right:2px solid var(--ink);display:flex;flex-direction:column;transition:background .2s;text-decoration:none;color:inherit;}
+.course-card:last-child{border-right:none;}
+.course-card:hover{background:var(--cream);}
+.card-top{background:var(--ink);color:var(--paper);padding:32px 36px 28px;flex-shrink:0;position:relative;overflow:hidden;}
+.course-card:hover .card-top{background:#1a1a1a;}
+.card-ghost{position:absolute;right:-10px;bottom:-20px;font-family:'Bebas Neue',sans-serif;font-size:100px;line-height:1;opacity:.06;pointer-events:none;}
+.card-num{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;opacity:.4;margin-bottom:14px;}
+.card-course-num{font-family:'Bebas Neue',sans-serif;font-size:52px;line-height:1;margin-bottom:4px;}
+.card-course-num span{color:var(--red);}
+.card-title{font-family:'DM Serif Display',serif;font-size:18px;font-style:italic;color:rgba(245,240,232,.75);line-height:1.3;}
+.card-body{padding:28px 36px 36px;flex:1;display:flex;flex-direction:column;}
+.status-badge{display:inline-block;padding:3px 9px;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;border-radius:2px;margin-bottom:10px;}
+.status-taught{background:rgba(10,124,110,.12);color:var(--teal);border:1px solid rgba(10,124,110,.3);}
+.status-dev{background:rgba(212,160,23,.1);color:#8a6500;border:1px solid rgba(212,160,23,.3);}
+.status-proposed{background:rgba(90,90,90,.08);color:var(--dim);border:1px solid rgba(90,90,90,.2);}
+.card-desc{font-size:13.5px;line-height:1.8;color:var(--dim);flex:1;margin-bottom:24px;}
+.card-meta{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--cream);padding-top:20px;margin-bottom:24px;}
+.meta-row{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.06em;}
+.meta-label{color:var(--dim);opacity:.7;}
+.meta-value{color:var(--ink);}
+.card-cta{display:flex;align-items:center;gap:10px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--red);transition:gap .2s;}
+.course-card:hover .card-cta{gap:16px;}
+.cta-arrow{font-size:18px;}
+.course-card.c180 .card-course-num span{color:var(--red);}
+.course-card.c185 .card-course-num span{color:#4dd9f0;}.course-card.c185 .card-top{background:#060b14;}.course-card.c185 .card-title{color:rgba(200,235,255,.7);}.course-card.c185 .card-cta{color:#4dd9f0;}
+.course-card.c210 .card-course-num span{color:var(--orange);}.course-card.c210 .card-top{background:#1a1205;}.course-card.c210 .card-title{color:rgba(250,246,240,.7);}.course-card.c210 .card-cta{color:var(--orange);}
+.course-card.c175 .card-course-num span{color:#00d4ff;}.course-card.c175 .card-top{background:#020c14;}.course-card.c175 .card-title{color:rgba(210,240,255,.7);}.course-card.c175 .card-cta{color:#00d4ff;}
+.course-card.cm2b .card-course-num span{color:#8b7cf8;}.course-card.cm2b .card-top{background:#0b0b14;}.course-card.cm2b .card-title{color:rgba(220,218,240,.7);}.course-card.cm2b .card-cta{color:#8b7cf8;}
+.course-card.ce11 .card-course-num span{color:#a8ff3e;}.course-card.ce11 .card-top{background:#060a06;}.course-card.ce11 .card-title{color:rgba(220,240,210,.7);}.course-card.ce11 .card-cta{color:#a8ff3e;}
+.tracks-section{background:var(--ink);color:var(--paper);border-top:2px solid rgba(255,255,255,.06);border-bottom:2px solid rgba(255,255,255,.06);}
+.tracks-inner{max-width:1300px;margin:0 auto;padding:80px 60px;display:grid;grid-template-columns:280px 1fr;gap:80px;align-items:start;}
+.tracks-label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--red);display:flex;align-items:flex-start;gap:10px;padding-top:4px;}
+.tracks-label::before{content:'//';color:rgba(255,255,255,.2);}
+.tracks-key-insight{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);padding:18px 24px;margin-bottom:32px;font-family:'DM Serif Display',serif;font-size:17px;font-style:italic;color:var(--paper);line-height:1.5;}
+.tracks-key-insight span{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.3);display:block;margin-top:8px;font-style:normal;}
+.tracks-desc{font-size:15px;line-height:1.85;color:rgba(245,240,232,.55);margin-bottom:32px;max-width:640px;}
+.tracks-grid{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid rgba(255,255,255,.1);}
+.track-card{padding:36px 32px;border-right:1px solid rgba(255,255,255,.1);}
+.track-card:last-of-type{border-right:none;}
+.track-roman{font-family:'Bebas Neue',sans-serif;font-size:48px;line-height:1;margin-bottom:12px;}
+.track-i{color:rgba(255,255,255,.2);}.track-ii{color:rgba(255,255,255,.5);}.track-iii{color:var(--paper);}
+.track-name{font-family:'DM Serif Display',serif;font-size:17px;font-style:italic;margin-bottom:10px;color:var(--paper);}
+.track-body{font-size:13px;line-height:1.8;color:rgba(245,240,232,.45);}
+.track-examples{margin-top:16px;display:flex;flex-direction:column;gap:6px;}
+.track-example{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.06em;color:rgba(245,240,232,.3);padding:6px 10px;border-left:2px solid rgba(255,255,255,.1);}
+.track-note{padding:20px 32px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.06em;color:rgba(245,240,232,.3);line-height:1.7;}
+.projects-section{border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);}
+.projects-inner{max-width:1300px;margin:0 auto;padding:80px 60px;}
+.projects-header{display:grid;grid-template-columns:280px 1fr;gap:80px;margin-bottom:64px;align-items:start;}
+.projects-intro{font-size:15px;line-height:1.85;color:var(--dim);}
+.projects-grid{display:grid;grid-template-columns:repeat(3,1fr);border:2px solid var(--ink);}
+.project-card{padding:36px 36px 40px;border-right:2px solid var(--ink);border-bottom:2px solid var(--ink);}
+.project-card:nth-child(3n){border-right:none;}
+.project-card:nth-last-child(-n+3){border-bottom:none;}
+.project-featured{grid-column:1/-1;border-bottom:2px solid var(--ink);display:grid;grid-template-columns:1fr 1fr;gap:0;padding:0;}
+.project-featured .pf-left{padding:36px 36px 40px;border-right:2px solid var(--ink);}
+.project-featured .pf-right{padding:36px 36px 40px;display:flex;flex-direction:column;justify-content:center;}
+.project-featured .project-title{font-size:28px;margin-bottom:16px;}
+.pf-cta{display:inline-flex;align-items:center;gap:10px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--red);text-decoration:none;margin-top:16px;transition:gap .2s;}
+.pf-cta:hover{gap:16px;}
+.featured-banner{display:block;text-decoration:none;color:inherit;background:var(--ink);border-bottom:3px solid var(--copper);padding:24px 60px;transition:background .2s;}
+.featured-banner:hover{background:#1a1510;}
+.fb-inner{display:flex;align-items:center;gap:20px;flex-wrap:wrap;max-width:1300px;}
+.fb-badge{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--copper);background:rgba(184,115,51,.12);border:1px solid rgba(184,115,51,.3);padding:5px 12px;white-space:nowrap;flex-shrink:0;}
+.fb-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.02em;color:var(--paper);white-space:nowrap;}
+.fb-title span{color:var(--copper);}
+.fb-desc{font-size:13px;color:rgba(245,240,232,.45);flex:1;min-width:200px;}
+.fb-arrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--copper);white-space:nowrap;margin-left:auto;}
+.fb-tags{display:flex;gap:5px;flex-wrap:wrap;}
+.fb-tags span{padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:7px;letter-spacing:.1em;text-transform:uppercase;border-radius:2px;}
+.fb-phys{background:rgba(37,99,235,.12);color:#2563eb;border:1px solid rgba(37,99,235,.25);}
+.fb-math{background:rgba(124,58,237,.12);color:#7c3aed;border:1px solid rgba(124,58,237,.25);}
+.fb-linalg{background:rgba(8,145,178,.12);color:#0891b2;border:1px solid rgba(8,145,178,.25);}
+.fb-diffeq{background:rgba(220,38,38,.1);color:#dc2626;border:1px solid rgba(220,38,38,.2);}
+.fb-chem{background:rgba(5,150,105,.12);color:#059669;border:1px solid rgba(5,150,105,.25);}
+.pf-stem-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;}
+.pf-stem{padding:3px 8px;font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.1em;text-transform:uppercase;border-radius:2px;}
+.pf-phys{background:rgba(37,99,235,.1);color:#2563eb;border:1px solid rgba(37,99,235,.25);}
+.pf-math{background:rgba(124,58,237,.1);color:#7c3aed;border:1px solid rgba(124,58,237,.25);}
+.pf-chem{background:rgba(5,150,105,.1);color:#059669;border:1px solid rgba(5,150,105,.25);}
+.pf-diffeq{background:rgba(220,38,38,.08);color:#dc2626;border:1px solid rgba(220,38,38,.2);}
+.pf-linalg{background:rgba(8,145,178,.1);color:#0891b2;border:1px solid rgba(8,145,178,.25);}
+.project-tag{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--red);margin-bottom:12px;}
+.project-title{font-family:'DM Serif Display',serif;font-size:21px;font-style:italic;line-height:1.2;margin-bottom:12px;}
+.project-body{font-size:13px;line-height:1.8;color:var(--dim);margin-bottom:16px;}
+.project-learns{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.06em;color:var(--dim);opacity:.7;line-height:1.7;}
+.project-learns strong{color:var(--ink);opacity:1;display:block;margin-bottom:3px;font-size:9px;letter-spacing:.15em;text-transform:uppercase;}
+.ng-section{background:var(--ink);color:var(--paper);border-top:2px solid rgba(255,255,255,.06);}
+.ng-inner{max-width:1300px;margin:0 auto;padding:80px 60px;}
+.ng-label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#c4b5fd;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.ng-label::before{content:'//';color:rgba(255,255,255,.2);}
+.ng-desc{font-size:15px;line-height:1.85;color:rgba(245,240,232,.55);max-width:680px;margin-bottom:12px;}
+.ng-credit{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.04em;color:rgba(245,240,232,.3);margin-bottom:48px;line-height:1.7;border-left:2px solid rgba(255,255,255,.08);padding-left:14px;}
+.ng-grid{display:grid;grid-template-columns:repeat(4,1fr);border:2px solid rgba(255,255,255,.08);}
+.phil-strip{background:var(--red);color:white;padding:48px 60px;display:grid;grid-template-columns:1fr auto;gap:48px;align-items:center;}
+.phil-quote-text{font-family:'DM Serif Display',serif;font-size:clamp(22px,2.8vw,34px);font-style:italic;line-height:1.35;max-width:760px;}
+.phil-source{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;opacity:.6;margin-top:14px;}
+.phil-stats{display:flex;flex-direction:column;gap:16px;flex-shrink:0;}
+.phil-stat{text-align:right;}
+.phil-num{font-family:'Bebas Neue',sans-serif;font-size:48px;line-height:1;}
+.phil-label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);}
+.thinkers{padding:80px 60px;border-top:2px solid var(--ink);max-width:1300px;margin:0 auto;}
+.thinkers-header{display:grid;grid-template-columns:280px 1fr;gap:80px;margin-bottom:56px;align-items:start;}
+.thinkers-label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);display:flex;align-items:flex-start;gap:10px;padding-top:4px;}
+.thinkers-label::before{content:'//';color:var(--cream);}
+.thinkers-intro{font-size:14px;line-height:1.85;color:var(--dim);max-width:620px;}
+.thinker-row{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--cream);}
+.thinker{padding:28px 0 28px 28px;border-right:1px solid var(--cream);border-bottom:1px solid var(--cream);}
+.thinker:nth-child(4n){border-right:none;}
+.thinker-name{font-family:'DM Serif Display',serif;font-size:16px;margin-bottom:3px;}
+.thinker-book{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.06em;color:var(--red);margin-bottom:10px;font-style:italic;}
+.thinker-desc{font-size:11.5px;line-height:1.65;color:var(--dim);margin-bottom:10px;}
+.thinker-in-practice{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.04em;color:var(--ink);line-height:1.6;padding:8px 10px;border-left:2px solid var(--cream);background:rgba(0,0,0,.02);}
+.thinker-in-practice strong{display:block;font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:3px;}
+.about-section{background:var(--cream);border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);}
+.about-inner{max-width:1300px;margin:0 auto;padding:80px 60px;display:grid;grid-template-columns:280px 1fr;gap:80px;}
+.about-text p{font-size:15px;line-height:1.9;color:var(--ink);margin-bottom:18px;}
+.about-text p:last-child{margin-bottom:0;}
+.about-links{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px;}
+.about-link{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--red);text-decoration:none;border-bottom:1px solid rgba(193,18,31,.3);padding-bottom:2px;transition:border-color .15s;}
+.about-link:hover{border-color:var(--red);}
+footer{background:var(--ink);color:var(--paper);padding:40px 60px;display:flex;justify-content:space-between;align-items:center;border-top:3px solid var(--red);}
+.footer-left{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;color:rgba(245,240,232,.35);line-height:2;}
+.footer-left a{color:rgba(245,240,232,.5);text-decoration:none;}
+.footer-left a:hover{color:var(--paper);}
+.footer-right{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.05em;color:rgba(245,240,232,.15);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+@media(max-width:1100px){
+  .mast-main{grid-template-columns:1fr;gap:40px;}
+  .mast-aside{border-left:none;border-top:1px solid rgba(255,255,255,.08);padding-left:0;padding-top:40px;}
+  .problem-inner,.philosophy-header,.projects-header,.thinkers-header,.about-inner{grid-template-columns:1fr;gap:28px;}
+  .tracks-inner{grid-template-columns:1fr;gap:28px;}
+}
+@media(max-width:1000px){
+  .course-grid{grid-template-columns:1fr;}
+  .course-card{border-right:none;border-bottom:2px solid var(--ink);}
+  .course-card:last-child{border-bottom:none;}
+  .ng-grid{grid-template-columns:1fr!important;}
+  .site-nav,.mast-top,.courses,.thinkers,.problem-inner,.philosophy-inner,.tracks-inner,.ng-inner,.projects-inner,.about-inner{padding-left:28px;padding-right:28px;}
+  .featured-banner{padding-left:28px;padding-right:28px;}.fb-inner{gap:12px;}
+  .mast-main{padding-left:28px;padding-right:28px;}
+  .phil-strip{grid-template-columns:1fr;gap:24px;padding:40px 28px;}
+  .phil-stats{flex-direction:row;gap:28px;}
+  .thinker-row{grid-template-columns:repeat(2,1fr);}
+  .thinker:nth-child(2n){border-right:none;}
+  .philosophy-grid{grid-template-columns:1fr;}
+  .philosophy-card{border-right:none;border-bottom:2px solid var(--ink);}
+  .philosophy-card:last-child{border-bottom:none;}
+  .tracks-grid{grid-template-columns:1fr;}
+  .track-card{border-right:none;border-bottom:1px solid rgba(255,255,255,.1);}
+  .projects-grid{grid-template-columns:1fr;}
+  .project-card{border-right:none;}
+  .project-featured{grid-template-columns:1fr;}.project-featured .pf-left{border-right:none;border-bottom:2px solid var(--ink);}
+  footer{flex-direction:column;gap:16px;text-align:center;padding:28px;}
+  .nav-links{display:none;}
+}
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a class="nav-brand" href="index.html">Teaching <strong>Computing</strong> Differently</a>
+  <ul class="nav-links">
+    <li><a href="build-a-computer.html" style="color:var(--copper);">Build a Computer</a></li>
+    <li><a href="#philosophy">Philosophy</a></li>
+    <li><a href="#courses">Courses</a></li>
+    <li><a href="#tracks">Three Tracks</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#thinkers">Research Roots</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="research/" style="color:var(--red);">Research Portfolio &nearr;</a></li>
+  </ul>
+</nav>
+
+<header class="masthead">
+  <div class="mast-top">
+    <span>Community College CS</span>
+    <span>Computer Science Department</span>
+    <span>Project-Based &middot; Equity-Centered &middot; Open Access</span>
+  </div>
+  <div class="mast-main">
+    <div>
+      <div class="mast-kicker">A Curriculum Framework for Community College CS</div>
+      <div class="mast-title">Teaching<br><span>Computing</span><br>Differently.</div>
+      <p class="mast-desc">Six courses built on one conviction: students learn CS best when they build real things, earn abstractions through struggle, and understand that every algorithm encodes a set of values about the world. No exams. No required textbooks. Every concept earned by building.</p>
+      <div class="mast-pills">
+        <span class="pill">No Required Textbooks</span>
+        <span class="pill">No Exams</span>
+        <span class="pill">3 Entry Tracks per Course</span>
+        <span class="pill">Portfolio Assessment</span>
+        <span class="pill">All Resources Free</span>
+      </div>
+    </div>
+    <div class="mast-aside">
+      <div class="aside-label">Three Core Principles</div>
+      <div class="aside-principle">
+        <div class="aside-principle-num">01 &mdash; Derive Before Compute</div>
+        <div class="aside-principle-title">Earn the abstraction.</div>
+        <div class="aside-principle-body">Every tool &mdash; a hash table, a gradient descent step, a transformer &mdash; is introduced through a problem that makes it necessary, before the formal concept is named.</div>
+      </div>
+      <div class="aside-principle">
+        <div class="aside-principle-num">02 &mdash; Build Before Import</div>
+        <div class="aside-principle-title">Implement before you use.</div>
+        <div class="aside-principle-body">Students implement every major data structure and algorithm from scratch before reaching for a library. You earn the abstraction by understanding its interior.</div>
+      </div>
+      <div class="aside-principle">
+        <div class="aside-principle-num">03 &mdash; Equity as Design</div>
+        <div class="aside-principle-title">Algorithms encode values.</div>
+        <div class="aside-principle-body">The social implications of systems are not a module added at the end &mdash; they are part of understanding what the system does. Bias is measurable. So we measure it.</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<a class="featured-banner" href="build-a-computer.html">
+  <div class="fb-inner">
+    <span class="fb-badge">Featured Project</span>
+    <span class="fb-title">Build a <span>Computer</span> from Scratch</span>
+    <span class="fb-desc">20 weeks &middot; Team-built 8-bit breadboard computer &middot; Cross-STEM transfer across 5 disciplines</span>
+    <span class="fb-tags"><span class="fb-phys">Physics</span><span class="fb-math">Math</span><span class="fb-linalg">Lin Alg</span><span class="fb-diffeq">Diff Eq</span><span class="fb-chem">Chem</span></span>
+    <span class="fb-arrow">Open Project &rarr;</span>
+  </div>
+</a>
+
+<section class="problem-section">
+  <div class="problem-inner">
+    <div class="section-label">The Problem This Curriculum Addresses</div>
+    <div class="problem-text">
+      <p>Most introductory CS courses follow the same pattern: explain a concept, demonstrate syntax, assign practice problems, assess on recall. Students who arrive with prior exposure tend to succeed. Students who don&rsquo;t fall behind quickly and conclude they are <em>not a CS person.</em> The course then calls this selection, when in fact it is structure.</p>
+      <p>This failure is especially concentrated at community colleges, where students arrive with more diverse prior experience, more financial and time constraints, and less inherited access to the social capital that makes traditional CS culture feel familiar. The typical response &mdash; remediation, prerequisite chains, stricter placement &mdash; treats the wrong variable.</p>
+      <p>This curriculum takes a different position: <strong>the difficulty students experience in introductory CS is not uniformly about ability.</strong> Most of it is caused by courses that teach abstractions before problems, syntax before meaning, and efficiency before understanding. The fix is not remediation. It is a different kind of course &mdash; one that begins with a problem the student wants to solve, introduces tools only when they&rsquo;re needed, and assesses understanding through what students build rather than what they recall.</p>
+    </div>
+  </div>
+</section>
+
+<section id="philosophy" class="philosophy-section">
+  <div class="philosophy-inner">
+    <div class="philosophy-header">
+      <div class="section-label">How These Courses Are Built</div>
+      <p class="philosophy-intro">Three pedagogical principles run through every course in this curriculum. They are not buzzwords &mdash; each one is a concrete design decision that shows up in how units are sequenced, how projects are scoped, and how student work is assessed. Each principle traces to a specific body of learning science research.</p>
+    </div>
+    <div class="philosophy-grid">
+      <div class="philosophy-card">
+        <span class="phil-num">01</span>
+        <div class="phil-title">Derive Before Compute</div>
+        <p class="phil-body">Every major concept is introduced through a problem that requires it &mdash; before the formal tool is offered. This is Guershon Harel&rsquo;s intellectual need principle: students must experience the inadequacy of what they currently have before a new tool will feel like a solution rather than a fact to memorize. A hash table isn&rsquo;t defined on day one. Students first build a slow lookup system, hit the wall of its inefficiency, and then the hash table arrives as the answer to a question they already have.</p>
+        <div class="phil-example">
+          <span class="phil-example-label">In Practice &mdash; CS 210</span>
+          Students build a linear-search contacts app in Week 2. With 10,000 entries it&rsquo;s unusably slow. Week 4 introduces hash tables &mdash; as the solution to a problem students already own.
+        </div>
+        <div class="phil-citation">Harel &amp; Tall (1991) &middot; &ldquo;The General, the Abstract, and the Generic&rdquo; &middot; For the Learning of Mathematics</div>
+      </div>
+      <div class="philosophy-card">
+        <span class="phil-num">02</span>
+        <div class="phil-title">Build Before Import</div>
+        <p class="phil-body">Students implement every major data structure and algorithm from scratch before using the library version. This is not hazing &mdash; it is the difference between knowing that sklearn has a fit() method and understanding what fitting means. Ko&rsquo;s read-before-write research shows that students who trace implementations before writing them develop significantly stronger debugging ability and conceptual transfer. Every abstraction has an interior; students earn the right to ignore it by first understanding it.</p>
+        <div class="phil-example">
+          <span class="phil-example-label">In Practice &mdash; CS 185</span>
+          Logistic regression is implemented in NumPy before scikit-learn is opened. The final submission includes both versions with a written comparison explaining what the library hides.
+        </div>
+        <div class="phil-citation">Ko et al. (2019) &middot; Critically Conscious Computing &middot; University of Washington &middot; cs.washington.edu/ccc</div>
+      </div>
+      <div class="philosophy-card">
+        <span class="phil-num">03</span>
+        <div class="phil-title">Equity as Design, Not Afterthought</div>
+        <p class="phil-body">The social implications of algorithmic systems are not a lecture added at the end of the semester &mdash; they are woven into the technical content from the start. When students build a word frequency analyzer, they ask whose vocabulary the default dictionary centers. When they study PageRank, they ask what gets amplified and what gets buried. This is not politics inserted into CS. It is the recognition that every algorithm encodes the values of the people who built it &mdash; and understanding those values is part of understanding the algorithm.</p>
+        <div class="phil-example">
+          <span class="phil-example-label">In Practice &mdash; CS 180 &amp; CS 185</span>
+          The final project in every AI/ML course is a structured bias audit of a real deployed system &mdash; written like a research report and presented at a public exhibition.
+        </div>
+        <div class="phil-citation">Buolamwini &amp; Gebru (2018) &middot; &ldquo;Gender Shades&rdquo; &middot; ACM FAccT &nbsp;&middot;&nbsp; Noble (2018) &middot; Algorithms of Oppression</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="courses">
+  <div class="courses">
+    <div class="courses-label">Six Courses</div>
+    <p class="courses-subhead">Each course is a complete 18-week experience: a central project arc, three entry tracks for students at different levels, portfolio-based assessment, and a public exhibition at semester end. No exams. No required textbook purchases. All course materials free and open access.</p>
+    <div class="pathway">
+      <div class="pathway-node"><div class="pathway-dot">No<br>prereq</div><div class="pathway-label">Any student</div></div>
+      <div class="pathway-arrow"></div>
+      <div class="pathway-node"><div class="pathway-dot filled">CS 175</div><div class="pathway-label">How Things Work</div></div>
+      <div class="pathway-arrow"></div>
+      <div class="pathway-node"><div class="pathway-dot filled">CS 180</div><div class="pathway-label">Intro AI</div></div>
+      <div class="pathway-arrow"></div>
+      <div class="pathway-node"><div class="pathway-dot accent">CS 185</div><div class="pathway-label">Intro ML</div></div>
+      <div class="pathway-arrow"></div>
+      <div class="pathway-node"><div class="pathway-dot filled">CS 210</div><div class="pathway-label">Data Structures</div></div>
+      <div class="pathway-arrow" style="width:56px;"></div>
+      <div class="pathway-node"><div class="pathway-dot branch">Math 2B</div><div class="pathway-label">Linear Algebra</div></div>
+      <div class="pathway-arrow"></div>
+      <div class="pathway-node"><div class="pathway-dot branch">ENGR 11</div><div class="pathway-label">MATLAB &amp; Eng.</div></div>
+    </div>
+    <p class="pathway-note">CS pathway (left to right) &middot; Engineering track branches at Math 2B / ENGR 11 &middot; All courses accessible at Track I with no prior programming</p>
+    <div class="course-grid">
+      <a class="course-card c180" href="cs180-intro-ai.html">
+        <div class="card-top"><div class="card-ghost">AI</div><div class="card-num">Course 01 of 06</div><div class="card-course-num">CS <span>180</span></div><div class="card-title">Introduction to<br>Artificial Intelligence</div></div>
+        <div class="card-body"><span class="status-badge status-taught">Currently Taught</span><p class="card-desc">AI is not magic &mdash; it is math, history, and human choice. We build from first principles: probability, search, neural networks, language models. Then we ask who built these systems, for whom, and what they&rsquo;re encoding about the world.</p>
+        <div class="card-meta"><div class="meta-row"><span class="meta-label">Units</span><span class="meta-value">3 &middot; 18 Weeks</span></div><div class="meta-row"><span class="meta-label">Prereq</span><span class="meta-value">None (Track I) &middot; Python (Track II+)</span></div><div class="meta-row"><span class="meta-label">Projects</span><span class="meta-value">9 Major &middot; 2 Exhibitions</span></div><div class="meta-row"><span class="meta-label">Thinkers</span><span class="meta-value">Turing &middot; Buolamwini &middot; Noble</span></div></div>
+        <div class="card-cta"><span>Open Course Site</span><span class="cta-arrow">&rarr;</span></div></div>
+      </a>
+      <a class="course-card c185" href="cs185-intro-ml.html">
+        <div class="card-top"><div class="card-ghost">ML</div><div class="card-num">Course 02 of 06</div><div class="card-course-num">CS <span>185</span></div><div class="card-title">Introduction to<br>Machine Learning</div></div>
+        <div class="card-body"><span class="status-badge status-dev">In Development</span><p class="card-desc">ML algorithms are not neutral mathematical facts &mdash; they are choices about what to optimize, whose data counts, who bears the error. We derive every algorithm before using it, implement from scratch before touching any library.</p>
+        <div class="card-meta"><div class="meta-row"><span class="meta-label">Units</span><span class="meta-value">3 &middot; 18 Weeks</span></div><div class="meta-row"><span class="meta-label">Prereq</span><span class="meta-value">Basic Python &middot; Some Math</span></div><div class="meta-row"><span class="meta-label">Projects</span><span class="meta-value">8 Major &middot; Bias Audits</span></div><div class="meta-row"><span class="meta-label">Thinkers</span><span class="meta-value">Ko &middot; Benjamin &middot; Obermeyer</span></div></div>
+        <div class="card-cta"><span>Open Course Site</span><span class="cta-arrow">&rarr;</span></div></div>
+      </a>
+      <a class="course-card c210" href="cs210-dsa.html">
+        <div class="card-top"><div class="card-ghost">DS</div><div class="card-num">Course 03 of 06</div><div class="card-course-num">CS <span>210</span></div><div class="card-title">Data Structures<br>&amp; Algorithms</div></div>
+        <div class="card-body"><span class="status-badge status-taught">Currently Taught</span><p class="card-desc">Every data structure is an argument about the world. Every algorithm is a strategy, a tradeoff, a value judgment. We implement every structure before using the library version. No LeetCode grind culture &mdash; deep projects that transfer.</p>
+        <div class="card-meta"><div class="meta-row"><span class="meta-label">Units</span><span class="meta-value">4 &middot; 18 Weeks</span></div><div class="meta-row"><span class="meta-label">Prereq</span><span class="meta-value">Python or Java &middot; OOP</span></div><div class="meta-row"><span class="meta-label">Projects</span><span class="meta-value">12 Mini Projects &middot; Capstone</span></div><div class="meta-row"><span class="meta-label">Thinkers</span><span class="meta-value">Knuth &middot; Dijkstra &middot; Noble &middot; Tarjan</span></div></div>
+        <div class="card-cta"><span>Open Course Site</span><span class="cta-arrow">&rarr;</span></div></div>
+      </a>
+      <a class="course-card c175" href="how-things-work.html">
+        <div class="card-top"><div class="card-ghost">HTW</div><div class="card-num">Course 04 of 06</div><div class="card-course-num">CS <span>175</span></div><div class="card-title">How Things<br>Work</div></div>
+        <div class="card-body"><span class="status-badge status-dev">In Development</span><p class="card-desc">PageRank. GPS. The phone in your pocket. Three technologies derived from first principles. You&rsquo;ll understand why they work &mdash; not just that they work. Includes the signature project: <strong>Build a Computer from Scratch</strong> &mdash; a 20-week team build of an 8-bit breadboard computer bridging five STEM disciplines.</p>
+        <div class="card-meta"><div class="meta-row"><span class="meta-label">Units</span><span class="meta-value">3 Systems &middot; First Principles</span></div><div class="meta-row"><span class="meta-label">Prereq</span><span class="meta-value">Basic Math &middot; No Calculus Required</span></div><div class="meta-row"><span class="meta-label">Projects</span><span class="meta-value">Build PageRank &middot; GPS Simulator &middot; <a href="build-a-computer.html" style="color:#00d4ff;text-decoration:underline;text-underline-offset:2px;">Build a Computer</a></span></div></div>
+        <div class="card-cta"><span>Open Course Site</span><span class="cta-arrow">&rarr;</span></div></div>
+      </a>
+      <a class="course-card cm2b" href="math2b-linear-algebra.html">
+        <div class="card-top"><div class="card-ghost">LA</div><div class="card-num">Course 05 of 06</div><div class="card-course-num">Math <span>2B</span></div><div class="card-title">Applied Linear<br>Algebra</div></div>
+        <div class="card-body"><span class="status-badge status-taught">Currently Taught</span><p class="card-desc">Six fundamental problems. Twenty-nine lessons. Build circuits, collect data, verify models. Derive before compute &mdash; the ALAF approach. Math made useful the moment it&rsquo;s introduced.</p>
+        <div class="card-meta"><div class="meta-row"><span class="meta-label">Units</span><span class="meta-value">3 &middot; 29 Lessons &middot; ELSP Project</span></div><div class="meta-row"><span class="meta-label">Prereq</span><span class="meta-value">Pre-calculus or Calculus</span></div><div class="meta-row"><span class="meta-label">Textbook</span><span class="meta-value">ALAF &middot; appliedlinearalgebra.com</span></div></div>
+        <div class="card-cta"><span>Open Course Site</span><span class="cta-arrow">&rarr;</span></div></div>
+      </a>
+      <a class="course-card ce11" href="engr11-matlab.html">
+        <div class="card-top"><div class="card-ghost">M&#8741;</div><div class="card-num">Course 06 of 06</div><div class="card-course-num">ENGR <span>11</span></div><div class="card-title">Programming &amp;<br>Problem Solving</div></div>
+        <div class="card-body"><span class="status-badge status-taught">Currently Taught</span><p class="card-desc">Model real circuits. Understand why 0.1 + 0.2 &ne; 0.3. MATLAB the way engineers use it &mdash; from binary representation up to IEEE 754 floating-point. No prior programming required.</p>
+        <div class="card-meta"><div class="meta-row"><span class="meta-label">Units</span><span class="meta-value">3 &middot; 18 Lessons &middot; ELSP Project</span></div><div class="meta-row"><span class="meta-label">Prereq</span><span class="meta-value">No Programming Required</span></div><div class="meta-row"><span class="meta-label">Skills</span><span class="meta-value">MATLAB &middot; Numerical Analysis &middot; IEEE 754</span></div></div>
+        <div class="card-cta"><span>Open Course Site</span><span class="cta-arrow">&rarr;</span></div></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section id="tracks" class="tracks-section">
+  <div class="tracks-inner">
+    <div class="tracks-label">Three Tracks</div>
+    <div>
+      <div class="tracks-key-insight">&ldquo;Tracks are chosen weekly, not at semester start. A student can run Track I for ten weeks and switch to Track II for the capstone. There is no grade penalty for choosing Track I.&rdquo;<span>The Key Design Insight &mdash; Track System</span></div>
+      <p class="tracks-desc">Every course in this curriculum is taught at three simultaneous depth levels. These are not ability groups, remediation tiers, or ceiling categories &mdash; they are depth choices. The same concept is taught to everyone. What varies is whether a student builds it, proves it, or extends it. Track I is a complete, serious course outcome &mdash; not a consolation.</p>
+      <div class="tracks-grid">
+        <div class="track-card">
+          <div class="track-roman track-i">I</div>
+          <div class="track-name">Novice &mdash; Build &amp; Understand</div>
+          <p class="track-body">Students develop genuine working fluency with the core concept. They build a complete, functional implementation and can explain what it does and why. No prior experience required at Track I &mdash; by design.</p>
+          <div class="track-examples">
+            <div class="track-example">CS 180: Build a rule-based chatbot; document its failure modes</div>
+            <div class="track-example">CS 210: Implement a linked list from scratch; analyze insertion cost</div>
+          </div>
+        </div>
+        <div class="track-card">
+          <div class="track-roman track-ii">II</div>
+          <div class="track-name">Builder &mdash; Implement &amp; Extend</div>
+          <p class="track-body">Students implement the concept rigorously, handle edge cases, and extend it to a novel context. They move between their own implementation and a library version and explain the tradeoffs in writing.</p>
+          <div class="track-examples">
+            <div class="track-example">CS 185: Implement logistic regression in NumPy; compare to sklearn</div>
+            <div class="track-example">CS 210: Implement a self-balancing BST; profile on large datasets</div>
+          </div>
+        </div>
+        <div class="track-card" style="border-right:none;">
+          <div class="track-roman track-iii">III</div>
+          <div class="track-name">Architect &mdash; Prove &amp; Research</div>
+          <p class="track-body">Students engage with the formal mathematical structure of the concept, read related research, and contribute something original &mdash; a proof, an optimization, a novel application, or a written critical analysis.</p>
+          <div class="track-examples">
+            <div class="track-example">CS 185: Derive the gradient update rule; prove convergence bound</div>
+            <div class="track-example">CS 180: Read and summarize a primary research paper; connect to project</div>
+          </div>
+        </div>
+        <div class="track-note" style="grid-column:1/-1;">Track I is a complete, serious outcome &mdash; not a consolation. Students completing Track I have built more real software than most students in exam-based courses. &nbsp;&middot;&nbsp; Tracks are chosen weekly. A student can run Track I for 10 weeks and switch to Track II for the capstone. &nbsp;&middot;&nbsp; There is no grade penalty for choosing Track I. Assessment is portfolio-based across all tracks.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="projects" class="projects-section">
+  <div class="projects-inner">
+    <div class="projects-header">
+      <div class="section-label">Signature Projects</div>
+      <p class="projects-intro">These are not homework assignments with a twist. Each signature project is the central learning experience of its unit &mdash; designed so that students encounter the core concept as a genuine problem to solve, not a technique to apply. Every project is public: presented at a semester-end exhibition open to the campus community.</p>
+    </div>
+    <div class="projects-grid">
+      <a class="project-featured" href="build-a-computer.html" style="text-decoration:none;color:inherit;">
+        <div class="pf-left">
+          <div class="project-tag" style="color:var(--copper);">Featured &middot; CS 175 &middot; 20-Week Signature Project</div>
+          <div class="project-title">Build a Computer from Scratch</div>
+          <p class="project-body">Teams of students build a working, programmable 8-bit computer on breadboards from logic gates &mdash; and in the process encounter the physics, mathematics, linear algebra, differential equations, and chemistry that make it possible. Inspired by Ben Eater. Grounded in seven bodies of learning science research. Designed for cross-STEM transfer: every module includes an explicit &ldquo;STEM Bridge Moment&rdquo; where the instructor names the connection to the student&rsquo;s next math, physics, or chemistry course.</p>
+          <div class="pf-stem-tags">
+            <span class="pf-stem pf-phys">Physics</span>
+            <span class="pf-stem pf-math">Discrete Math</span>
+            <span class="pf-stem pf-linalg">Linear Algebra</span>
+            <span class="pf-stem pf-diffeq">Diff Eq</span>
+            <span class="pf-stem pf-chem">Chemistry</span>
+          </div>
+        </div>
+        <div class="pf-right">
+          <div class="project-learns"><strong>Students Learn Through This Project</strong>How a computer works from first principles &mdash; not as metaphor, but as physical reality &middot; Ohm&rsquo;s Law, RC circuits, Boolean algebra, two&rsquo;s complement, modular arithmetic, state vectors, matrix transformations, recurrence relations, semiconductor chemistry &middot; Collaborative debugging as the primary learning activity &middot; The experience of building something real with your hands that no AI can replicate</div>
+          <div class="pf-cta"><span>Open Full Project Page</span><span style="font-size:18px;">&rarr;</span></div>
+        </div>
+      </a>
+      <div class="project-card">
+        <div class="project-tag">CS 210 &middot; Data Structures</div>
+        <div class="project-title">The Contacts Problem</div>
+        <p class="project-body">Students build a functional contacts application &mdash; adding, searching, sorting &mdash; starting with a flat list. As the dataset grows, they measure slowdown empirically, identify the bottleneck, and redesign. The project runs four weeks, and students implement and profile at least three structural approaches before semester end.</p>
+        <div class="project-learns"><strong>Students Learn Through This Project</strong>Time complexity as felt experience, not formula &middot; Hash tables as motivated solutions &middot; Profiling and empirical analysis &middot; The cost of early design decisions</div>
+      </div>
+      <div class="project-card">
+        <div class="project-tag">CS 185 &middot; Machine Learning</div>
+        <div class="project-title">Derive Before Deploy</div>
+        <p class="project-body">Students implement linear regression, logistic regression, and a single-layer neural network entirely in NumPy &mdash; no sklearn allowed until the implementation is complete. The final submission includes both versions plus a written explanation of what the library conceals and why that matters.</p>
+        <div class="project-learns"><strong>Students Learn Through This Project</strong>Gradient descent as a mechanical process &middot; What &ldquo;fitting&rdquo; actually means &middot; Reading library source code &middot; The professional risk of tools you don&rsquo;t understand</div>
+      </div>
+      <div class="project-card">
+        <div class="project-tag">CS 180 / CS 185 &middot; AI &amp; ML</div>
+        <div class="project-title">The Bias Audit</div>
+        <p class="project-body">Students choose a real, deployed AI product &mdash; a hiring tool, content moderator, facial recognition API, or recommendation system &mdash; design a structured test protocol, run it, measure performance across demographic groups, and produce a findings report structured like a research paper. Directly adapted from Buolamwini&rsquo;s Gender Shades methodology.</p>
+        <div class="project-learns"><strong>Students Learn Through This Project</strong>Experimental design &middot; Bias as a measurable quantity &middot; Technical writing for non-technical audiences &middot; That &ldquo;neutral&rdquo; systems make choices</div>
+      </div>
+      <div class="project-card">
+        <div class="project-tag">CS 175 &middot; How Things Work</div>
+        <div class="project-title">Build PageRank</div>
+        <p class="project-body">Students derive the PageRank algorithm from the random surfer model, implement it on a graph of their own construction, then run it on a real web crawl. They modify the damping factor and adjacency structure and observe how rankings change &mdash; which leads directly to the question of who decides what matters on the internet.</p>
+        <div class="project-learns"><strong>Students Learn Through This Project</strong>Markov chains and stationary distributions &middot; Matrix multiplication as a meaningful operation &middot; Power and amplification in information systems &middot; How search encodes value judgments</div>
+      </div>
+      <div class="project-card">
+        <div class="project-tag">All Courses</div>
+        <div class="project-title">The Abuelita Test</div>
+        <p class="project-body">Every capstone project must include a written explanation addressed to a non-technical family member: what does your program do, what problem does it solve, and why should someone care? If you cannot explain it to someone who doesn&rsquo;t speak code, you don&rsquo;t fully understand it yet. Communication is assessed alongside the code itself.</p>
+        <div class="project-learns"><strong>Students Learn Through This Project</strong>Technical communication as a skill, not an add-on &middot; The gap between knowing and explaining &middot; Audience-aware writing &middot; Why documentation matters in professional software</div>
+      </div>
+      <div class="project-card">
+        <div class="project-tag">All Courses &middot; End of Semester</div>
+        <div class="project-title">Public Exhibition</div>
+        <p class="project-body">Every course ends with a public exhibition, not a final exam. Students present their portfolio of work to an audience of peers, instructors, and community members. Students write a self-evaluation against the course learning goals and propose their final grade with evidence from their portfolio.</p>
+        <div class="project-learns"><strong>Students Learn Through This Project</strong>Portfolio thinking and self-assessment &middot; Public communication of technical work &middot; Ownership of learning outcomes &middot; That the work they built is worth showing</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="phil-strip">
+  <div>
+    <div class="phil-quote-text">&ldquo;The most advanced technical skill in these courses is understanding who built a system, for whom, and what it encodes about the world.&rdquo;</div>
+    <div class="phil-source">Course Philosophy &middot; Rooted in Freire, hooks, Ko, Anderson</div>
+  </div>
+  <div class="phil-stats">
+    <div class="phil-stat"><div class="phil-num">0</div><div class="phil-label">Required Textbooks</div></div>
+    <div class="phil-stat"><div class="phil-num">0</div><div class="phil-label">Exams</div></div>
+    <div class="phil-stat"><div class="phil-num">3</div><div class="phil-label">Tracks per Course</div></div>
+  </div>
+</div>
+
+<div class="ng-section">
+  <div class="ng-inner">
+    <div class="ng-label">Curriculum Adaptations &mdash; Andrew Ng &times; Community College</div>
+    <p class="ng-desc">Andrew Ng&rsquo;s landmark Coursera specializations, rebuilt for community college students. Same rigorous concepts, three entry tracks per course, problem-first sequencing, and every project connected to a real community need. No exams. No required textbooks.</p>
+    <p class="ng-credit">Original course content by Andrew Ng (Coursera / deeplearning.ai). These are community college curriculum adaptations &mdash; restructured for three-track delivery, portfolio assessment, and equity-centered project design. Not affiliated with or endorsed by deeplearning.ai.</p>
+    <div class="ng-grid">
+      <a class="course-card" href="ai-for-everyone.html" style="border-right:2px solid rgba(255,255,255,.08);">
+        <div class="card-top" style="background:#061614;"><div class="card-ghost" style="opacity:.05;color:#00b4a6;">AIE</div><div class="card-num" style="opacity:.3;">Ng Adaptation</div><div class="card-course-num" style="font-size:36px;line-height:1.1;">AI For<br><span style="color:#00b4a6;">Everyone</span></div><div class="card-title" style="color:rgba(200,245,240,.6);">Civic AI Literacy<br>for All</div></div>
+        <div class="card-body"><p class="card-desc" style="color:var(--dim);">Understanding AI is a civic skill. Three tracks from no-prereq literacy to building with APIs. Community audit projects. Portfolio-based.</p><div class="card-meta"><div class="meta-row"><span class="meta-label">Tracks</span><span class="meta-value">Civic &middot; Practitioner &middot; Builder</span></div><div class="meta-row"><span class="meta-label">Prereq</span><span class="meta-value">None (Track I)</span></div><div class="meta-row"><span class="meta-label">Projects</span><span class="meta-value">4 Major &middot; Exhibition</span></div></div><div class="card-cta" style="color:#00b4a6;"><span>Open Course Site</span><span class="cta-arrow">&rarr;</span></div></div>
+      </a>
+      <a class="course-card" href="ml-specialization.html" style="border-right:2px solid rgba(255,255,255,.08);">
+        <div class="card-top" style="background:#09081a;"><div class="card-ghost" style="opacity:.05;color:#8b5cf6;">ML</div><div class="card-num" style="opacity:.3;">Ng Adaptation</div><div class="card-course-num" style="font-size:36px;line-height:1.1;">Machine<br><span style="color:#8b5cf6;">Learning</span></div><div class="card-title" style="color:rgba(210,200,255,.6);">Every Algorithm<br>is a Choice</div></div>
+        <div class="card-body"><p class="card-desc" style="color:var(--dim);">Derive before you compute. Implement before you import. Audit before you deploy. Six projects on real community data including bias audits.</p><div class="card-meta"><div class="meta-row"><span class="meta-label">Tracks</span><span class="meta-value">Consumer &middot; Practitioner &middot; Engineer</span></div><div class="meta-row"><span class="meta-label">Prereq</span><span class="meta-value">None &rarr; Python &rarr; Calculus</span></div><div class="meta-row"><span class="meta-label">Projects</span><span class="meta-value">6 Major &middot; Bias Audit &middot; Capstone</span></div></div><div class="card-cta" style="color:#8b5cf6;"><span>Open Course Site</span><span class="cta-arrow">&rarr;</span></div></div>
+      </a>
+      <a class="course-card" href="deep-learning-spec.html" style="border-right:2px solid rgba(255,255,255,.08);">
+        <div class="card-top" style="background:#100e06;"><div class="card-ghost" style="opacity:.05;color:#f59e0b;">DL</div><div class="card-num" style="opacity:.3;">Ng Adaptation</div><div class="card-course-num" style="font-size:36px;line-height:1.1;">Deep<br><span style="color:#f59e0b;">Learning</span></div><div class="card-title" style="color:rgba(253,230,138,.6);">Build What<br>You Can Explain</div></div>
+        <div class="card-body"><p class="card-desc" style="color:var(--dim);">Six modules from neurons to transformers. Implement backpropagation from scratch. Mandatory bias audit module. Capstone serves a real community need.</p><div class="card-meta"><div class="meta-row"><span class="meta-label">Tracks</span><span class="meta-value">Conceptual &middot; Applied &middot; Engineer</span></div><div class="meta-row"><span class="meta-label">Prereq</span><span class="meta-value">Algebra &rarr; Python &rarr; Calculus</span></div><div class="meta-row"><span class="meta-label">Projects</span><span class="meta-value">6 Modules &middot; Bias Audit &middot; Capstone</span></div></div><div class="card-cta" style="color:#f59e0b;"><span>Open Course Site</span><span class="cta-arrow">&rarr;</span></div></div>
+      </a>
+      <a class="course-card" href="gen-ai-for-everyone.html">
+        <div class="card-top" style="background:#12060e;"><div class="card-ghost" style="opacity:.05;color:#c2185b;">GenAI</div><div class="card-num" style="opacity:.3;">Ng Adaptation</div><div class="card-course-num" style="font-size:36px;line-height:1.1;">Gen AI For<br><span style="color:#c2185b;">Everyone</span></div><div class="card-title" style="color:rgba(252,220,235,.6);">Prompts are<br>Arguments</div></div>
+        <div class="card-body"><p class="card-desc" style="color:var(--dim);">Every image is a choice. Every output reflects training data. Use gen AI critically, build with it skillfully, and audit its biases rigorously.</p><div class="card-meta"><div class="meta-row"><span class="meta-label">Tracks</span><span class="meta-value">Collaborator &middot; Creator &middot; Critic</span></div><div class="meta-row"><span class="meta-label">Prereq</span><span class="meta-value">None &rarr; Python &rarr; ML Background</span></div><div class="meta-row"><span class="meta-label">Projects</span><span class="meta-value">4 Major &middot; Bias Audit &middot; Exhibition</span></div></div><div class="card-cta" style="color:#c2185b;"><span>Open Course Site</span><span class="cta-arrow">&rarr;</span></div></div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<section id="thinkers">
+  <div class="thinkers">
+    <div class="thinkers-header">
+      <div class="thinkers-label">Research Roots</div>
+      <p class="thinkers-intro">These courses are not built on personal teaching preference. Each design decision traces to a body of research or a theoretical framework. The thinkers below are not name-dropped &mdash; their ideas show up in specific assignments, assessment structures, and sequencing decisions across every course in this curriculum.</p>
+    </div>
+    <div class="thinker-row">
+      <div class="thinker"><div class="thinker-name">Amy J. Ko</div><div class="thinker-book">Critically Conscious Computing &middot; UW</div><div class="thinker-desc">Equitable, joyous computing education. Read-before-write sequencing. Student agency and institutional trust as preconditions for learning.</div><div class="thinker-in-practice"><strong>In These Courses</strong>Students trace and read existing implementations before writing their own. Build-before-import is directly drawn from Ko&rsquo;s read-before-write research.</div></div>
+      <div class="thinker"><div class="thinker-name">Jeff Anderson</div><div class="thinker-book">Antiracist Learning Science &middot; Ungrading &middot; Strategic Deep Learning &middot; Foothill College</div><div class="thinker-desc">Jeff&rsquo;s top-level professional goal: use antiracist learning science to help people thrive. He maps every classroom decision back to research in cognitive science, the psychology of learning, and the scholarship of anti-racism. Creator of the ALAF textbook, the Strategic Deep Learning framework, five anti-racist learner-centered objectives, and a pioneering ungrading practice. His conviction: the top 100% of learners deserve the best teaching in the world.</div><div class="thinker-in-practice"><strong>In These Courses</strong>Portfolio assessment and student-proposed grading are drawn directly from Anderson&rsquo;s ungrading framework. The Abuelita Test is adapted from his communication frameworks. The three-track system honors his principle that learner-centered means the student determines their path. The Build a Computer project&rsquo;s entire assessment structure, reflection design, and cross-STEM bridging philosophy are built on his foundation.</div></div>
+      <div class="thinker"><div class="thinker-name">Paulo Freire</div><div class="thinker-book">Pedagogy of the Oppressed &middot; 1968</div><div class="thinker-desc">Students are not empty vessels to fill with content. The banking model of education reproduces passivity. Knowledge is a liberatory act when connected to lived experience.</div><div class="thinker-in-practice"><strong>In These Courses</strong>Every capstone is student-chosen and connected to a real problem in the student&rsquo;s community. Students determine what they build, and for whom.</div></div>
+      <div class="thinker"><div class="thinker-name">bell hooks</div><div class="thinker-book">Teaching to Transgress &middot; 1994</div><div class="thinker-desc">The classroom as a site of freedom. Bringing the full self to learning. The instructor&rsquo;s vulnerability and intellectual engagement as pedagogical tools.</div><div class="thinker-in-practice"><strong>In These Courses</strong>Reflective writing is required alongside every project. Students write about struggle, confusion, and discovery &mdash; not just what they built.</div></div>
+      <div class="thinker"><div class="thinker-name">Joy Buolamwini</div><div class="thinker-book">Gender Shades &middot; MIT Media Lab</div><div class="thinker-desc">The coded gaze. Facial recognition systems that fail disproportionately on darker-skinned women. Bias is not accidental &mdash; it is the product of who is in the room when systems are built.</div><div class="thinker-in-practice"><strong>In These Courses</strong>The Bias Audit project in CS 180 and CS 185 is directly modeled on the Gender Shades methodology, adapted for undergraduates with no prior research training.</div></div>
+      <div class="thinker"><div class="thinker-name">Safiya Umoja Noble</div><div class="thinker-book">Algorithms of Oppression &middot; 2018</div><div class="thinker-desc">Search engines encode power. Information retrieval systems reflect and amplify the values of the people and institutions that build and fund them.</div><div class="thinker-in-practice"><strong>In These Courses</strong>The Build PageRank project ends with a structured analysis of how the algorithm&rsquo;s design choices determine whose content surfaces and whose is buried.</div></div>
+      <div class="thinker"><div class="thinker-name">Ruha Benjamin</div><div class="thinker-book">Race After Technology &middot; 2019</div><div class="thinker-desc">The New Jim Code: technological systems that discriminate while claiming objectivity, making discrimination harder to name and challenge.</div><div class="thinker-in-practice"><strong>In These Courses</strong>Benjamin&rsquo;s framework is the theoretical grounding for CS 185: every algorithm is a choice about what to optimize, and that choice has a politics.</div></div>
+      <div class="thinker"><div class="thinker-name">Donald Knuth</div><div class="thinker-book">The Art of Computer Programming</div><div class="thinker-desc">Algorithms are art. Rigor and beauty are not opposites. The deep analysis of even simple algorithms reveals structure that cannot be seen from the surface.</div><div class="thinker-in-practice"><strong>In These Courses</strong>CS 210&rsquo;s emphasis on implementing before using, and on understanding the full analysis of even simple structures, is a direct inheritance from Knuth.</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="about" class="about-section">
+  <div class="about-inner">
+    <div class="section-label">About This Curriculum</div>
+    <div class="about-text">
+      <p>This curriculum is developed by Henry Fan, a CS instructor at a California community college working at the intersection of computer science education, equitable pedagogy, and learning science research. The courses on this site represent a multi-year project to redesign introductory CS at the community college level &mdash; building courses that are technically rigorous, project-driven, and designed from the start to serve students who have historically been pushed out of CS.</p>
+      <p>The pedagogical foundation of this work is built on the mentorship and teaching philosophy of <strong>Jeff Anderson</strong> (Foothill College), whose commitment to antiracist learning science, ungrading, and the principle that every classroom decision should map back to research in cognitive science has shaped how every course on this site is designed, assessed, and taught. His <a href="https://jeffandersonmath.wordpress.com/2024/10/28/five-anti-racist-research-based-learner-centered-learning-objectives-for-college-students-updated/" class="about-link">five anti-racist, research-based, learner-centered learning objectives</a> are the invisible architecture of this entire curriculum.</p>
+      <p>The curriculum is connected to ongoing research into help-seeking behavior in introductory CS courses, curriculum dependency structures, and the experiences of students who leave STEM at community colleges. That work lives at the <a href="research/" class="about-link">CS Education Research Portfolio &rarr;</a></p>
+      <p>All course materials are free and open access. Instructors who want to adapt any of these courses for their own institutions are encouraged to do so. For questions, collaboration, or to share what you build with these materials, reach out directly.</p>
+      <div class="about-links">
+        <a href="research/" class="about-link">Research Portfolio</a>
+        <a href="apps/app-analyst.html" class="about-link">CVC-OEI Toolkit</a>
+        <a href="apps/student-foo.html" class="about-link">Student FOO</a>
+        <a href="https://jeffandersonmath.wordpress.com/" class="about-link">Jeff Anderson Math</a>
+        <a href="mailto:henry@henryfan.org" class="about-link">henry@henryfan.org</a>
+        <a href="https://github.com/fansofhenry/teach_cs" class="about-link">GitHub</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-left">
+    Community College Computer Science<br>
+    All resources free and open-access &middot; No required textbook purchases &middot; <a href="mailto:henry@henryfan.org">henry@henryfan.org</a><br>
+    Liberatory Education &middot; Project-Based Learning &middot; Portfolio Assessment
+  </div>
+  <div class="footer-right">CS 175 &middot; 180 &middot; 185 &middot; 210 &middot; Math 2B &middot; ENGR 11</div>
+</footer>
+
+</body>
 </html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prototypes — Henry Fan</title>
+  <meta name="description" content="Proof-of-concept research tools: curriculum dependency visualization, pedagogical debt analysis, and minimum viable curriculum computation.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="site-nav" aria-label="Main navigation">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-name">Henry Fan</a>
+    <button class="nav-toggle" aria-label="Toggle navigation" onclick="document.querySelector('.nav-links').classList.toggle('open')">☰</button>
+    <ul class="nav-links">
+      <li><a href="../">← Curriculum</a></li>
+      <li><a href="research.html">Research</a></li>
+      <li><a href="projects.html">Projects</a></li>
+      <li><a href="teaching.html">Teaching</a></li>
+      <li><a href="writing.html">Writing</a></li>
+      <li><a href="tools.html" class="active">Prototypes</a></li>
+      <li><a href="background.html">Background</a></li>
+      <li><a href="cv.pdf">CV</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="page-container">
+  <div class="page-header">
+    <p class="label">Prototype Tools</p>
+    <h1>Proof-of-Concept Implementations</h1>
+    <p class="subtitle">
+      Three prototype tools that operationalize ideas from the research agenda. These are proof-of-concept illustrations — the theoretical frameworks they demonstrate need empirical validation against real data. They are offered here as interactive sketches of what the research aims to build and test, not as validated instruments.
+    </p>
+  </div>
+
+  <p style="background: var(--color-bg-alt); border: 1px solid var(--color-border-light); padding: var(--space-lg); font-size: 0.92rem; margin-bottom: var(--space-2xl);">
+    <strong>Important context:</strong> These prototypes use synthetic data and heuristic scoring. Validating the underlying constructs is the goal of projects <a href="projects.html#p2">P2</a> and <a href="projects.html#p4">P4</a>. The prototypes exist to make abstract ideas concrete — they illustrate <em>what</em> the research aims to measure, not <em>how well</em> it can be measured yet.
+  </p>
+
+  <!-- Tool 1 -->
+  <div class="card">
+    <span class="card-label">Prototype for Project P4 · Graph Visualization</span>
+    <p class="card-title" style="font-size: 1.2rem;">Curriculum Dependency Visualizer</p>
+    <p class="card-desc">
+      An interactive graph representation of a synthetic introductory linear algebra curriculum using a typed dependency grammar. Each node is a learning objective; each edge encodes one of four dependency types (conceptual, procedural, motivational, social). The empirical question in P4 is whether real instructor-annotated graphs show structural patterns that predict student outcomes — this prototype shows what such a graph looks like and what structural statistics it produces.
+    </p>
+    <p class="card-desc mt-md">
+      <a href="project1_curriculum_grammar.pdf">Read the technical paper (PDF) →</a>
+    </p>
+  </div>
+
+  <!-- Tool 2 -->
+  <div class="card">
+    <span class="card-label">Prototype for Project P2 · Text Analysis</span>
+    <p class="card-title" style="font-size: 1.2rem;">Pedagogical Debt Analyzer</p>
+    <p class="card-desc">
+      A text-input tool that scores course descriptions and syllabus excerpts for motivational, scaffolding, and verification structure using heuristics grounded in Harel's necessity principle. Users paste course material and receive a structural analysis across four dimensions. These are heuristic scores based on keyword patterns and structural rules — P2 is the project to validate whether they correlate with expert annotation and student outcomes.
+    </p>
+    <p class="card-desc mt-md">
+      <a href="project2_pedagogical_debt.pdf">Read the technical paper (PDF) →</a>
+    </p>
+  </div>
+
+  <!-- Tool 3 -->
+  <div class="card">
+    <span class="card-label">Prototype for Project P4 · Algorithm Visualization</span>
+    <p class="card-title" style="font-size: 1.2rem;">Minimum Viable Curriculum Visualizer</p>
+    <p class="card-desc">
+      A step-through visualization of a greedy approximation algorithm for the Minimum Viable Curriculum (MVC) problem on a synthetic curriculum graph. The key theoretical result: finding the optimal MVC is NP-complete (polynomial reduction from Set Cover). This visualizer illustrates the algorithm on a small example. The research question in P4 is whether MVC-distance — how far a real curriculum is from its minimum viable form — predicts student outcomes.
+    </p>
+    <p class="card-desc mt-md">
+      <a href="project3_mvc.pdf">Read the technical paper (PDF) →</a>
+    </p>
+  </div>
+
+  <hr>
+
+  <h2>Applied Curriculum Designs</h2>
+
+  <p>
+    Three project designs for an introductory CS course, grounded in Anderson's necessity principle. Each is designed so students experience a real problem before encountering the technical tool that addresses it. These are not research projects — they're instructional designs informed by the research agenda.
+  </p>
+
+  <div class="card">
+    <span class="card-label">HTML · CSS · JS · Intro CS · 4–6 weeks</span>
+    <p class="card-title">Community Resource Aggregator</p>
+    <p class="card-desc">
+      Students build a searchable map of local support resources for their campus or city. The necessity hook: students first survey three peers about resources they couldn't find. The search problem exists before a line of code is written. Students write a one-page research memo before coding, document design decisions, conduct peer testing with real users, and reflect on what the data revealed versus what they assumed.
+    </p>
+  </div>
+
+  <div class="card">
+    <span class="card-label">JavaScript · LocalStorage · Meta-Learning · 3–5 weeks</span>
+    <p class="card-title">Personal Learning System Builder</p>
+    <p class="card-desc">
+      Students build a scheduling app, habit tracker, or question-capture tool that they actually use. The necessity hook: students audit their current study system in week one, and the gaps they find become the specification for what they build. The meta dimension is deliberate — students simultaneously learn to code and reflect on how they learn.
+    </p>
+  </div>
+
+  <div class="card">
+    <span class="card-label">Data · APIs · D3 or Chart.js · Civic Tech · 5–7 weeks</span>
+    <p class="card-title">Neighborhood Data Story</p>
+    <p class="card-desc">
+      Students pick a local issue, find public data, and build a visualization with a written narrative. Motivated by Anderson's "abuelita test": the final deliverable must include an explanation a non-technical family member could understand. Students first write a one-paragraph argument using only intuition, then find the data — the gap between the two is the learning.
+    </p>
+  </div>
+
+  <p class="font-sans text-small text-muted mt-xl">
+    These curriculum designs enact the research principles described on the <a href="research.html">research page</a>. See the <a href="teaching.html">teaching page</a> for the full pedagogical framework.
+  </p>
+
+  <hr>
+
+  <h2>Platform Design</h2>
+
+  <div class="card" style="border-left:3px solid var(--color-accent);">
+    <p class="card-label">Next.js 14 · TypeScript · Supabase · Tailwind CSS · Deployed</p>
+    <p class="card-title">ProjectBridge: A Project-Based Learning Platform for Community Colleges</p>
+    <p class="card-desc">
+      A campus-wide platform where students discover, join, lead, and document meaningful projects — turning their college experience into a portfolio of real work. Designed with first-generation community college students as the primary user.
+    </p>
+    <p class="card-desc" style="margin-top:var(--space-sm);">
+      Core features: project directory with search and filtering, collaborator marketplace with wanted ads, build journals for public project documentation, milestone tracking with celebration moments, weekly check-in system, 30-day pulse check automation, student profiles with contribution history, faculty dashboards for class project oversight, and learning community pages for programs like MESA, Puente, and Umoja.
+    </p>
+    <p class="card-desc" style="margin-top:var(--space-sm);">
+      Design principles: agency first (every interaction makes a student feel more capable), low floor/high ceiling (post a project in under 2 minutes, document a year-long initiative with milestones and portfolio artifacts), show the work (GitHub-inspired public timeline), and survive the semester (projects outlive their creators through the campus archive).
+    </p>
+    <p class="card-desc" style="margin-top:var(--space-sm);">
+      Built with Next.js 14 (App Router), TypeScript, Tailwind CSS, and Supabase (PostgreSQL + Row Level Security). Mobile-first design. Complete database schema with 8 core models. Deployed on Vercel.
+    </p>
+    <p style="margin-top:var(--space-md);font-size:0.88rem;">
+      Research grounding: the platform operationalizes the same structural equity principles that guide the empirical projects on this site. If sense of belonging is structural (Walton &amp; Brady) and can be designed into platforms (not just classrooms), then a platform that gives students agency, visibility, and community should measurably affect persistence. This is a testable claim.
+    </p>
+  </div>
+
+  <p class="font-sans text-small text-muted mt-xl">Last updated: March 2026</p>
+</main>
+
+<footer class="site-footer" style="text-align:center;">
+  <p>© 2026 Henry Fan · SJSU McNair Scholar · Foothill College Science Learning Institute</p>
+  <p style="margin-top:0.25rem;"><a href="mailto:henry@henryfan.org" style="color:var(--color-text-muted);">henry@henryfan.org</a> · <a href="../" style="color:var(--color-text-muted);">← Curriculum Site</a></p>
+</footer>
+
+</body>
+</html>

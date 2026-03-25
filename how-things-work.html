@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en" data-course="htw">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CS 175 — How Things Work: PageRank, GPS & the Phone</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700&family=Barlow:ital,wght@0,300;0,400;1,300&family=Overpass+Mono:wght@300;400;600&display=swap" rel="stylesheet">
+<script src="js/progress.js" defer></script>
+<style>
+:root{--bg:#080c14;--surface:#0d1520;--card:#111b2a;--border:#1e2e42;--muted:#2a3d54;--dim:#4a6480;--mid:#6e8fab;--soft:#9ab4cc;--paper:#e8eef4;--cyan:#00d4ff;--orange:#ff6b2b;--green:#3dd68c;--yellow:#ffd166;--red:#ff4d6a}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--paper);font-family:'Barlow',sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* Blueprint grid */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+background-image:linear-gradient(rgba(0,212,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.025) 1px,transparent 1px),linear-gradient(rgba(0,212,255,.01) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.01) 1px,transparent 1px);
+background-size:96px 96px,96px 96px,24px 24px,24px 24px}
+
+/* Vignette */
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 50% 0%,transparent 40%,rgba(8,12,20,.7) 100%)}
+
+/* PROGRESS */
+#progress-bar-container{position:sticky;top:0;z-index:100;background:var(--surface);border-bottom:1px solid var(--border);padding:10px 52px;display:flex;align-items:center;gap:20px}
+#progress-track{flex:1;height:2px;background:var(--muted)}
+#progress-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--cyan),var(--green));transition:width .5s ease}
+#progress-text{font-family:'Overpass Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:.08em;white-space:nowrap}
+#active-track-badge{font-family:'Overpass Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--cyan);border:1px solid rgba(0,212,255,.4);padding:2px 8px}
+
+/* MASTHEAD */
+.masthead{position:relative;z-index:1;border-bottom:1px solid var(--border)}
+.mast-top{display:flex;justify-content:space-between;align-items:center;padding:14px 52px;border-bottom:1px solid var(--border);font-family:'Overpass Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.mast-top .blink{animation:blink 1.2s step-end infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.mast-hero{display:grid;grid-template-columns:1fr 1fr;min-height:480px}
+.mast-left{padding:64px 52px;border-right:1px solid var(--border);display:flex;flex-direction:column;justify-content:center}
+.mast-tag{font-family:'Overpass Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--cyan);margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.mast-tag::before{content:'[SYS]';color:var(--muted)}
+.mast-num{font-family:'Barlow Condensed',sans-serif;font-size:clamp(72px,9vw,120px);font-weight:700;line-height:.85;letter-spacing:-.01em;color:var(--paper);margin-bottom:6px}
+.mast-num span{color:var(--cyan)}
+.mast-subtitle{font-family:'Barlow Condensed',sans-serif;font-size:clamp(22px,2.5vw,32px);font-weight:300;color:var(--mid);margin-bottom:28px;letter-spacing:.02em}
+.mast-desc{font-size:17px;line-height:1.85;color:rgba(232,238,244,.55);max-width:540px;margin-bottom:32px;font-weight:300}
+.mast-pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{padding:4px 12px;border:1px solid var(--border);font-family:'Overpass Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.pill.c{border-color:rgba(0,212,255,.4);color:var(--cyan)}
+.pill.o{border-color:rgba(255,107,43,.4);color:var(--orange)}
+.pill.g{border-color:rgba(61,214,140,.4);color:var(--green)}
+.mast-right{display:grid;grid-template-rows:repeat(3,1fr)}
+.system-card{padding:32px 36px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;justify-content:center;transition:background .2s}
+.system-card:last-child{border-bottom:none}
+.system-card:hover{background:rgba(0,212,255,.04)}
+.sys-label{font-family:'Overpass Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-bottom:8px}
+.sys-name{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:600;letter-spacing:.03em;margin-bottom:6px}
+.sys-name.c{color:var(--cyan)}.sys-name.o{color:var(--orange)}.sys-name.g{color:var(--green)}
+.sys-tagline{font-size:14px;line-height:1.7;color:var(--mid);font-weight:300}
+
+/* TRACK SELECTOR */
+.track-wrap{position:relative;z-index:1;padding:16px 52px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.ts-label{font-family:'Overpass Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);white-space:nowrap}
+.ts-buttons{display:flex;gap:6px}
+.ts-btn{padding:6px 14px;background:transparent;border:1px solid var(--border);font-family:'Overpass Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);cursor:pointer;transition:all .2s}
+.ts-btn:hover{border-color:var(--cyan);color:var(--cyan)}.ts-btn.active{background:rgba(0,212,255,.15);border-color:var(--cyan);color:var(--cyan)}
+.ts-btn:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+
+/* SECTIONS */
+section{position:relative;z-index:1;padding:60px 52px;border-bottom:1px solid var(--border)}
+.section-header{display:flex;align-items:center;gap:16px;margin-bottom:36px}
+.sec-code{font-family:'Overpass Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;padding:3px 10px;border:1px solid;white-space:nowrap}
+.sec-code.c{border-color:rgba(0,212,255,.4);color:var(--cyan)}
+.sec-code.o{border-color:rgba(255,107,43,.4);color:var(--orange)}
+.sec-code.g{border-color:rgba(61,214,140,.4);color:var(--green)}
+.sec-code.y{border-color:rgba(255,209,102,.4);color:var(--yellow)}
+.section-title{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:600;letter-spacing:.03em;color:var(--paper)}
+.section-rule{flex:1;height:1px;background:var(--border)}
+
+/* UNIT BLOCKS */
+.unit-block{margin-bottom:48px}
+.unit-label{font-family:'Overpass Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-bottom:16px;display:flex;align-items:center;gap:12px}
+.unit-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* LESSON GRID */
+.lesson-grid{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--border)}
+.lesson-cell{padding:24px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);transition:background .2s;position:relative}
+.lesson-cell:hover{background:rgba(0,212,255,.04)}.lesson-cell:nth-child(3n){border-right:none}
+.lesson-num{font-family:'Overpass Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-bottom:8px}
+.lesson-title{font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:600;letter-spacing:.02em;color:var(--paper);margin-bottom:8px;line-height:1.2}
+.lesson-desc{font-size:13.5px;line-height:1.8;color:rgba(232,238,244,.5);font-weight:300;margin-bottom:10px}
+.lesson-tag{display:inline-block;padding:2px 7px;border:1px solid var(--border);font-family:'Overpass Mono',monospace;font-size:8px;color:var(--dim);margin-right:3px;margin-bottom:3px}
+.lesson-tag.c{border-color:rgba(0,212,255,.4);color:var(--cyan)}.lesson-tag.o{border-color:rgba(255,107,43,.4);color:var(--orange)}.lesson-tag.g{border-color:rgba(61,214,140,.4);color:var(--green)}
+
+/* MATH BOX */
+.math-box{margin-top:10px;padding:10px 14px;background:var(--surface);border:1px solid var(--muted);font-family:'Overpass Mono',monospace;font-size:12px;color:var(--cyan);line-height:1.7}
+
+/* COMPLETE BTN */
+.complete-btn{margin-top:12px;padding:6px 14px;background:transparent;border:1px solid var(--border);font-family:'Overpass Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);cursor:pointer;transition:all .2s;width:100%;text-align:center}
+.complete-btn:hover{border-color:var(--green);color:var(--green)}.complete-btn.done{background:rgba(61,214,140,.08);border-color:var(--green);color:var(--green)}
+.complete-btn:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+
+/* RECALL */
+.recall-box{margin-top:10px;border:1px solid var(--muted);background:var(--card)}
+.recall-toggle{width:100%;padding:8px 12px;background:transparent;border:none;font-family:'Overpass Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,212,255,.7);cursor:pointer;text-align:left;display:flex;justify-content:space-between}
+.recall-toggle:hover{color:var(--cyan)}.recall-body{display:none;padding:10px 12px 14px}.recall-body.open{display:block}
+.recall-q{font-family:'Barlow',sans-serif;font-size:13.5px;font-style:italic;color:var(--mid);line-height:1.65;padding:5px 0;border-bottom:1px dashed var(--border)}
+.recall-q:last-child{border-bottom:none}.recall-q::before{content:'> ';color:var(--cyan);font-style:normal;font-family:'Overpass Mono',monospace;font-size:10px}
+
+/* CAREER */
+.career-box{margin-top:10px;padding:10px 12px;background:rgba(61,214,140,.05);border-left:2px solid var(--green)}
+.career-label{font-family:'Overpass Mono',monospace;font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--green);margin-bottom:5px}
+.career-chips{display:flex;flex-wrap:wrap;gap:3px}
+.career-chip{padding:2px 7px;background:rgba(61,214,140,.1);font-family:'Overpass Mono',monospace;font-size:8px;color:var(--green)}
+
+/* CRITICAL */
+.critical-block{padding:22px 26px;border:1px solid var(--border);border-left:3px solid var(--orange);background:rgba(255,107,43,.04);margin-top:24px}
+.critical-label{font-family:'Overpass Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--orange);margin-bottom:10px}
+.critical-q{font-size:14.5px;font-style:italic;color:rgba(232,238,244,.6);line-height:1.7;padding:4px 0;border-bottom:1px dashed rgba(255,107,43,.15);list-style:none}
+.critical-q:last-child{border-bottom:none}.critical-q::before{content:'▸ ';color:var(--orange);font-style:normal;font-family:'Overpass Mono',monospace;font-size:10px}
+
+/* FIRST PRINCIPLES BOX */
+.fp-box{padding:24px 28px;background:var(--card);border:1px solid var(--border);margin-bottom:28px}
+.fp-kicker{font-family:'Overpass Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--yellow);margin-bottom:8px}
+.fp-question{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:600;color:var(--paper);margin-bottom:10px;line-height:1.2}
+.fp-answer{font-size:15px;line-height:1.85;color:rgba(232,238,244,.55);font-weight:300}
+
+/* SUCCEED / DATASETS / BADGES — same grid pattern */
+.tri-grid{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--border)}
+.tri-cell{padding:26px;border-right:1px solid var(--border);border-bottom:1px solid var(--border)}
+.tri-cell:nth-child(3n){border-right:none}.tri-cell:nth-child(4),.tri-cell:nth-child(5),.tri-cell:nth-child(6){border-bottom:none}
+.duo-grid{display:grid;grid-template-columns:repeat(2,1fr);border:1px solid var(--border)}
+.duo-cell{padding:20px 24px;border-right:1px solid var(--border);border-bottom:1px solid var(--border)}
+.duo-cell:nth-child(2n){border-right:none}
+.cell-icon{font-size:22px;margin-bottom:10px}.cell-name{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:600;color:var(--paper);margin-bottom:7px;letter-spacing:.02em}
+.cell-desc{font-size:13px;line-height:1.8;color:rgba(232,238,244,.5);font-weight:300}
+.data-name{font-family:'Overpass Mono',monospace;font-size:10px;color:var(--yellow);margin-bottom:6px}
+.data-link{font-family:'Overpass Mono',monospace;font-size:9px;color:var(--cyan);text-decoration:none}
+.data-link:hover{color:var(--paper)}
+
+/* CONCEPT MAP */
+.cmap{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--border)}
+.cmap-node{padding:20px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);position:relative}
+.cmap-node:nth-child(3n){border-right:none}.cmap-node:nth-child(4),.cmap-node:nth-child(5),.cmap-node:nth-child(6){border-bottom:none}
+.cmap-arrow{position:absolute;right:-10px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--cyan);z-index:2;font-family:'Overpass Mono',monospace}
+.cmap-title{font-family:'Overpass Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--cyan);margin-bottom:8px}
+.cmap-items{list-style:none}
+.cmap-item{font-size:13px;color:var(--soft);line-height:1.6;padding-left:10px;position:relative}
+.cmap-item::before{content:'—';position:absolute;left:0;color:var(--border)}
+
+/* BADGES */
+.badges-row{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--border)}
+.badge-card{padding:28px;border-right:1px solid var(--border);text-align:center}
+.badge-card:last-child{border-right:none}
+.badge-icon{font-size:32px;margin-bottom:12px}.badge-name{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:600;color:var(--paper);letter-spacing:.02em;margin-bottom:5px}
+.badge-req{font-family:'Overpass Mono',monospace;font-size:9px;color:var(--dim);margin-bottom:8px}
+.badge-earned{display:none;font-family:'Overpass Mono',monospace;font-size:10px;color:var(--green)}
+.badge-card.unlocked .badge-earned{display:block}.badge-card.unlocked{background:rgba(61,214,140,.04)}
+
+/* FOOTER */
+footer{position:relative;z-index:1;background:var(--surface);padding:36px 52px;border-top:1px solid var(--cyan);display:flex;justify-content:space-between;align-items:center}
+.footer-text{font-family:'Overpass Mono',monospace;font-size:10px;letter-spacing:.07em;color:var(--dim);line-height:2}
+.footer-sig{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:300;letter-spacing:.1em;color:rgba(232,238,244,.1)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.mast-tag{animation:fadeUp .4s ease .1s both}.mast-num{animation:fadeUp .5s ease .2s both}
+.mast-subtitle{animation:fadeUp .5s ease .3s both}.mast-desc{animation:fadeUp .5s ease .4s both}.mast-pills{animation:fadeUp .5s ease .5s both}
+
+@media(max-width:960px){.mast-hero{grid-template-columns:1fr}.mast-right{border-top:1px solid var(--border)}.mast-left,.track-wrap,section,#progress-bar-container,footer{padding-left:24px;padding-right:24px}.lesson-grid,.tri-grid,.cmap{grid-template-columns:1fr}.lesson-cell,.tri-cell,.cmap-node{border-right:none!important}.duo-grid,.badges-row{grid-template-columns:1fr}.duo-cell,.badge-card{border-right:none!important}}
+
+  /* ── CRITERIA UPGRADE: Necessity + Prior Knowledge + Assumptions + Iteration ── */
+  .headache{background:rgba(212,160,23,.07);border-left:3px solid rgba(212,160,23,.45);border-radius:0 4px 4px 0;padding:11px 15px;margin-bottom:9px}
+  .headache strong{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#c9981a;display:block;margin-bottom:5px}
+  .headache p{font-size:12px;line-height:1.6;font-style:italic}
+  .prior-box{background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.18);border-radius:6px;padding:16px 20px;margin:0 0 22px}
+  .prior-box strong{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#10b981;display:block;margin-bottom:8px}
+  .prior-box p,.prior-box li{font-size:12.5px;line-height:1.65;color:inherit;opacity:.8}
+  .prior-box ul{list-style:none;margin:6px 0 0;display:flex;flex-direction:column;gap:5px}
+  .prior-box li{padding-left:14px;position:relative}
+  .prior-box li::before{content:'→';position:absolute;left:0;color:#10b981;font-family:'IBM Plex Mono',monospace}
+  .assume-box{background:rgba(139,92,246,.06);border-left:3px solid rgba(139,92,246,.3);border-radius:0 4px 4px 0;padding:11px 15px;margin-top:9px}
+  .assume-box strong{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#8b5cf6;display:block;margin-bottom:5px}
+  .assume-box p{font-size:12px;line-height:1.6}
+  .iteration-box{background:rgba(6,182,212,.05);border:1px solid rgba(6,182,212,.18);border-radius:6px;padding:14px 18px;margin:10px 0}
+  .iteration-box strong{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#06b6d4;display:block;margin-bottom:8px}
+  .iteration-flow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}
+  .iter-step{background:rgba(6,182,212,.08);border-radius:3px;padding:5px 10px;font-size:11px;color:#06b6d4;font-family:'IBM Plex Mono',monospace}
+  .iter-arrow{color:rgba(6,182,212,.4);font-size:11px}
+  .multi-rep{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+  .rep-chip{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:3px;padding:4px 10px;font-size:10px;font-family:'IBM Plex Mono',monospace;opacity:.7}
+
+</style>
+</head>
+<body>
+<div id="progress-bar-container" role="status" aria-label="Course progress">
+  <div id="progress-track"><div id="progress-fill"></div></div>
+  <span id="progress-text">0 of 0 units</span>
+  <span id="active-track-badge">All Tracks</span>
+</div>
+
+<header class="masthead">
+  <div class="mast-top">
+    <span><a href="index.html" style="color:var(--dim);text-decoration:none;opacity:.7;transition:opacity .15s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7">&larr; Home</a> &middot; Community College · Computer Science Dept · CS 175</span>
+    <span class="blink">▮</span>
+    <span>First Principles · Liberatory · Portfolio-Based</span>
+  </div>
+  <div class="mast-hero">
+    <div class="mast-left">
+      <div class="mast-tag">CS 175 · How Things Work</div>
+      <div class="mast-num">HOW<br><span>THINGS</span><br>WORK</div>
+      <div class="mast-subtitle">PageRank. GPS. The Phone in Your Pocket.</div>
+      <p class="mast-desc">Three technologies billions of people use every day. We ask: how do they <em>actually</em> work?
+
+Not the marketing version. The real version — the mathematics, physics, and engineering underneath. We go all the way down to first principles, and we build back up. When you're done, you won't just know these systems work. You'll know <em>why</em> — well enough to explain them from scratch.</p>
+      <div class="mast-pills">
+        <span class="pill c">PageRank &amp; the Web</span>
+        <span class="pill o">GPS &amp; Trilateration</span>
+        <span class="pill g">The Smartphone</span>
+        <span class="pill">No textbook</span>
+        <span class="pill">Ungraded</span>
+        <span class="pill">3 Learning Tracks</span>
+      </div>
+    </div>
+    <div class="mast-right">
+      <div class="system-card">
+        <div class="sys-label">System 01 — The Web</div>
+        <div class="sys-name c">PageRank</div>
+        <div class="sys-tagline">Eigenvalues, Markov chains, and the math that built a $2 trillion company. How does a machine decide which pages matter?</div>
+      </div>
+      <div class="system-card">
+        <div class="sys-label">System 02 — Location</div>
+        <div class="sys-name o">GPS</div>
+        <div class="sys-tagline">Satellites, light-speed timing, and least squares fitting. How does a chip in your pocket know where you are to within 3 meters?</div>
+      </div>
+      <div class="system-card">
+        <div class="sys-label">System 03 — The Device</div>
+        <div class="sys-name g">The Smartphone</div>
+        <div class="sys-tagline">Transistors, signals, touchscreens, cameras, CPUs. How does sand become a device that contains all of human knowledge?</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="track-wrap">
+  <span class="ts-label">Learning track:</span>
+  <div class="ts-buttons" role="group" aria-label="Filter by learning track">
+    <button class="ts-btn active" onclick="setTrack('all')" aria-pressed="true">All Tracks</button>
+    <button class="ts-btn" onclick="setTrack('novice')" aria-pressed="false">Novice</button>
+    <button class="ts-btn" onclick="setTrack('builder')" aria-pressed="false">Builder</button>
+    <button class="ts-btn" onclick="setTrack('architect')" aria-pressed="false">Architect</button>
+  </div>
+</div>
+
+<!-- UNIT 0: FOUNDATIONS -->
+<a href="build-a-computer.html" style="display:block;text-decoration:none;color:inherit;position:relative;z-index:1;margin:0;padding:28px 52px;background:linear-gradient(135deg,rgba(184,115,51,.08),rgba(0,212,255,.04));border-bottom:1px solid var(--border);transition:background .2s;" onmouseover="this.style.background='linear-gradient(135deg,rgba(184,115,51,.14),rgba(0,212,255,.08))'" onmouseout="this.style.background='linear-gradient(135deg,rgba(184,115,51,.08),rgba(0,212,255,.04))'">
+  <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+    <span style="font-family:'Overpass Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:#b87333;background:rgba(184,115,51,.12);border:1px solid rgba(184,115,51,.3);padding:4px 10px;">Featured Signature Project</span>
+    <span style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:600;color:var(--paper);">Build a Computer from Scratch</span>
+    <span style="font-family:'Overpass Mono',monospace;font-size:10px;color:var(--dim);">20 Weeks · Team-Built · Cross-STEM · Ben Eater Inspired</span>
+    <span style="font-family:'Overpass Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#b87333;margin-left:auto;">Open Project &rarr;</span>
+  </div>
+  <div style="font-size:13px;line-height:1.7;color:var(--mid);max-width:800px;margin-top:10px;font-weight:300;">Teams build a working 8-bit computer on breadboards from logic gates &mdash; encountering physics, linear algebra, differential equations, and chemistry along the way. Every connection made explicit.</div>
+</a>
+
+<section id="unit0">
+  <div class="section-header"><span class="sec-code y">Unit 00</span><h2 class="section-title">First Principles Thinking</h2><div class="section-rule"></div></div>
+  <p style="font-size:16px;line-height:1.85;color:rgba(232,238,244,.5);max-width:700px;margin-bottom:32px;font-weight:300;">Before we reverse-engineer anything, we need a method. First principles thinking means refusing to accept "it just works" — we keep asking why until we reach something undeniable.</p>
+
+  <div class="fp-box">
+    <div class="fp-kicker">// The Central Question of This Course</div>
+    <div class="fp-question">What does "understanding" technology actually mean?</div>
+    <div class="fp-answer">We'll draw a distinction between three levels: (1) using something (press button, result appears), (2) modeling something (knowing the algorithm, the protocol, the equation), and (3) building something (could you recreate it from scratch?). This course aims for level 2 in all three systems, and level 3 in at least one component of each.</div>
+  </div>
+
+  <div class="lesson-grid">
+    <div class="lesson-cell">
+<div class="prior-box">
+  <strong>What You Already Know (Activate Before Unit 0)</strong>
+  <p>You use three complex technologies every day. Before we go deep, name what you already know:</p>
+  <ul>
+    <li>Google returns results in an order. You've noticed that order changes. You've wondered why. (PageRank is the answer.)</li>
+    <li>Your phone knows where you are without anyone telling it. You know it uses satellites. That's trilateration — and it's beautiful math.</li>
+    <li>Your phone has a camera, a radio, a GPS, a touchscreen, and a brain — all in your palm. Each is a marvel of physics and engineering.</li>
+  </ul>
+  <p style="margin-top:8px">In this course, we go from intuition to derivation. You won't just know <em>that</em> GPS works. You'll know <em>why</em> — well enough to explain it to someone else from scratch.</p>
+</div>
+      <div class="lesson-num">Week 1</div>
+      <div class="lesson-title">Three Levels of Understanding</div>
+      <div class="headache"><strong>The Problem First</strong><p>You've used Google 10,000 times. Can you explain, from first principles, why one page ranks above another? If not — you're a user, not an understander. This course fixes that.</p></div>
+      <div class="lesson-desc">User, modeler, builder. The difference between operating a GPS app and understanding trilateration. This course aims for level 3: you can derive it from scratch.</div>
+      <span class="lesson-tag y" style="border-color:rgba(255,209,102,.4);color:var(--yellow);">Foundation</span>
+      <div class="recall-box"><button class="recall-toggle" onclick="toggleRecall(this)" aria-expanded="false"><span>⚙ Quick Recall</span><span>+</span></button><div class="recall-body"><div class="recall-q">Describe a piece of technology you use daily. What would it take to understand it at level 2? Level 3?</div><div class="recall-q">What is a "black box"? In what situations is black-box thinking dangerous?</div></div></div>
+      <button class="complete-btn" onclick="toggleComplete('htw-w0',this)">Mark Complete</button>
+    </div>
+    <div class="lesson-cell">
+      <div class="lesson-num">Week 1</div>
+      <div class="lesson-title">Math You Already Know (And Don't Know You Know)</div>
+      <div class="lesson-desc">Exponentials, logarithms, basic probability, graphs and networks. This is a math-forward course but not a calculus course. We use the math we need, when we need it.</div>
+      <div class="career-box"><div class="career-label">// Why It Matters</div><div class="career-chips"><span class="career-chip">Every job in tech</span><span class="career-chip">Every job NOT in tech</span></div></div>
+      <div class="recall-box"><button class="recall-toggle" onclick="toggleRecall(this)" aria-expanded="false"><span>⚙ Quick Recall</span><span>+</span></button><div class="recall-body"><div class="recall-q">What does log₂(8) equal? What does this have to do with data storage?</div><div class="recall-q">What is a probability distribution? Give an example of something with a non-uniform distribution.</div></div></div>
+      <button class="complete-btn" onclick="toggleComplete('htw-w0b',this)">Mark Complete</button>
+    </div>
+    <div class="lesson-cell">
+      <div class="lesson-num">Week 1</div>
+      <div class="lesson-title">Graphs, Networks, and Links</div>
+      <div class="lesson-desc">Nodes, edges, directed graphs, adjacency matrices. The web is a graph. Your contact list is a graph. Diseases spread through graphs. Starting here makes PageRank natural.</div>
+      <div class="math-box">G = (V, E)<br>adjacency matrix: A[i][j] = 1 if edge i→j</div>
+      <div class="career-box"><div class="career-label">// Used In</div><div class="career-chips"><span class="career-chip">Social network analysis</span><span class="career-chip">Routing</span><span class="career-chip">Epidemiology</span></div></div>
+      <div class="recall-box"><button class="recall-toggle" onclick="toggleRecall(this)" aria-expanded="false"><span>⚙ Quick Recall</span><span>+</span></button><div class="recall-body"><div class="recall-q">Draw the adjacency matrix for a 4-node directed graph with edges A→B, B→C, C→A, A→D.</div><div class="recall-q">What is the difference between a directed and undirected graph? Give a real example of each.</div></div></div>
+      <button class="complete-btn" onclick="toggleComplete('htw-w0c',this)">Mark Complete</button>
+    </div>
+  </div>
+</section>
+
+<!-- UNIT 1: PAGERANK -->
+<section id="unit1">
+  <div class="section-header"><span class="sec-code c">Unit 01</span><h2 class="section-title">PageRank — How Google Decided What Mattered</h2><div class="section-rule"></div></div>
+  <p style="font-size:16px;line-height:1.85;color:rgba(232,238,244,.5);max-width:700px;margin-bottom:32px;font-weight:300;">In 1998, two PhD students had a simple idea: a page is important if important pages link to it. That recursive definition, turned into an eigenvalue equation, became a $2 trillion company. We will derive it from scratch.</p>
+
+  <div class="fp-box">
+    <div class="fp-kicker">// The Big Idea</div>
+    <div class="fp-question">What makes a webpage "important"?</div>
+    <div class="fp-answer">Before Google: count keywords. After Brin and Page: count the links pointing at a page, weighted by the importance of the pages pointing to it. This is circular — but it has a unique mathematical solution: the dominant eigenvector of the link matrix. Follow this chain from first principles and you'll understand how a billion searches per day are ranked.</div>
+  </div>
+
+  <div class="lesson-grid">
+    <div class="lesson-cell">
+      <div class="lesson-num">Week 2 · Lesson 1</div>
+      <div class="lesson-title">The Link Structure of the Web</div>
+      <div class="lesson-desc">Building the web graph. What links meant in 1998: a vote of trust. How Brin and Page modeled the web as a directed graph and built a matrix from it.</div>
+      <span class="lesson-tag c">PageRank</span>
+      <div class="math-box">Web = directed graph<br>Link i→j = page i endorses j</div>
+      <div class="recall-box"><button class="recall-toggle" onclick="toggleRecall(this)" aria-expanded="false"><span>⚙ Quick Recall</span><span>+</span></button><div class="recall-body"><div class="recall-q">Why is "number of incoming links" a flawed measure of importance? What can be gamed?</div><div class="recall-q">Build a simple web graph with 5 pages and write the link matrix.</div></div></div>
+      <button class="complete-btn" onclick="toggleComplete('htw-pr1',this)">Mark Complete</button>
+    </div>
+    <div class="lesson-cell">
+      <div class="lesson-num">Week 2 · Lesson 2</div>
+      <div class="lesson-title">The Random Surfer Model</div>
+      <div class="lesson-desc">Imagine a surfer clicking random links forever. Where do they spend most of their time? Pages they visit most often are the most important. This is PageRank's intuition.</div>
+      <span class="lesson-tag c">PageRank</span>
+      <div class="math-box">P(visit page j) = Σᵢ P(visit i) · P(i→j)<br>= steady-state of Markov chain</div>
+      <div class="recall-box"><button class="recall-toggle" onclick="toggleRecall(this)" aria-expanded="false"><span>⚙ Quick Recall</span><span>+</span></button><div class="recall-body"><div class="recall-q">What is a Markov chain? What makes it "memoryless"?</div><div class="recall-q">What happens when the random surfer reaches a "dangling node" (no outgoing links)? How does PageRank handle this?</div></div></div>
+      <button class="complete-btn" onclick="toggleComplete('htw-pr2',this)">Mark Complete</button>
+    </div>
+    <div class="lesson-cell">
+      <div class="lesson-num">Week 3 · Lesson 3</div>
+      <div class="lesson-title">Stochastic Matrices & Steady State</div>
+      <div class="lesson-desc">The link matrix as a stochastic (column-stochastic) matrix. Why stochastic matrices always have an eigenvalue of 1. The steady-state vector as the PageRank vector.</div>
+      <div class="assume-box"><strong>Assumption to Make Explicit</strong><p>We're assuming a link is a vote of equal trust — but that's not always true. A link from a spam site and a link from Wikipedia count the same in this model. What does that mean for the results?</p></div>
+      <span class="lesson-tag c">PageRank</span>
+      <div class="math-box">Mv = v  ←  eigenvalue equation!<br>v = PageRank vector<br>M = modified link matrix</div>
+      <div class="recall-box"><button class="recall-toggle" onclick="toggleRecall(this)" aria-expanded="false"><span>⚙ Quick Recall</span><span>+</span></button><div class="recall-body"><div class="recall-q">What is a column-stochastic matrix? Why do all columns sum to 1?</div><div class="recall-q">State the Perron-Frobenius theorem (informal version). What does it guarantee about the PageRank vector?</div></div></div>
+      <button class="complete-btn" onclick="toggleComplete('htw-pr3',this)">Mark Complete</button>
+    </div>
+    <div class="lesson-cell">
+      <div class="lesson-num">Week 3 · Lesson 4</div>
+      <div class="lesson-title">Power Iteration — Computing PageRank</div>
+      <div class="lesson-desc">You can't directly compute eigenvectors for a billion-node graph. Power iteration: start with uniform ranking, multiply by M, repeat. Watch it converge to the true PageRank vector.</div>
+      <div class="math-box">v₀ = [1/n, 1/n, ..., 1/n]ᵀ<br>v_{k+1} = M · v_k<br>converges to dominant eigenvector</div>
+      <div class="career-box"><div class="career-label">// Used In</div><div class="career-chips"><span class="career-chip">Google Search</span><span class="career-chip">Citation analysis</span><span class="career-chip">Social network influence</span><span class="career-chip">Academic impact</span></div></div>
+      <div class="recall-box"><button class="recall-toggle" onclick="toggleRecall(this)" aria-expanded="false"><span>⚙ Quick Recall</span><span>+</span></button><div class="recall-body"><div class="recall-q">Why does power iteration converge? What property of M guarantees this?</div><div class="recall-q">Implement power iteration by hand on a 3×3 stochastic matrix. How many iterations to converge?</div></div></div>
+      <button class="complete-btn" onclick="toggleComplete('htw-pr4',this)">Mark Complete</button>
+    </div>
+    <div class="lesson-cell">
+      <div class="lesson-num">Week 4 · Lesson 5</div>
+      <div class="lesson-title">The Damping Factor & the Google Matrix</div>
+      <div class="lesson-desc">The "teleportation" fix for dangling nodes and disconnected graphs. The Google matrix G = αM + (1-α)ee^T/n. Why α ≈ 0.85 and what it means for the random surfer.</div>
+      <div class="math-box">G = 0.85·M + 0.15·(1/n)·J<br>J = matrix of all ones<br>ensures G is irreducible, aperiodic</div>
+      <div class="recall-box"><button class="recall-toggle" onclick="toggleRecall(this)" aria-expanded="false"><span>⚙ Quick Recall</span><span>+</span></button><div class="recall-body"><div class="recall-q">What does the damping factor α represent for the random surfer?</div><div class="recall-q">What are "dangling nodes"? Why do they break the basic PageRank algorithm?</div></div></div>
+      <button class="complete-btn" onclick="toggleComplete('htw-pr5',this)">Mark Complete</button>
+    </div>
+    <div class="lesson-cell">
+      <div class="lesson-num">Week 4 · Project</div>
+      <div class="lesson-title">Build Your Own PageRank</div>
+      <div class="lesson-desc">Implement PageRank from scratch in Python. Build a web graph from a small dataset (Wikipedia links, or a citation network). Rank pages. Visualize the convergence.</div>
+      <div class="iteration-box"><strong>How This Project Works — Iteratively</strong><div class="iteration-flow"><span class="iter-step">Tiny graph (5 nodes)</span><span class="iter-arrow">→</span><span class="iter-step">Check convergence</span><span class="iter-arrow">→</span><span class="iter-step">Scale up</span><span class="iter-arrow">→</span><span class="iter-step">Interpret results</span></div><p style="font-size:11px;margin-top:8px;opacity:.7">Start with a graph you can verify by hand. Only scale up once you trust your small version.</p></div>
+      <span class="lesson-tag c">Project</span>
+      <div class="critical-block" style="margin-top:10px;">
+        <div class="critical-label" style="font-size:8px;">// Critical Questions</div>
+        <ul>
+          <li class="critical-q" style="font-size:13px;">PageRank decides what information a billion people see daily. Who decides what counts as a "link"? Who has more links?</li>
+          <li class="critical-q" style="font-size:13px;">SEO (search engine optimization) is an industry designed to game PageRank. What does this say about the algorithm's assumptions?</li>
+        </ul>
+      </div>
+      <button class="complete-btn" onclick="toggleComplete('htw-pr6',this)">Mark Complete</button>
+    </div>
+  </div>
+</section>
+
+<!-- UNIT 2: GPS -->
+<section id="unit2">
+  <div class="section-header"><span class="sec-code o">Unit 02</span><h2 class="section-title">GPS — How Satellites Know Where You Are</h2><div class="section-rule"></div></div>
+  <p style="font-size:15px;line-height:1.85;color:rgba(232,238,244,.5);max-width:700px;margin-bottom:32px;font-weight:300;">31 satellites. Atomic clocks. Einstein's relativity corrections. And least squares to tie it all together. GPS is applied mathematics at civilizational scale — and every piece of the math is something you can derive yourself.</p>
+
+  <div class="prior-box">
+    <strong>What You Already Know (Before GPS Unit)</strong>
+    <ul>
+      <li>You've used distance = speed × time since middle school. GPS is built on exactly that equation.</li>
+      <li>You know that circles intersect at points. Three spheres in 3D intersect at two points. A 4th sphere picks one.</li>
+      <li>From the PageRank unit: you already understand overdetermined systems and least squares. GPS uses the same idea.</li>
+    </ul>
+  </div>
+
+  <div class="fp-box">
+    <div class="fp-kicker">// The Big Idea</div>
+    <div class="fp-question">How does a chip in your phone know it's at exactly 37.421998°N, 122.084101°W?</div>
+    <div class="fp-answer">Each GPS satellite broadcasts the time and its position. Your receiver measures when those signals arrive. Light travels at 299,792,458 m/s, so a timing difference of 1 nanosecond corresponds to 30cm of distance. With signals from 4+ satellites, you have an overdetermined system of equations — and least squares gives you the best position estimate.</div>
+  </div>
+
+  <div class="lesson-grid">
+    <div class="lesson-cell">
+      <div class="lesson-num">Week 5 · Lesson 1</div>
+      <div class="lesson-title">The GPS Constellation</div>
+      <div class="lesson-desc">31 satellites in medium Earth orbit, 4 always visible from anywhere on Earth. How the constellation was designed. Why 4 satellites (not 3) are needed: x, y, z, and clock error.</div>
+      <span class="lesson-tag o">GPS</span>
+      <div class="math-box">unknowns: (x, y, z, Δt)<br>need ≥ 4 satellites<br>→ overdetermined system with 4+ eqs</div>
+      <div class="recall-box"><button class="recall-toggle" onclick="toggleRecall(this)" aria-expanded="false"><span>⚙ Quick Recall</span><span>+</span></button><div class="recall-body"><div class="recall-q">Why do we need 4 satellites to determine position, not 3? What is the 4th unknown?</div><div class="recall-q">GPS satellites orbit at ~20,000 km. Why does this altitude matter for signal coverage?</div></div></div>
+      <button class="complete-btn" onclick="toggleComplete('htw-gps1',this)">Mark Complete</button>
+    </div>
+    <div class="lesson-cell">
+      <div class="lesson-num">Week 5 · Lesson 2</div>
+      <div class="lesson-title">Time, Distance, and the Speed of Light</div>
+      <div class="lesson-desc">Distance = speed × time. GPS satellites carry atomic clocks accurate to 1 nanosecond. How the receiver uses signal travel time to compute pseudoranges. Why "pseudo"?</div>
+      <div class="math-box">d = c · Δt<br>c = 299,792,458 m/s<br>1 ns error → 30 cm position error</div>
+      <div class="career-box"><div class="career-label">// Used In</div><div class="career-chips"><span class="career-chip">Navigation</span><span class="career-chip">Precision agriculture</span><span class="career-chip">Air traffic control</span><span class="career-chip">Earthquake monitoring</span></div></div>
+      <div class="recall-box"><button class="recall-toggle" onclick="toggleRecall(this)" aria-expanded="false"><span>⚙ Quick Recall</span><span>+</span></button><div class="recall-body"><div class="recall-q">What is a "pseudorange"? Why is it not the true range?</div><div class="recall-q">Atomic clocks are accurate to 1 part in 10¹³. What does that mean in nanoseconds per day?</div></div></div>
+      <button class="complete-btn" onclick="toggleComplete('htw-gps2',this)">Mark Complete</button>
+    </div>
+    <div class="lesson-cell">
+      <div class="lesson-num">Week 6 · Lesson 3</div>
+      <div class="lesson-title">Trilateration — The Geometry of Location</div>
+      <div class="lesson-desc">Two satellites: you're on the intersection of two spheres (a circle). Three satellites: you're at two points. Four satellites: unique position in 3D. The geometry of trilateration — not triangulation.</div>
+      <div class="math-box">(x-xᵢ)² + (y-yᵢ)² + (z-zᵢ)² = (c·tᵢ)²<br>4 equations, 4 unknowns<br>nonlinear → linearize → solve</div>
+      <div class="recall-box"><button class="recall-toggle" onclick="toggleRecall(this)" aria-expanded="false"><span>⚙ Quick Recall</span><span>+</span></button><div class="recall-body"><div class="recall-q">What is the difference between triangulation (angles) and trilateration (distances)?</div><div class="recall-q">Draw the geometry of 3 satellites giving you exactly 2 candidate positions. How does a 4th satellite eliminate the wrong one?</div></div></div>
+      <button class="complete-btn" onclick="toggleComplete('htw-gps3',this)">Mark Complete</button>
+    </div>
+    <div class="lesson-cell">
+      <div class="lesson-num">Week 6 · Lesson 4</div>
+      <div class="lesson-title">Least Squares GPS — More Satellites = More Accuracy</div>
+      <div class="lesson-desc">With 6+ satellites you have an overdetermined system — more equations than unknowns. Least squares finds the best-fit position. Why more satellites make your position estimate better.</div>
+      <div class="math-box">Ax = b (overdetermined)<br>x̂ = (AᵀA)⁻¹Aᵀb<br>minimizes Σ(residuals)²</div>
+      <div class="career-box"><div class="career-label">// Used In</div><div class="career-chips"><span class="career-chip">Survey-grade GPS</span><span class="career-chip">Autonomous vehicles</span><span class="career-chip">Drone navigation</span></div></div>
+      <div class="recall-box"><button class="recall-toggle" onclick="toggleRecall(this)" aria-expanded="false"><span>⚙ Quick Recall</span><span>+</span></button><div class="recall-body"><div class="recall-q">Why does having more satellite measurements improve accuracy? What statistical principle is this?</div><div class="recall-q">Write the normal equations for GPS position estimation with 6 satellites.</div></div></div>
+      <button class="complete-btn" onclick="toggleComplete('htw-gps4',this)">Mark Complete</button>
+    </div>
+    <div class="lesson-cell">
+      <div class="lesson-num">Week 7 · Lesson 5</div>
+      <div class="lesson-title">Einstein Was Right: Relativistic Corrections</div>
+      <div class="lesson-desc">GPS satellites move fast (special relativity: clocks tick slower) and are high up (general relativity: gravity is weaker, clocks tick faster). Net effect: +38 microseconds/day. Without correction, GPS would drift 10km/day.</div>
+      <div class="math-box">SR: -7.2 μs/day (time dilation)<br>GR: +45.9 μs/day (gravitational)<br>Net: +38.4 μs/day<br>→ 11.4 km/day error uncorrected</div>
+      <div class="recall-box"><button class="recall-toggle" onclick="toggleRecall(this)" aria-expanded="false"><span>⚙ Quick Recall</span><span>+</span></button><div class="recall-body"><div class="recall-q">State the special relativistic time dilation formula. Why does a fast-moving clock tick slower?</div><div class="recall-q">GPS is often cited as the most important everyday application of Einstein's relativity. Why is this such a powerful teaching example?</div></div></div>
+      <button class="complete-btn" onclick="toggleComplete('htw-gps5',this)">Mark Complete</button>
+    </div>
+    <div class="lesson-cell">
+      <div class="lesson-num">Week 7 · Project</div>
+      <div class="lesson-title">Simulate GPS Position Finding</div>
+      <div class="lesson-desc">Given simulated satellite positions and noisy pseudorange measurements, implement trilateration and least squares to find your position. Add noise and observe how accuracy changes.</div>
+      <span class="lesson-tag o">Project</span>
+      <div class="critical-block" style="margin-top:10px;">
+        <div class="critical-label" style="font-size:8px;">// Critical Questions</div>
+        <ul>
+          <li class="critical-q" style="font-size:13px;">GPS is controlled by the US military, which can selectively degrade or deny access. Who should control global positioning infrastructure?</li>
+          <li class="critical-q" style="font-size:13px;">GPS enables precise drone strikes. It also guides ambulances and disaster relief. How do you weigh a technology's harms and benefits?</li>
+        </ul>
+      </div>
+      <button class="complete-btn" onclick="toggleComplete('htw-gps6',this)">Mark Complete</button>
+    </div>
+  </div>
+</section>
+
+<!-- UNIT 3: THE SMARTPHONE -->
+<section id="unit3">
+  <div class="section-header"><span class="sec-code g">Unit 03</span><h2 class="section-title">The Smartphone — From Sand to Supercomputer</h2><div class="section-rule"></div></div>
+  <p style="font-size:16px;line-height:1.85;color:rgba(232,238,244,.5);max-width:700px;margin-bottom:32px;font-weight:300;">The smartphone is arguably the most complex object ever mass-produced. We take it apart layer by layer: silicon, transistors, logic gates, binary arithmetic, memory, the CPU, the operating system, radio waves, the camera, the touchscreen. How does sand become a device that contains all of human knowledge?</p>
+
+  <div class="lesson-grid">
+    <div class="lesson-cell">
+      <div class="lesson-num">Week 8 · Lesson 1</div>
+      <div class="lesson-title">Silicon, Semiconductors & Transistors</div>
+      <div class="lesson-desc">Why silicon? How doping creates p-type and n-type semiconductors. The transistor as a voltage-controlled switch. A modern phone has 15 billion transistors the size of a virus.</div>
+      <span class="lesson-tag g">Hardware</span>
+      <div class="math-box">transistor: V_gate controls I_drain<br>on: ~1 (logic HIGH)<br>off: ~0 (logic LOW)<br>switching time: ~0.1 nanoseconds</div>
+      <div class="recall-box"><button class="recall-toggle" onclick="toggleRecall(this)" aria-expanded="false"><span>⚙ Quick Recall</span><span>+</span></button><div class="recall-body"><div class="recall-q">What is a semiconductor? What makes silicon useful that pure metals are not?</div><div class="recall-q">A transistor acts as a switch. How does a voltage on the gate control current flow? Draw it.</div></div></div>
+      <button class="complete-btn" onclick="toggleComplete('htw-ph1',this)">Mark Complete</button>
+    </div>
+    <div class="lesson-cell">
+      <div class="lesson-num">Week 8 · Lesson 2</div>
+      <div class="lesson-title">Logic Gates, Binary & Information</div>
+      <div class="lesson-desc">AND, OR, NOT, NAND — transistors wired to perform Boolean logic. Binary representation. Why computers count in base 2. How a NAND gate is universal: you can build any circuit from NAND gates alone.</div>
+      <div class="math-box">NAND(A,B) = NOT(A AND B)<br>universal gate: any logic from NAND<br>1 bit = 1 answer to a yes/no question</div>
+      <div class="career-box"><div class="career-label">// Used In</div><div class="career-chips"><span class="career-chip">Every digital device</span><span class="career-chip">Cryptography</span><span class="career-chip">Error correction</span></div></div>
+      <div class="recall-box"><button class="recall-toggle" onclick="toggleRecall(this)" aria-expanded="false"><span>⚙ Quick Recall</span><span>+</span></button><div class="recall-body"><div class="recall-q">Why is binary (base 2) used instead of decimal in computers? What advantage does it have for physical implementation?</div><div class="recall-q">What does it mean for NAND to be "functionally complete"? Prove it by expressing AND, OR, NOT using only NAND.</div></div></div>
+      <button class="complete-btn" onclick="toggleComplete('htw-ph2',this)">Mark Complete</button>
+    </div>
+    <div class="lesson-cell">
+      <div class="lesson-num">Week 9 · Lesson 3</div>
+      <div class="lesson-title">From Gates to Arithmetic: The ALU</div>
+      <div class="lesson-desc">The half adder, full adder, ripple-carry adder. How Boolean logic performs arithmetic. The Arithmetic Logic Unit (ALU) as the math engine of the CPU. Clock cycles.</div>
+      <div class="math-box">1 + 1 = 10 (binary)<br>half adder: sum = A XOR B, carry = A AND B<br>modern CPUs: ~3-4 GHz (3-4 billion adds/sec)</div>
+      <div class="recall-box"><button class="recall-toggle" onclick="toggleRecall(this)" aria-expanded="false"><span>⚙ Quick Recall</span><span>+</span></button><div class="recall-body"><div class="recall-q">Design a half adder from logic gates. What are its inputs and outputs?</div><div class="recall-q">A 3 GHz processor executes roughly 3 billion operations per second. What limits this from going faster?</div></div></div>
+      <button class="complete-btn" onclick="toggleComplete('htw-ph3',this)">Mark Complete</button>
+    </div>
+    <div class="lesson-cell">
+      <div class="lesson-num">Week 9 · Lesson 4</div>
+      <div class="lesson-title">Memory: Bits, Bytes, RAM & Storage</div>
+      <div class="lesson-desc">How transistors store one bit. SRAM vs DRAM. Cache hierarchy: L1, L2, L3 cache, RAM, SSD. Why cache matters enormously for program performance. Flash storage.</div>
+      <div class="math-box">1 byte = 8 bits<br>L1 cache: ~1 ns, 64KB<br>RAM: ~100 ns, 8GB<br>SSD: ~50,000 ns, 256GB</div>
+      <div class="recall-box"><button class="recall-toggle" onclick="toggleRecall(this)" aria-expanded="false"><span>⚙ Quick Recall</span><span>+</span></button><div class="recall-body"><div class="recall-q">Explain the memory hierarchy in your own words. Why not just have one fast tier?</div><div class="recall-q">How does DRAM store a bit? Why does it need to be refreshed thousands of times per second?</div></div></div>
+      <button class="complete-btn" onclick="toggleComplete('htw-ph4',this)">Mark Complete</button>
+    </div>
+    <div class="lesson-cell">
+      <div class="lesson-num">Week 10 · Lesson 5</div>
+      <div class="lesson-title">Radio Waves, Modulation & Cellular Networks</div>
+      <div class="lesson-desc">How your phone converts digital bits into electromagnetic waves and back. AM vs FM modulation. How cellular networks handle millions of simultaneous calls through frequency division and CDMA.</div>
+      <div class="math-box">signal = carrier × message<br>AM: A(t) = [1 + m(t)]·cos(2πf_c·t)<br>bandwidth = data rate / spectral efficiency</div>
+      <div class="career-box"><div class="career-label">// Used In</div><div class="career-chips"><span class="career-chip">5G networks</span><span class="career-chip">WiFi</span><span class="career-chip">Bluetooth</span><span class="career-chip">Satellite comms</span></div></div>
+      <div class="recall-box"><button class="recall-toggle" onclick="toggleRecall(this)" aria-expanded="false"><span>⚙ Quick Recall</span><span>+</span></button><div class="recall-body"><div class="recall-q">What is modulation? Why can't you just transmit the audio signal directly as a radio wave?</div><div class="recall-q">How do millions of phones in a city share the same radio spectrum without all interfering with each other?</div></div></div>
+      <button class="complete-btn" onclick="toggleComplete('htw-ph5',this)">Mark Complete</button>
+    </div>
+    <div class="lesson-cell">
+      <div class="lesson-num">Week 10 · Lesson 6</div>
+      <div class="lesson-title">The Camera, Touchscreen & the Full System</div>
+      <div class="lesson-desc">CMOS image sensors: how a pixel converts photons to charge. Capacitive touchscreens: how a finger's electric field changes capacitance at known grid coordinates. Bringing the whole system together.</div>
+      <div class="math-box">touchscreen: ΔC = ε₀A/d<br>finger changes capacitance at (x,y)<br>camera: photon → photoelectron → ADC → pixel value</div>
+      <div class="recall-box"><button class="recall-toggle" onclick="toggleRecall(this)" aria-expanded="false"><span>⚙ Quick Recall</span><span>+</span></button><div class="recall-body"><div class="recall-q">How does a capacitive touchscreen know exactly where you touched? Describe the sensing grid.</div><div class="recall-q">A smartphone camera sensor has 50 megapixels. How much raw data does one photo contain before compression?</div></div></div>
+      <button class="complete-btn" onclick="toggleComplete('htw-ph6',this)">Mark Complete</button>
+    </div>
+  </div>
+  <div class="critical-block">
+    <div class="critical-label">// Critical Lens — Unit 3: The Smartphone</div>
+    <ul>
+      <li class="critical-q">Smartphone manufacturing depends on cobalt from the Democratic Republic of Congo, where mining is linked to child labor and armed conflict. How do you hold both truths: the phone's utility and its supply chain?</li>
+      <li class="critical-q">15 billion transistors were designed primarily by engineers in a very small demographic. What does it mean for the world's information device to be designed by a narrow slice of humanity?</li>
+      <li class="critical-q">Your phone generates enormous data about your location, habits, and social network. Who owns that data? Who benefits from it? Who is harmed?</li>
+    </ul>
+  </div>
+</section>
+
+<!-- HOW TO SUCCEED -->
+<section id="succeed">
+  <div class="section-header"><span class="sec-code y">◈</span><h2 class="section-title">How to Succeed in This Course</h2><div class="section-rule"></div></div>
+  <div class="tri-grid">
+    <div class="tri-cell"><div class="cell-icon">🔬</div><div class="cell-name">Always Ask "Why?"</div><div class="cell-desc">When you learn how something works, your next question is always: why was it built this way? What problem was being solved? What other approaches were considered? First principles means going one layer deeper than you think you need to.</div></div>
+    <div class="tri-cell"><div class="cell-icon">📐</div><div class="cell-name">Derive the Math Before Using It</div><div class="cell-desc">When we arrive at an equation, don't just memorize it — derive it. Walk back through the reasoning that led to it. An equation you derived yourself is one you actually own. One you memorized will vanish under pressure.</div></div>
+    <div class="tri-cell"><div class="cell-icon">🔧</div><div class="cell-name">Build Something Small</div><div class="cell-desc">For every major concept, build a minimal working version: a 4-node PageRank, a 3-satellite GPS simulator, a logic gate circuit. The act of building reveals what you actually understand vs. what you only think you understand.</div></div>
+    <div class="tri-cell"><div class="cell-icon">🌐</div><div class="cell-name">Connect the Systems</div><div class="cell-desc">GPS uses eigenvalues (matrix math). PageRank uses probability (Markov chains). Phones use signal processing (Fourier). These aren't separate topics — they're the same math wearing different clothes. Find the connections.</div></div>
+    <div class="tri-cell"><div class="cell-icon">⚖️</div><div class="cell-name">Hold the Ethical Dimension</div><div class="cell-desc">Every system we study has ethical stakes: GPS enables drone strikes, PageRank shapes what we believe, smartphones exploit labor and attention. Understanding the technology means you must also understand its power and its costs.</div></div>
+    <div class="tri-cell"><div class="cell-icon">❓</div><div class="cell-name">The 2-Minute Rule</div><div class="cell-desc">If you've been stuck for 2 minutes, write down exactly what you're stuck on and ask. This is Jeff Anderson's rule. It works in math. It works in engineering. It works in life. The ability to articulate confusion is a skill.</div></div>
+  </div>
+</section>
+
+<!-- CONCEPT MAP -->
+<section id="concept-map">
+  <div class="section-header"><span class="sec-code c">◈</span><h2 class="section-title">How the Course Connects</h2><div class="section-rule"></div></div>
+  <div class="cmap">
+    <div class="cmap-node"><div class="cmap-title">Foundation Math</div><ul class="cmap-items"><li class="cmap-item">Graphs & networks</li><li class="cmap-item">Probability basics</li><li class="cmap-item">Linear algebra</li><li class="cmap-item">Distance / geometry</li></ul><div class="cmap-arrow">→</div></div>
+    <div class="cmap-node"><div class="cmap-title">PageRank</div><ul class="cmap-items"><li class="cmap-item">Link matrix (graph)</li><li class="cmap-item">Markov chains</li><li class="cmap-item">Eigenvalue equation</li><li class="cmap-item">Power iteration</li></ul><div class="cmap-arrow">→</div></div>
+    <div class="cmap-node"><div class="cmap-title">GPS</div><ul class="cmap-items"><li class="cmap-item">Pseudorange equations</li><li class="cmap-item">Trilateration geometry</li><li class="cmap-item">Least squares fitting</li><li class="cmap-item">Relativistic corrections</li></ul></div>
+    <div class="cmap-node"><div class="cmap-title">Digital Hardware</div><ul class="cmap-items"><li class="cmap-item">Transistors & gates</li><li class="cmap-item">Boolean logic</li><li class="cmap-item">Binary arithmetic</li><li class="cmap-item">Memory hierarchy</li></ul><div class="cmap-arrow">→</div></div>
+    <div class="cmap-node"><div class="cmap-title">Communication</div><ul class="cmap-items"><li class="cmap-item">Radio waves</li><li class="cmap-item">Modulation</li><li class="cmap-item">Cellular networks</li><li class="cmap-item">Signal processing</li></ul><div class="cmap-arrow">→</div></div>
+    <div class="cmap-node"><div class="cmap-title">Critical Thread</div><ul class="cmap-items"><li class="cmap-item">Who controls this?</li><li class="cmap-item">Who benefits?</li><li class="cmap-item">Who is harmed?</li><li class="cmap-item">What should change?</li></ul></div>
+  </div>
+</section>
+
+<!-- DATASETS -->
+<section id="datasets">
+  <div class="section-header"><span class="sec-code y">◈</span><h2 class="section-title">Real Data to Work With</h2><div class="section-rule"></div></div>
+  <div class="duo-grid">
+    <div class="duo-cell"><div class="data-name">Wikipedia Link Graph (SNAP)</div><div class="cell-desc" style="font-size:13px;color:rgba(232,238,244,.5);margin-bottom:8px;">Apply PageRank to the actual Wikipedia link structure. Find which articles are most "authoritative." Compare to human intuitions about importance.</div><a href="https://snap.stanford.edu/data/enwiki-2013.html" target="_blank" class="data-link">Access Dataset →</a></div>
+    <div class="duo-cell"><div class="data-name">GPS Raw Measurements (u-blox)</div><div class="cell-desc" style="font-size:13px;color:rgba(232,238,244,.5);margin-bottom:8px;">Real pseudorange measurements from a GPS receiver. Implement trilateration and compare your computed position to known ground truth.</div><a href="https://www.u-blox.com/en/open-source-raw-gnss-measurements" target="_blank" class="data-link">Access Dataset →</a></div>
+    <div class="duo-cell"><div class="data-name">Twitter/Web Crawl Networks</div><div class="cell-desc" style="font-size:13px;color:rgba(232,238,244,.5);margin-bottom:8px;">Social network graphs for PageRank experiments. Compare directed vs. undirected implementations. Study the effect of the damping factor.</div><a href="https://snap.stanford.edu/data/ego-Twitter.html" target="_blank" class="data-link">Access Dataset →</a></div>
+    <div class="duo-cell"><div class="data-name">OpenCellID — Cell Tower Data</div><div class="cell-desc" style="font-size:13px;color:rgba(232,238,244,.5);margin-bottom:8px;">Crowdsourced database of cell tower positions. Build a cell-tower trilateration system and compare accuracy to GPS.</div><a href="https://opencellid.org/" target="_blank" class="data-link">Access Dataset →</a></div>
+    <div class="duo-cell"><div class="data-name">Academic Citation Networks</div><div class="cell-desc" style="font-size:13px;color:rgba(232,238,244,.5);margin-bottom:8px;">Apply PageRank to citation data to measure paper influence. Compare to citation count. What does each measure differently?</div><a href="https://snap.stanford.edu/data/cit-Patents.html" target="_blank" class="data-link">Access Dataset →</a></div>
+    <div class="duo-cell"><div class="data-name">COMPAS Recidivism (ProPublica)</div><div class="cell-desc" style="font-size:13px;color:rgba(232,238,244,.5);margin-bottom:8px;">Algorithmic decision-making at its most consequential. Compare the structure of this algorithm to PageRank. What are the ethical differences?</div><a href="https://github.com/propublica/compas-analysis" target="_blank" class="data-link">Access Dataset →</a></div>
+  </div>
+</section>
+
+<!-- BADGES -->
+<section id="badges">
+  <div class="section-header"><span class="sec-code g">◈</span><h2 class="section-title">Learning Milestones</h2><div class="section-rule"></div></div>
+  <div class="badges-row">
+    <div class="badge-card" id="badge-1" data-threshold="4"><div class="badge-icon">🔗</div><div class="badge-name">Network Thinker</div><div class="badge-req">Complete 4+ units (PageRank foundations)</div><div class="badge-earned">✓ Milestone Reached</div></div>
+    <div class="badge-card" id="badge-2" data-threshold="8"><div class="badge-icon">📡</div><div class="badge-name">Signal Reader</div><div class="badge-req">Complete 8+ units (through GPS)</div><div class="badge-earned">✓ Milestone Reached</div></div>
+    <div class="badge-card" id="badge-3" data-threshold="15"><div class="badge-icon">⚡</div><div class="badge-name">Systems Thinker</div><div class="badge-req">Complete all 15 units</div><div class="badge-earned">✓ Milestone Reached</div></div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-text">CS 175 · How Things Work · Community College CS<br>PageRank · GPS · The Smartphone · From First Principles<br>Liberatory Education · Ungraded · Portfolio-Based<br><a href="build-a-computer.html" style="color:var(--cyan);text-decoration:underline;text-underline-offset:2px;">Signature Project: Build a Computer from Scratch &rarr;</a> · <a href="index.html" style="color:var(--dim);text-decoration:underline;text-underline-offset:2px;">&larr; Teaching Computing Differently</a> · <a href="mailto:henry@henryfan.org" style="color:var(--dim);">henry@henryfan.org</a></div>
+  <div class="footer-sig">HOW THINGS WORK</div>
+</footer>
+</body>
+</html>

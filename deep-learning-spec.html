@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en" data-course="dl-spec">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deep Learning Specialization — Community College Edition</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,500;0,600;1,300;1,500&family=Barlow:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void:    #080807;
+  --deep:    #0f0e0b;
+  --surface: #161510;
+  --lift:    #1e1c15;
+  --amber:   #f59e0b;
+  --amber-lt:#fde68a;
+  --amber-dk:#92400e;
+  --red-dim: #ef4444;
+  --teal-dim:#2dd4bf;
+  --muted:   rgba(253,230,138,0.35);
+  --text:    rgba(254,249,230,0.9);
+  --border:  rgba(245,158,11,0.12);
+  --mono:    'JetBrains Mono', monospace;
+  --display: 'Cormorant Garamond', serif;
+  --body:    'Barlow', sans-serif;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { background:var(--void); color:var(--text); font-family:var(--body); overflow-x:hidden; }
+body::after {
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:9999; opacity:.025;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ── NAV ── */
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  padding:16px 56px; display:flex; justify-content:space-between; align-items:center;
+  background:rgba(8,8,7,0.9); backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+}
+.nav-home { font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--amber); text-decoration:none; }
+.nav-home:hover { color:var(--amber-lt); }
+.nav-label { font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+
+/* ── HERO ── */
+.hero {
+  min-height:100vh; display:grid; grid-template-columns:1fr 420px;
+  align-items:center; padding:120px 56px 80px;
+  position:relative; z-index:1; overflow:hidden;
+  border-bottom:1px solid var(--border);
+}
+.hero-glow {
+  position:absolute; border-radius:50%; filter:blur(150px); pointer-events:none;
+}
+.glow-1 { width:600px; height:400px; background:rgba(245,158,11,0.06); top:-100px; right:-100px; }
+.glow-2 { width:300px; height:300px; background:rgba(239,68,68,0.04); bottom:100px; left:30%; }
+
+.hero-tag {
+  font-family:var(--mono); font-size:11px; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--amber); margin-bottom:24px; display:flex; align-items:center; gap:12px;
+}
+.hero-h1 {
+  font-family:var(--display); font-size:clamp(60px,8.5vw,116px);
+  font-weight:600; line-height:.9; margin-bottom:28px;
+  letter-spacing:-.01em;
+}
+.hero-h1 em { font-style:italic; font-weight:300; color:var(--amber); }
+.hero-h1 strong { font-weight:600; }
+.hero-sub {
+  font-family:var(--display); font-size:17px; font-style:italic; font-weight:300;
+  color:var(--muted); max-width:500px; line-height:1.9; margin-bottom:44px;
+}
+.hero-bar { display:flex; gap:0; border:1px solid var(--border); width:fit-content; }
+.hero-stat { padding:14px 24px; border-right:1px solid var(--border); font-family:var(--mono); font-size:10px; letter-spacing:.1em; color:var(--muted); }
+.hero-stat:last-child { border-right:none; }
+.hero-stat strong { display:block; font-family:var(--display); font-size:26px; font-weight:600; color:var(--text); margin-bottom:1px; }
+.hero-stat strong.a { color:var(--amber); }
+
+/* ── LAYER DIAGRAM ── */
+.layer-viz { display:flex; flex-direction:column; align-items:center; gap:10px; position:relative; z-index:2; }
+.lv-label { font-family:var(--mono); font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); margin-bottom:4px; }
+.lv-svg { width:100%; max-width:380px; }
+.lv-layer-bg { fill:none; stroke:rgba(245,158,11,0.18); stroke-width:1; rx:4; }
+.lv-layer-fill {
+  fill:rgba(245,158,11,0.06); stroke:rgba(245,158,11,0.25); stroke-width:1; rx:4;
+  transition:fill .3s;
+}
+.lv-text { font-family:var(--mono); font-size:9px; fill:rgba(253,230,138,0.5); }
+.lv-node { fill:rgba(245,158,11,0.5); }
+.lv-edge { stroke:rgba(245,158,11,0.12); stroke-width:1; }
+.lv-active-node { fill:var(--amber); animation:node-fire 2.5s ease-in-out infinite; }
+.lv-active-edge { stroke:var(--amber); stroke-width:1.5; opacity:0; animation:edge-fire 2.5s linear infinite; }
+
+@keyframes node-fire {
+  0%,100% { opacity:.2; r:5; }
+  50% { opacity:1; r:7; }
+}
+@keyframes edge-fire {
+  0% { opacity:0; stroke-dashoffset:30; }
+  20% { opacity:.7; }
+  80% { opacity:.7; }
+  100% { opacity:0; stroke-dashoffset:0; }
+}
+
+/* ── SECTIONS ── */
+.section-rule { border:none; border-top:1px solid var(--border); }
+section { padding:90px 56px; max-width:1280px; margin:0 auto; position:relative; z-index:1; }
+
+.overline {
+  font-family:var(--mono); font-size:9.5px; letter-spacing:.22em; text-transform:uppercase;
+  color:var(--amber); margin-bottom:18px; display:flex; align-items:center; gap:10px;
+}
+.overline::before { content:'//'; color:rgba(245,158,11,.25); }
+
+h2 { font-family:var(--display); font-size:clamp(34px,4.5vw,62px); font-weight:600; line-height:.95; margin-bottom:20px; }
+h2 em { font-style:italic; font-weight:300; color:var(--amber); }
+
+.lead { font-family:var(--display); font-style:italic; font-size:17px; font-weight:300; line-height:1.9; color:var(--muted); max-width:680px; margin-bottom:52px; }
+
+/* ── VERSUS ── */
+.versus { display:grid; grid-template-columns:1fr 1fr; gap:2px; background:var(--border); margin-bottom:56px; }
+.versus-col { padding:38px 34px; background:var(--deep); }
+.vs-label { font-family:var(--mono); font-size:9px; letter-spacing:.2em; text-transform:uppercase; margin-bottom:14px; color:var(--muted); }
+.versus-col.ours .vs-label { color:var(--amber); }
+.vs-title { font-family:var(--display); font-size:24px; font-weight:600; margin-bottom:16px; }
+.versus-col.theirs .vs-title { color:rgba(254,249,230,.4); }
+.vs-list { list-style:none; display:flex; flex-direction:column; gap:9px; }
+.vs-list li { display:flex; gap:10px; align-items:flex-start; font-family:var(--display); font-style:italic; font-size:14.5px; line-height:1.65; color:var(--muted); }
+.versus-col.ours .vs-list li { color:rgba(254,249,230,.7); }
+.vs-list li::before { content:''; width:5px; height:5px; border-radius:50%; flex-shrink:0; margin-top:7px; }
+.versus-col.theirs .vs-list li::before { background:rgba(245,158,11,.2); }
+.versus-col.ours .vs-list li::before { background:var(--amber); }
+
+/* ── TRACKS ── */
+.tracks { display:flex; flex-direction:column; gap:2px; margin-top:48px; }
+.track { display:grid; grid-template-columns:240px 1fr 1fr; background:var(--deep); border:1px solid var(--border); transition:border-color .2s; overflow:hidden; }
+.track:hover { border-color:rgba(245,158,11,.25); }
+.track-left { padding:34px 28px; border-right:1px solid var(--border); display:flex; flex-direction:column; justify-content:space-between; }
+.track-badge { font-family:var(--mono); font-size:8.5px; letter-spacing:.18em; text-transform:uppercase; padding:4px 10px; width:fit-content; margin-bottom:12px; background:rgba(245,158,11,.07); border:1px solid rgba(245,158,11,.2); color:var(--amber); }
+.t2 .track-badge { background:rgba(45,212,191,.07); border-color:rgba(45,212,191,.2); color:var(--teal-dim); }
+.t3 .track-badge { background:rgba(239,68,68,.07); border-color:rgba(239,68,68,.2); color:var(--red-dim); }
+.track-num { font-family:var(--display); font-size:58px; font-weight:600; line-height:1; margin-bottom:4px; color:var(--amber); }
+.t2 .track-num { color:var(--teal-dim); }
+.t3 .track-num { color:var(--red-dim); }
+.track-name { font-family:var(--display); font-size:20px; font-style:italic; font-weight:300; color:var(--muted); line-height:1.2; }
+.track-prereq { font-family:var(--mono); font-size:8px; letter-spacing:.1em; text-transform:uppercase; color:rgba(254,249,230,.18); margin-top:14px; }
+.track-mid, .track-right { padding:30px 26px; }
+.track-mid { border-right:1px solid var(--border); }
+.t-label { font-family:var(--mono); font-size:8.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); margin-bottom:12px; }
+.t-desc { font-family:var(--display); font-style:italic; font-size:14px; font-weight:300; color:var(--muted); line-height:1.8; }
+.proj-list { list-style:none; display:flex; flex-direction:column; gap:8px; }
+.proj-list li { display:flex; gap:10px; font-size:13px; line-height:1.6; align-items:flex-start; color:var(--muted); padding-bottom:8px; border-bottom:1px solid var(--border); }
+.proj-list li:last-child { border-bottom:none; padding-bottom:0; }
+.pn { font-family:var(--mono); font-size:8px; color:var(--amber); flex-shrink:0; margin-top:3px; }
+.t2 .pn { color:var(--teal-dim); }
+.t3 .pn { color:var(--red-dim); }
+
+/* ── MODULE ARC ── */
+.modules { display:flex; flex-direction:column; gap:2px; margin-top:48px; }
+.module { display:grid; grid-template-columns:160px 1fr 300px; background:var(--deep); border:1px solid var(--border); transition:border-color .2s; overflow:hidden; }
+.module:hover { border-color:rgba(245,158,11,.22); }
+.module-num { padding:32px 28px; border-right:1px solid var(--border); display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; }
+.mod-n { font-family:var(--display); font-size:64px; font-weight:600; line-height:1; color:rgba(245,158,11,.15); }
+.mod-label { font-family:var(--mono); font-size:8.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--amber); margin-top:4px; }
+.module-body { padding:32px 28px; border-right:1px solid var(--border); }
+.module-title { font-family:var(--display); font-size:24px; font-weight:600; margin-bottom:10px; }
+.module-desc { font-family:var(--display); font-style:italic; font-size:14px; font-weight:300; color:var(--muted); line-height:1.8; }
+.module-right { padding:32px 24px; }
+.module-concepts { list-style:none; display:flex; flex-direction:column; gap:7px; }
+.module-concepts li { font-family:var(--mono); font-size:11px; color:var(--muted); letter-spacing:.02em; display:flex; gap:8px; align-items:flex-start; }
+.module-concepts li::before { content:'→'; color:var(--amber); flex-shrink:0; }
+.mod-proj { margin-top:16px; padding:10px 12px; background:rgba(245,158,11,.05); border-left:2px solid var(--amber); font-family:var(--mono); font-size:10.5px; color:rgba(253,230,138,.6); line-height:1.5; }
+
+/* ── PHIL ── */
+.phil-strip { background:var(--surface); border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:56px; display:grid; grid-template-columns:1fr 1fr; gap:56px; align-items:center; position:relative; z-index:1; }
+.phil-quote { font-family:var(--display); font-size:clamp(22px,2.6vw,34px); font-style:italic; font-weight:300; line-height:1.45; }
+.phil-source { font-family:var(--mono); font-size:9.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-top:14px; }
+.phil-items { display:flex; flex-direction:column; gap:12px; }
+.phi { padding:16px 18px; border:1px solid var(--border); display:flex; gap:14px; align-items:flex-start; }
+.phi:hover { border-color:rgba(245,158,11,.25); }
+.phi-ico { font-size:16px; flex-shrink:0; }
+.phi-body { font-family:var(--display); font-style:italic; font-size:13.5px; font-weight:300; color:var(--muted); line-height:1.7; }
+.phi-body strong { font-style:normal; font-family:var(--body); font-size:13px; font-weight:500; color:var(--text); display:block; margin-bottom:3px; }
+
+/* ── THINKERS ── */
+.thinkers { display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--border); position:relative; z-index:1; }
+.thinker { padding:24px 24px; border-right:1px solid var(--border); border-bottom:1px solid var(--border); transition:background .2s; }
+.thinker:hover { background:var(--surface); }
+.thinker:nth-child(4n) { border-right:none; }
+.thinker-name { font-family:var(--display); font-size:17px; font-weight:600; margin-bottom:4px; }
+.thinker-tag { font-family:var(--mono); font-size:8px; letter-spacing:.1em; text-transform:uppercase; color:var(--amber); margin-bottom:8px; }
+.thinker-desc { font-family:var(--display); font-style:italic; font-size:12.5px; font-weight:300; color:var(--muted); line-height:1.7; }
+
+/* ── FOOTER ── */
+footer { background:var(--void); padding:40px 56px; display:flex; justify-content:space-between; align-items:center; border-top:2px solid var(--amber); position:relative; z-index:1; }
+.footer-l { font-family:var(--mono); font-size:10px; letter-spacing:.06em; color:rgba(254,249,230,.2); line-height:2; }
+.footer-r { font-family:var(--display); font-size:32px; font-weight:600; color:rgba(254,249,230,.07); }
+
+@media(max-width:1000px){
+  .hero { grid-template-columns:1fr; padding:100px 28px 60px; }
+  .layer-viz { display:none; }
+  nav,section,.phil-strip { padding-left:28px; padding-right:28px; }
+  .track { grid-template-columns:1fr; }
+  .track-left,.track-mid { border-right:none; border-bottom:1px solid var(--border); }
+  .module { grid-template-columns:1fr; }
+  .module-num,.module-body { border-right:none; border-bottom:1px solid var(--border); }
+  .versus { grid-template-columns:1fr; }
+  .thinkers { grid-template-columns:1fr 1fr; }
+  .thinker:nth-child(2n) { border-right:none; }
+  .phil-strip { grid-template-columns:1fr; }
+  footer { flex-direction:column; gap:14px; text-align:center; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-home" href="index.html">← All Courses</a>
+  <span class="nav-label">Deep Learning Specialization · Community College Edition</span>
+</nav>
+
+<section class="hero" style="padding-top:120px; max-width:none;">
+  <div class="hero-glow glow-1"></div>
+  <div class="hero-glow glow-2"></div>
+  <div style="position:relative;z-index:2;">
+    <div class="hero-tag">Deep Learning Specialization · Reimagined</div>
+    <div class="hero-h1">Build what<br>you can <em>explain.</em></div>
+    <p class="hero-sub">Andrew Ng's five-course deep learning specialization rebuilt for community college learners. Six modules, three entry depths. You will not use a neural network until you have built one by hand.</p>
+    <div class="hero-bar">
+      <div class="hero-stat"><strong class="a">3</strong>Tracks</div>
+      <div class="hero-stat"><strong class="a">6</strong>Modules</div>
+      <div class="hero-stat"><strong>18</strong>Weeks</div>
+      <div class="hero-stat"><strong>0</strong>Exams</div>
+    </div>
+  </div>
+
+  <!-- Layer visualization -->
+  <div class="layer-viz" style="position:relative;z-index:2;">
+    <div class="lv-label">Neural Network · Forward Pass</div>
+    <svg class="lv-svg" viewBox="0 0 380 300" xmlns="http://www.w3.org/2000/svg">
+      <!-- Connections (edges) -->
+      <!-- Input to Hidden1 -->
+      <line class="lv-edge" x1="60" y1="80" x2="160" y2="60"/>
+      <line class="lv-edge" x1="60" y1="80" x2="160" y2="100"/>
+      <line class="lv-edge" x1="60" y1="80" x2="160" y2="140"/>
+      <line class="lv-edge" x1="60" y1="130" x2="160" y2="60"/>
+      <line class="lv-edge" x1="60" y1="130" x2="160" y2="100"/>
+      <line class="lv-edge" x1="60" y1="130" x2="160" y2="140"/>
+      <line class="lv-edge" x1="60" y1="180" x2="160" y2="60"/>
+      <line class="lv-edge" x1="60" y1="180" x2="160" y2="100"/>
+      <line class="lv-edge" x1="60" y1="180" x2="160" y2="140"/>
+      <!-- Hidden1 to Hidden2 -->
+      <line class="lv-edge" x1="160" y1="60" x2="250" y2="80"/>
+      <line class="lv-edge" x1="160" y1="60" x2="250" y2="130"/>
+      <line class="lv-edge" x1="160" y1="100" x2="250" y2="80"/>
+      <line class="lv-edge" x1="160" y1="100" x2="250" y2="130"/>
+      <line class="lv-edge" x1="160" y1="140" x2="250" y2="80"/>
+      <line class="lv-edge" x1="160" y1="140" x2="250" y2="130"/>
+      <!-- Hidden2 to Output -->
+      <line class="lv-edge" x1="250" y1="80" x2="330" y2="105"/>
+      <line class="lv-edge" x1="250" y1="130" x2="330" y2="105"/>
+
+      <!-- Active connections (animated) -->
+      <line class="lv-active-edge" x1="60" y1="130" x2="160" y2="100" stroke-dasharray="6 3" style="animation-delay:0s"/>
+      <line class="lv-active-edge" x1="160" y1="100" x2="250" y2="80" stroke-dasharray="6 3" style="animation-delay:.5s"/>
+      <line class="lv-active-edge" x1="250" y1="80" x2="330" y2="105" stroke-dasharray="6 3" style="animation-delay:1s"/>
+
+      <!-- Input layer -->
+      <circle class="lv-node" cx="60" cy="80" r="12"/>
+      <circle class="lv-node" cx="60" cy="130" r="12"/>
+      <circle class="lv-node" cx="60" cy="180" r="12"/>
+      <circle class="lv-active-node" cx="60" cy="130" r="12" style="animation-delay:0s"/>
+
+      <!-- Hidden 1 -->
+      <circle class="lv-node" cx="160" cy="60" r="12"/>
+      <circle class="lv-node" cx="160" cy="100" r="12"/>
+      <circle class="lv-node" cx="160" cy="140" r="12"/>
+      <circle class="lv-active-node" cx="160" cy="100" r="12" style="animation-delay:.5s"/>
+
+      <!-- Hidden 2 -->
+      <circle class="lv-node" cx="250" cy="80" r="12"/>
+      <circle class="lv-node" cx="250" cy="130" r="12"/>
+      <circle class="lv-active-node" cx="250" cy="80" r="12" style="animation-delay:1s"/>
+
+      <!-- Output -->
+      <circle class="lv-node" cx="330" cy="105" r="14"/>
+      <circle class="lv-active-node" cx="330" cy="105" r="14" style="animation-delay:1.5s"/>
+
+      <!-- Layer labels -->
+      <text class="lv-text" x="42" y="220">Input</text>
+      <text class="lv-text" x="142" y="175">Hidden 1</text>
+      <text class="lv-text" x="232" y="165">Hidden 2</text>
+      <text class="lv-text" x="314" y="140">Output</text>
+
+      <!-- Equation -->
+      <text class="lv-text" x="60" y="260" style="font-size:10px;fill:rgba(245,158,11,.4);">a⁽ˡ⁾ = σ(W⁽ˡ⁾a⁽ˡ⁻¹⁾ + b⁽ˡ⁾)</text>
+    </svg>
+    <div class="lv-label" style="font-size:8px;opacity:.5;">We derive this before we run it.</div>
+  </div>
+</section>
+
+<hr class="section-rule">
+
+<section>
+  <div class="overline">This vs. Andrew Ng's Original</div>
+  <h2>Five courses compressed.<br><em>Depth expanded.</em></h2>
+  <p class="lead">Andrew Ng's Deep Learning Specialization across five Coursera courses is the most thorough public DL education available. We condense it to one community-college-length course, add three entry tracks, and make implementation from scratch mandatory — not optional.</p>
+
+  <div class="versus">
+    <div class="versus-col theirs">
+      <div class="vs-label">Andrew Ng's Version</div>
+      <div class="vs-title">5 Courses, TensorFlow-first</div>
+      <ul class="vs-list">
+        <li>Five separate Coursera courses, 3–4 months each</li>
+        <li>Framework-first: TensorFlow and Keras introduced early</li>
+        <li>Single depth — same path for everyone</li>
+        <li>Graded coding assignments using pre-scaffolded notebooks</li>
+        <li>Limited treatment of AI bias in deep learning systems</li>
+        <li>No community application or deployment requirement</li>
+      </ul>
+    </div>
+    <div class="versus-col ours">
+      <div class="vs-label">This Course</div>
+      <div class="vs-title">One Course, First Principles</div>
+      <ul class="vs-list">
+        <li>Six focused modules, 18 weeks — matched to college schedule</li>
+        <li>Implement from scratch in NumPy before touching PyTorch</li>
+        <li>Three tracks from conceptual to from-scratch engineering</li>
+        <li>Portfolio: six projects you own, not auto-graded notebooks</li>
+        <li>Bias and harm analysis is a required module, not a footnote</li>
+        <li>Capstone must serve a real community problem you identify</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<hr class="section-rule">
+
+<section>
+  <div class="overline">Three Learning Tracks</div>
+  <h2>One architecture.<br><em>Three depths.</em></h2>
+  <p class="lead">All tracks attend every class, read every case study, and participate in every community discussion. The tracks differ in how far into the implementation you go — and you can move between them as your confidence builds.</p>
+
+  <div class="tracks">
+    <div class="track t1">
+      <div class="track-left">
+        <div>
+          <div class="track-badge">Track I</div>
+          <div class="track-num">I</div>
+          <div class="track-name">Conceptual<br>DL</div>
+        </div>
+        <div class="track-prereq">Prereq: High school algebra</div>
+      </div>
+      <div class="track-mid">
+        <div class="t-label">Focus</div>
+        <p class="t-desc">Understand how deep learning systems work at an architectural and conceptual level. Interpret model outputs, identify failure modes, read about DL in the news without being lost. Work with pre-trained models. Prepare for roles that use or oversee DL systems without building them.</p>
+      </div>
+      <div class="track-right">
+        <div class="t-label">Projects</div>
+        <ul class="proj-list">
+          <li><span class="pn">P1</span>Use CLIP and DALL·E to probe what a neural network "knows"</li>
+          <li><span class="pn">P2</span>Audit a deployed image classification system for failure modes</li>
+          <li><span class="pn">P3</span>Write a plain-language technical report on a DL system for a public audience</li>
+        </ul>
+      </div>
+    </div>
+    <div class="track t2">
+      <div class="track-left">
+        <div>
+          <div class="track-badge">Track II</div>
+          <div class="track-num">II</div>
+          <div class="track-name">Applied<br>DL</div>
+        </div>
+        <div class="track-prereq">Prereq: Python · Basic calculus</div>
+      </div>
+      <div class="track-mid">
+        <div class="t-label">Focus</div>
+        <p class="t-desc">Build real deep learning applications using PyTorch. Train, fine-tune, and deploy CNNs, sequence models, and transformers. Understand the key architectural decisions. By the end, you'll have built and deployed a working DL application solving a community problem you chose.</p>
+      </div>
+      <div class="track-right">
+        <div class="t-label">Projects</div>
+        <ul class="proj-list">
+          <li><span class="pn">P1</span>Fine-tune ResNet for a local species identification task</li>
+          <li><span class="pn">P2</span>Build a sequence model for community text classification</li>
+          <li><span class="pn">P3</span>Fine-tune a small transformer; document the training data's biases</li>
+          <li><span class="pn">P4</span>Deploy a DL model with a harm analysis document</li>
+        </ul>
+      </div>
+    </div>
+    <div class="track t3">
+      <div class="track-left">
+        <div>
+          <div class="track-badge">Track III</div>
+          <div class="track-num">III</div>
+          <div class="track-name">DL<br>Engineer</div>
+        </div>
+        <div class="track-prereq">Prereq: Python · Calculus · Linear Algebra</div>
+      </div>
+      <div class="track-mid">
+        <div class="t-label">Focus</div>
+        <p class="t-desc">Implement every architecture from scratch in NumPy: forward pass, backpropagation, Adam, batch normalization. Before you use PyTorch's autograd, you'll have written it. Before you call a Conv2d layer, you'll understand every multiplication inside it. Prepare for DL research.</p>
+      </div>
+      <div class="track-right">
+        <div class="t-label">Projects</div>
+        <ul class="proj-list">
+          <li><span class="pn">P1</span>Implement forward pass + backprop for a 3-layer MLP in NumPy only</li>
+          <li><span class="pn">P2</span>Implement a convolutional layer from scratch; verify against PyTorch</li>
+          <li><span class="pn">P3</span>Implement a single-head attention mechanism; visualize attention maps</li>
+          <li><span class="pn">P4</span>Train a small GPT-like model on community text; analyze what it learned</li>
+          <li><span class="pn">P5</span>Full reproducibility audit of a published deep learning paper</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-rule">
+
+<section>
+  <div class="overline">Six-Module Arc</div>
+  <h2>Foundations to<br><em>frontier — step by step.</em></h2>
+  <p class="lead">Each module builds on the last. You will not see attention until you deeply understand the MLP. You will not use PyTorch until you have implemented the core operations by hand. Depth before breadth.</p>
+
+  <div class="modules">
+    <div class="module">
+      <div class="module-num"><div class="mod-n">1</div><div class="mod-label">Weeks 1–3</div></div>
+      <div class="module-body">
+        <div class="module-title">Neural Foundations</div>
+        <p class="module-desc">What is a neuron, really? The perceptron, sigmoid activation, and the universal approximation theorem. Implement a single neuron that learns to classify. Derive backpropagation from the chain rule — not from a textbook formula, but from first principles.</p>
+        <div class="mod-proj">Project → Single-layer classifier in NumPy. Beat a decision tree on a community dataset.</div>
+      </div>
+      <div class="module-right">
+        <ul class="module-concepts">
+          <li>Perceptron and threshold logic</li>
+          <li>Sigmoid, ReLU, tanh</li>
+          <li>Forward pass as matrix multiplication</li>
+          <li>Chain rule and backpropagation</li>
+          <li>Binary cross-entropy loss</li>
+        </ul>
+      </div>
+    </div>
+    <div class="module">
+      <div class="module-num"><div class="mod-n">2</div><div class="mod-label">Weeks 4–6</div></div>
+      <div class="module-body">
+        <div class="module-title">Deep Networks</div>
+        <p class="module-desc">Stack the layers. Understand why depth matters — and when it doesn't. Implement batch normalization and dropout from scratch. Investigate: what does each layer actually learn? Visualize activations and challenge the "black box" myth.</p>
+        <div class="mod-proj">Project → 5-layer MLP from scratch. Visualize what each layer detects.</div>
+      </div>
+      <div class="module-right">
+        <ul class="module-concepts">
+          <li>Vanishing/exploding gradients</li>
+          <li>Batch normalization</li>
+          <li>Dropout regularization</li>
+          <li>Adam optimizer</li>
+          <li>Activation visualization</li>
+        </ul>
+      </div>
+    </div>
+    <div class="module">
+      <div class="module-num"><div class="mod-n">3</div><div class="mod-label">Weeks 7–9</div></div>
+      <div class="module-body">
+        <div class="module-title">Convolutional Networks</div>
+        <p class="module-desc">Why does a filter slide? Implement convolution as a mathematical operation. Build ResNet-style skip connections. Ask: when we train an image classifier on biased data, what exactly does the convolutional filter learn? This isn't abstract — it's the coded gaze.</p>
+        <div class="mod-proj">Project → CNN image classifier. Measure accuracy by demographic subgroup.</div>
+      </div>
+      <div class="module-right">
+        <ul class="module-concepts">
+          <li>Convolution as dot product</li>
+          <li>Pooling layers</li>
+          <li>ResNet and skip connections</li>
+          <li>Transfer learning</li>
+          <li>Feature map visualization</li>
+        </ul>
+      </div>
+    </div>
+    <div class="module">
+      <div class="module-num"><div class="mod-n">4</div><div class="mod-label">Weeks 10–12</div></div>
+      <div class="module-body">
+        <div class="module-title">Sequence Models</div>
+        <p class="module-desc">Language has order. Implement RNNs and LSTMs. Understand why they struggle with long-range dependencies. When we train a language model on community text, what patterns does it amplify? Sequence models encode the statistics of whoever wrote the training data.</p>
+        <div class="mod-proj">Project → LSTM sentiment classifier on local news. Analyze whose sentiment is captured.</div>
+      </div>
+      <div class="module-right">
+        <ul class="module-concepts">
+          <li>RNN unrolling through time</li>
+          <li>LSTM gates</li>
+          <li>Word embeddings</li>
+          <li>Long-range dependency problem</li>
+          <li>Bias in language models</li>
+        </ul>
+      </div>
+    </div>
+    <div class="module">
+      <div class="module-num"><div class="mod-n">5</div><div class="mod-label">Weeks 13–15</div></div>
+      <div class="module-body">
+        <div class="module-title">Transformers &amp; Attention</div>
+        <p class="module-desc">Attention is all you need — but what does attention mean? Implement single-head self-attention from scratch. Understand the architecture of GPT and BERT. Probe a small LLM to understand what it has and has not learned about your community.</p>
+        <div class="mod-proj">Project → Implement attention from scratch. Fine-tune a small LLM on community text.</div>
+      </div>
+      <div class="module-right">
+        <ul class="module-concepts">
+          <li>Query, key, value</li>
+          <li>Scaled dot-product attention</li>
+          <li>Positional encoding</li>
+          <li>GPT vs BERT architectures</li>
+          <li>Fine-tuning and RLHF</li>
+        </ul>
+      </div>
+    </div>
+    <div class="module">
+      <div class="module-num"><div class="mod-n">6</div><div class="mod-label">Weeks 16–18</div></div>
+      <div class="module-body">
+        <div class="module-title">Capstone: Build or Audit</div>
+        <p class="module-desc">Two paths. Build: design and deploy a deep learning system addressing a real community need you identified — with full documentation and a harm analysis. Audit: conduct a deep technical and ethical audit of an existing deployed DL system, including a reproducibility study.</p>
+        <div class="mod-proj">Project → Community DL application or deep audit report. Public exhibition.</div>
+      </div>
+      <div class="module-right">
+        <ul class="module-concepts">
+          <li>Deployment and MLOps basics</li>
+          <li>Model cards and datasheets</li>
+          <li>Reproducibility standards</li>
+          <li>Community consent</li>
+          <li>Public exhibition</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="phil-strip">
+  <div>
+    <div class="phil-quote">"You will not call model.fit() until you have written fit() yourself. Understanding precedes convenience — always."</div>
+    <div class="phil-source">Course Philosophy · Ko, Ng, Buolamwini, Anderson</div>
+  </div>
+  <div class="phil-items">
+    <div class="phi"><div class="phi-ico">⚙️</div><div class="phi-body"><strong>Implement Before Importing</strong>Every architecture is implemented from scratch before any library version is used. You will know what conv2d does because you wrote it.</div></div>
+    <div class="phi"><div class="phi-ico">🔭</div><div class="phi-body"><strong>Interpret Every Layer</strong>You will visualize what every layer in every network has learned. Black boxes are not acceptable. Explainability is engineering, not ethics theater.</div></div>
+    <div class="phi"><div class="phi-ico">⚖️</div><div class="phi-body"><strong>Audit Before Deployment</strong>Every model you build includes a mandatory bias and harm analysis. Model cards are not optional. Harm documentation is part of the grade.</div></div>
+    <div class="phi"><div class="phi-ico">🏘️</div><div class="phi-body"><strong>Real Stakes</strong>Every dataset comes from real communities. The capstone must address a real problem. You are building systems that will touch real lives.</div></div>
+  </div>
+</div>
+
+<hr class="section-rule">
+
+<section>
+  <div class="overline">Intellectual Lineage</div>
+  <h2>Who we're <em>learning from.</em></h2>
+  <div class="thinkers">
+    <div class="thinker"><div class="thinker-name">Andrew Ng</div><div class="thinker-tag">Deep Learning Spec</div><p class="thinker-desc">The five-course specialization whose conceptual depth and visual clarity we build on and condense. Module 5 directly references his attention mechanism explanations.</p></div>
+    <div class="thinker"><div class="thinker-name">Andrej Karpathy</div><div class="thinker-tag">micrograd · makemore</div><p class="thinker-desc">The best from-scratch implementation tutorials in existence. Our Track III backpropagation project is inspired by his micrograd series.</p></div>
+    <div class="thinker"><div class="thinker-name">Joy Buolamwini</div><div class="thinker-tag">Algorithmic Justice League</div><p class="thinker-desc">The coded gaze. Module 3's bias analysis project is built around her Gender Shades methodology applied to locally-relevant datasets.</p></div>
+    <div class="thinker"><div class="thinker-name">Timnit Gebru</div><div class="thinker-tag">DAIR Institute</div><p class="thinker-desc">Datasheets for datasets. Stochastic parrots. Critical analysis of scale in language models. Core reading for Module 5.</p></div>
+    <div class="thinker"><div class="thinker-name">Yoshua Bengio</div><div class="thinker-tag">Deep Learning Text</div><p class="thinker-desc">The canonical Deep Learning textbook (free online). Mathematical depth for Track III. The source for RNN and attention derivations.</p></div>
+    <div class="thinker"><div class="thinker-name">Amy J. Ko</div><div class="thinker-tag">UW CS Education</div><p class="thinker-desc">Read before write. Student agency. The pedagogical framework behind the three-track structure and portfolio assessment system.</p></div>
+    <div class="thinker"><div class="thinker-name">Emily Bender</div><div class="thinker-tag">Stochastic Parrots</div><p class="thinker-desc">On the dangers of stochastic parrots. What language models do and do not understand. Essential for Module 5's critical framing.</p></div>
+    <div class="thinker"><div class="thinker-name">Jeff Anderson</div><div class="thinker-tag">Ungrading</div><p class="thinker-desc">Portfolio over exams. Deep learning over performance. The two-minute rule. Assessment philosophy that runs throughout.</p></div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-l">Community College Computer Science<br>Andrew Ng's Deep Learning Spec · Reimagined for Community College<br>All resources free · Portfolio assessment · No required textbook<br><a href="mailto:henry@henryfan.org" style="color:rgba(245,240,232,.45);text-decoration:underline;text-underline-offset:2px;">henry@henryfan.org</a></div>
+  <div class="footer-r">Deep Learning</div>
+</footer>
+
+</body>
+</html>

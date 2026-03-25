@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en" data-course="ai-everyone">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI For Everyone — Community College Edition</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=Karla:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:    #0d100f;
+  --paper:  #f6f2ea;
+  --cream:  #ece7d5;
+  --teal:   #00897b;
+  --teal-lt:#e0f5f2;
+  --teal-dk:#005a52;
+  --rust:   #b5451b;
+  --dim:    #5c6360;
+  --rule:   2px solid var(--ink);
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Karla', sans-serif;
+  overflow-x: hidden;
+}
+body::after {
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:9999;
+  opacity:.025;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ── NAV ── */
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  background:rgba(246,242,234,0.92); backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--cream);
+  padding:14px 52px;
+  display:flex; justify-content:space-between; align-items:center;
+}
+.nav-home {
+  font-family:'IBM Plex Mono',monospace; font-size:11px;
+  letter-spacing:.15em; text-transform:uppercase;
+  color:var(--teal); text-decoration:none;
+}
+.nav-home:hover { color:var(--teal-dk); }
+.nav-course {
+  font-family:'IBM Plex Mono',monospace; font-size:10px;
+  letter-spacing:.12em; text-transform:uppercase; color:var(--dim);
+}
+
+/* ── MASTHEAD ── */
+.masthead {
+  background:var(--ink); color:var(--paper);
+  border-bottom:5px solid var(--teal);
+  padding-top:58px;
+}
+.mast-ticker {
+  padding:10px 52px;
+  border-bottom:1px solid rgba(255,255,255,.1);
+  font-family:'IBM Plex Mono',monospace; font-size:10px;
+  letter-spacing:.14em; text-transform:uppercase; opacity:.45;
+  display:flex; justify-content:space-between;
+}
+.mast-grid {
+  padding:52px 52px 40px;
+  display:grid; grid-template-columns:1fr 420px;
+  gap:60px; align-items:center;
+}
+.mast-eyebrow {
+  font-family:'IBM Plex Mono',monospace; font-size:11px;
+  letter-spacing:.2em; text-transform:uppercase;
+  color:var(--teal); margin-bottom:18px;
+}
+.mast-h1 {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(64px,9vw,130px);
+  line-height:.88; letter-spacing:.02em; margin-bottom:28px;
+}
+.mast-h1 span { color:var(--teal); }
+.mast-deck {
+  font-family:'Crimson Pro',serif; font-size:19px;
+  line-height:1.75; color:rgba(246,242,234,.65);
+  font-weight:300; max-width:540px; margin-bottom:32px;
+}
+.mast-pills {
+  display:flex; gap:8px; flex-wrap:wrap;
+}
+.pill {
+  padding:5px 13px;
+  border:1px solid rgba(255,255,255,.15);
+  font-family:'IBM Plex Mono',monospace; font-size:9.5px;
+  letter-spacing:.1em; text-transform:uppercase;
+  color:rgba(246,242,234,.5);
+}
+.pill.accent { border-color:var(--teal); color:var(--teal); }
+
+/* ── CIVIC WHEEL ── */
+.civic-wheel-wrap {
+  display:flex; flex-direction:column;
+  align-items:center; gap:20px;
+}
+.civic-question {
+  font-family:'Crimson Pro',serif; font-size:13px; font-style:italic;
+  color:rgba(246,242,234,.4); letter-spacing:.08em; text-align:center;
+}
+.civic-wheel {
+  width:340px; height:340px;
+  border-radius:50%;
+  border:1px solid rgba(0,137,123,.25);
+  position:relative; display:flex; align-items:center; justify-content:center;
+}
+.wheel-center {
+  width:90px; height:90px; border-radius:50%;
+  background:var(--teal);
+  display:flex; align-items:center; justify-content:center; flex-direction:column;
+  z-index:2; position:relative;
+  font-family:'IBM Plex Mono',monospace;
+}
+.wheel-center span { font-size:8px; letter-spacing:.15em; text-transform:uppercase; color:rgba(246,242,234,.6); }
+.wheel-center strong { font-size:22px; color:var(--paper); font-family:'Bebas Neue',sans-serif; letter-spacing:.05em; }
+.orbit {
+  position:absolute; inset:0;
+  animation:spin 28s linear infinite;
+}
+.orbit-dot {
+  position:absolute;
+  width:9px; height:9px; border-radius:50%;
+  background:var(--teal); opacity:.35;
+  transform-origin:170px 170px;
+}
+.orbit-dot:nth-child(1) { top:0; left:calc(50% - 4px); animation:dot-pulse 2s ease-in-out 0s infinite; }
+.orbit-dot:nth-child(2) { top:25%; right:0; transform:translate(50%,-50%); animation:dot-pulse 2s ease-in-out .4s infinite; }
+.orbit-dot:nth-child(3) { bottom:0; left:calc(50% - 4px); animation:dot-pulse 2s ease-in-out .8s infinite; }
+.orbit-dot:nth-child(4) { top:25%; left:0; transform:translate(-50%,-50%); animation:dot-pulse 2s ease-in-out 1.2s infinite; }
+
+.who-items {
+  position:absolute; inset:-60px;
+  display:flex; align-items:center; justify-content:center;
+}
+.who-item {
+  position:absolute;
+  font-family:'IBM Plex Mono',monospace; font-size:9px;
+  letter-spacing:.12em; text-transform:uppercase;
+  color:rgba(246,242,234,.5);
+  white-space:nowrap;
+}
+.who-item:nth-child(1) { top:0; left:50%; transform:translateX(-50%) translateY(-20px); }
+.who-item:nth-child(2) { right:0; top:30%; transform:translateX(24px); }
+.who-item:nth-child(3) { bottom:0; left:50%; transform:translateX(-50%) translateY(20px); }
+.who-item:nth-child(4) { left:0; top:50%; transform:translateX(-28px) translateY(-50%); }
+.who-item:nth-child(5) { right:0; bottom:30%; transform:translateX(24px); }
+.who-item:nth-child(6) { left:0; bottom:30%; transform:translateX(-28px); }
+
+@keyframes spin { to { transform:rotate(360deg); } }
+@keyframes dot-pulse {
+  0%,100% { opacity:.2; transform:scale(1); }
+  50% { opacity:.8; transform:scale(1.6); }
+}
+
+.mast-stats {
+  padding:24px 52px;
+  background:var(--teal-dk);
+  display:flex; gap:0;
+}
+.mast-stat {
+  padding:0 36px 0 0; margin-right:36px;
+  border-right:1px solid rgba(255,255,255,.15);
+}
+.mast-stat:last-child { border-right:none; }
+.stat-n {
+  font-family:'Bebas Neue',sans-serif; font-size:44px;
+  color:var(--paper); line-height:1;
+}
+.stat-l {
+  font-family:'IBM Plex Mono',monospace; font-size:9px;
+  letter-spacing:.12em; text-transform:uppercase;
+  color:rgba(246,242,234,.45); margin-top:3px;
+}
+
+/* ── SECTIONS ── */
+.section-rule { border:none; border-top:var(--rule); margin:0; }
+section { padding:80px 52px; max-width:1280px; margin:0 auto; }
+
+.section-tag {
+  font-family:'IBM Plex Mono',monospace; font-size:10px;
+  letter-spacing:.22em; text-transform:uppercase; color:var(--teal);
+  margin-bottom:22px; display:flex; align-items:center; gap:10px;
+}
+.section-tag::after { content:''; width:36px; height:1px; background:var(--teal); display:inline-block; }
+
+h2 {
+  font-family:'Crimson Pro',serif; font-size:clamp(34px,4.5vw,58px);
+  line-height:1.05; margin-bottom:20px; font-weight:600;
+}
+h2 em { color:var(--teal); font-style:italic; }
+
+.lead {
+  font-size:17px; line-height:1.9; color:var(--dim);
+  max-width:680px; font-weight:300; margin-bottom:52px;
+  font-family:'Crimson Pro',serif;
+}
+
+/* ── NG VS OURS ── */
+.versus {
+  display:grid; grid-template-columns:1fr 1fr;
+  border:var(--rule); margin-bottom:60px;
+}
+.versus-col { padding:40px 36px; }
+.versus-col.theirs { border-right:var(--rule); background:var(--cream); }
+.versus-col.ours { background:var(--ink); color:var(--paper); }
+.vs-label {
+  font-family:'IBM Plex Mono',monospace; font-size:9px;
+  letter-spacing:.2em; text-transform:uppercase;
+  margin-bottom:18px;
+}
+.versus-col.theirs .vs-label { color:var(--dim); }
+.versus-col.ours .vs-label { color:var(--teal); }
+.vs-title {
+  font-family:'Crimson Pro',serif; font-size:22px;
+  font-weight:600; margin-bottom:18px;
+}
+.versus-col.ours .vs-title { color:var(--paper); }
+.vs-list { list-style:none; display:flex; flex-direction:column; gap:10px; }
+.vs-list li {
+  display:flex; gap:10px; align-items:flex-start;
+  font-size:14px; line-height:1.65;
+}
+.versus-col.theirs .vs-list li { color:var(--dim); }
+.versus-col.ours .vs-list li { color:rgba(246,242,234,.72); }
+.vs-list li::before {
+  content:''; width:6px; height:6px; border-radius:50%;
+  flex-shrink:0; margin-top:6px;
+}
+.versus-col.theirs .vs-list li::before { background:var(--dim); opacity:.4; }
+.versus-col.ours .vs-list li::before { background:var(--teal); }
+
+/* ── TRACKS ── */
+.tracks { display:flex; flex-direction:column; gap:3px; margin-top:48px; }
+.track {
+  display:grid; grid-template-columns:260px 1fr 1fr;
+  border:1px solid var(--ink); background:var(--paper);
+  transition:background .2s; overflow:hidden;
+}
+.track:hover { background:var(--cream); }
+.track-left {
+  padding:36px 30px;
+  border-right:1px solid var(--ink);
+  background:var(--ink); color:var(--paper);
+  display:flex; flex-direction:column; justify-content:space-between;
+}
+.track-badge {
+  display:inline-block; padding:4px 10px;
+  font-family:'IBM Plex Mono',monospace; font-size:8.5px;
+  letter-spacing:.16em; text-transform:uppercase;
+  border:1px solid rgba(255,255,255,.2); width:fit-content;
+  margin-bottom:14px;
+}
+.t1 .track-badge { color:var(--teal); border-color:rgba(0,137,123,.4); }
+.t2 .track-badge { color:#79c7bf; border-color:rgba(121,199,191,.3); }
+.t3 .track-badge { color:#a8d8d4; border-color:rgba(168,216,212,.3); }
+.track-num {
+  font-family:'Bebas Neue',sans-serif; font-size:52px;
+  line-height:1; margin-bottom:4px;
+}
+.t1 .track-num { color:var(--teal); }
+.t2 .track-num { color:#79c7bf; }
+.t3 .track-num { color:#a8d8d4; }
+.track-name {
+  font-family:'Crimson Pro',serif; font-size:20px;
+  font-style:italic; color:rgba(246,242,234,.75); line-height:1.2;
+}
+.track-prereq {
+  font-family:'IBM Plex Mono',monospace; font-size:9px;
+  letter-spacing:.1em; text-transform:uppercase;
+  color:rgba(246,242,234,.35); margin-top:14px;
+}
+.track-mid, .track-right {
+  padding:32px 28px;
+}
+.track-mid { border-right:1px solid var(--cream); }
+.t-label {
+  font-family:'IBM Plex Mono',monospace; font-size:8.5px;
+  letter-spacing:.18em; text-transform:uppercase; color:var(--dim);
+  margin-bottom:12px;
+}
+.t-desc {
+  font-size:14px; line-height:1.75; color:var(--dim);
+  font-family:'Crimson Pro',serif;
+}
+.proj-list { list-style:none; display:flex; flex-direction:column; gap:8px; margin-top:4px; }
+.proj-list li {
+  display:flex; gap:10px; font-size:13px; line-height:1.6;
+  align-items:flex-start; color:var(--dim);
+  padding-bottom:8px; border-bottom:1px solid var(--cream);
+}
+.proj-list li:last-child { border-bottom:none; padding-bottom:0; }
+.proj-list li .pn {
+  font-family:'IBM Plex Mono',monospace; font-size:8.5px;
+  color:var(--teal); flex-shrink:0; margin-top:2px;
+}
+
+/* ── PROJECT ARC ── */
+.arc { margin-top:52px; }
+.arc-grid {
+  display:grid; grid-template-columns:repeat(4,1fr);
+  border:var(--rule);
+}
+.arc-card {
+  padding:32px 26px;
+  border-right:var(--rule);
+  position:relative; overflow:hidden;
+}
+.arc-card:last-child { border-right:none; }
+.arc-card::before {
+  content:''; position:absolute; top:0; left:0; right:0;
+  height:3px; background:var(--teal);
+}
+.arc-week {
+  font-family:'IBM Plex Mono',monospace; font-size:9px;
+  letter-spacing:.16em; text-transform:uppercase;
+  color:var(--teal); margin-bottom:10px;
+}
+.arc-title {
+  font-family:'Crimson Pro',serif; font-size:20px;
+  font-weight:600; margin-bottom:10px; line-height:1.15;
+}
+.arc-desc { font-size:13px; line-height:1.7; color:var(--dim); }
+.arc-deliverable {
+  margin-top:16px; padding:12px 14px;
+  background:var(--teal-lt); border-left:2px solid var(--teal);
+  font-size:12px; font-family:'IBM Plex Mono',monospace;
+  line-height:1.55; color:var(--teal-dk);
+  letter-spacing:.02em;
+}
+
+/* ── CONCEPTS ── */
+.concepts-grid {
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:2px; background:var(--cream); margin-top:48px;
+}
+.concept {
+  background:var(--paper); padding:30px 26px;
+  transition:background .18s;
+}
+.concept:hover { background:var(--teal-lt); }
+.concept-n {
+  font-family:'IBM Plex Mono',monospace; font-size:9px;
+  color:var(--teal); letter-spacing:.18em; margin-bottom:10px;
+}
+.concept-title {
+  font-family:'Crimson Pro',serif; font-size:19px;
+  font-weight:600; margin-bottom:8px;
+}
+.concept-body { font-size:13px; color:var(--dim); line-height:1.7; }
+
+/* ── PEDAGOGY STRIP ── */
+.ped-strip {
+  background:var(--teal-dk); color:var(--paper);
+  padding:52px 52px;
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:60px; align-items:center;
+}
+.ped-quote {
+  font-family:'Crimson Pro',serif; font-size:clamp(20px,2.5vw,30px);
+  font-style:italic; line-height:1.45;
+}
+.ped-source {
+  font-family:'IBM Plex Mono',monospace; font-size:10px;
+  letter-spacing:.1em; text-transform:uppercase;
+  color:rgba(246,242,234,.45); margin-top:14px;
+}
+.ped-principles { display:flex; flex-direction:column; gap:14px; }
+.ped-item {
+  display:flex; gap:14px; align-items:flex-start;
+  padding:16px 18px; border:1px solid rgba(255,255,255,.1);
+}
+.ped-icon {
+  font-size:18px; flex-shrink:0; margin-top:2px;
+}
+.ped-text { font-size:14px; line-height:1.65; color:rgba(246,242,234,.75); }
+.ped-text strong { color:var(--paper); font-weight:500; display:block; margin-bottom:2px; font-size:14px; }
+
+/* ── THINKERS ── */
+.thinkers { display:grid; grid-template-columns:repeat(4,1fr); border-top:var(--rule); }
+.thinker {
+  padding:24px 28px; border-right:var(--rule); border-bottom:var(--rule);
+  transition:background .18s;
+}
+.thinker:hover { background:var(--teal-lt); }
+.thinker:nth-child(4n) { border-right:none; }
+.thinker-name { font-family:'Crimson Pro',serif; font-size:17px; font-weight:600; margin-bottom:5px; }
+.thinker-tag {
+  font-family:'IBM Plex Mono',monospace; font-size:8.5px;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--teal);
+  margin-bottom:8px;
+}
+.thinker-desc { font-size:12.5px; line-height:1.65; color:var(--dim); }
+
+/* ── FOOTER ── */
+footer {
+  background:var(--ink); color:var(--paper);
+  padding:40px 52px;
+  display:flex; justify-content:space-between; align-items:center;
+  border-top:4px solid var(--teal);
+}
+.footer-l { font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.06em; color:rgba(246,242,234,.35); line-height:2; }
+.footer-r { font-family:'Bebas Neue',sans-serif; font-size:28px; letter-spacing:.05em; color:rgba(246,242,234,.12); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:1000px){
+  .mast-grid { grid-template-columns:1fr; gap:40px; padding:40px 28px 32px; }
+  .civic-wheel-wrap { display:none; }
+  nav,.mast-ticker,.mast-stats,section,.ped-strip { padding-left:28px; padding-right:28px; }
+  .track { grid-template-columns:1fr; }
+  .track-left { border-right:none; border-bottom:1px solid var(--ink); }
+  .track-mid { border-right:none; }
+  .arc-grid { grid-template-columns:1fr 1fr; }
+  .concepts-grid { grid-template-columns:1fr 1fr; }
+  .versus { grid-template-columns:1fr; }
+  .versus-col.theirs { border-right:none; border-bottom:var(--rule); }
+  .thinkers { grid-template-columns:1fr 1fr; }
+  .thinker:nth-child(2n) { border-right:none; }
+  .ped-strip { grid-template-columns:1fr; }
+  footer { flex-direction:column; gap:16px; text-align:center; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-home" href="index.html">← All Courses</a>
+  <span class="nav-course">AI For Everyone · Community College Edition</span>
+</nav>
+
+<!-- MASTHEAD -->
+<header class="masthead">
+  <div class="mast-ticker">
+    <span>Community College CS</span>
+    <span>Andrew Ng × Community Pedagogy</span>
+    <span>No Prereqs · 3 Tracks · Portfolio Assessment</span>
+  </div>
+  <div class="mast-grid">
+    <div>
+      <div class="mast-eyebrow">AI For Everyone · Reimagined</div>
+      <div class="mast-h1">AI is a<br><span>Civic</span><br>Skill.</div>
+      <p class="mast-deck">
+        Andrew Ng's landmark course redesigned for community college learners. Three tracks. Real community projects. No exams. We ask not just <em>how</em> AI works — but <em>who built it</em>, <em>for whom</em>, and <em>at whose expense</em>.
+      </p>
+      <div class="mast-pills">
+        <span class="pill accent">No Prereqs</span>
+        <span class="pill">3 Tracks</span>
+        <span class="pill">18 Weeks</span>
+        <span class="pill">Portfolio-Based</span>
+        <span class="pill">All Resources Free</span>
+      </div>
+    </div>
+    <div class="civic-wheel-wrap">
+      <div class="civic-question">Who is AI for?</div>
+      <div class="civic-wheel">
+        <div class="orbit">
+          <div class="orbit-dot"></div>
+          <div class="orbit-dot"></div>
+          <div class="orbit-dot"></div>
+          <div class="orbit-dot"></div>
+        </div>
+        <div class="wheel-center">
+          <span>Who?</span>
+          <strong>AI</strong>
+          <span>For?</span>
+        </div>
+        <div class="who-items">
+          <span class="who-item">Nurses</span>
+          <span class="who-item">Landlords</span>
+          <span class="who-item">Students</span>
+          <span class="who-item">Voters</span>
+          <span class="who-item">Tenants</span>
+          <span class="who-item">Workers</span>
+        </div>
+      </div>
+      <div class="civic-question">AI is already deciding. This course teaches you to decide back.</div>
+    </div>
+  </div>
+  <div class="mast-stats">
+    <div class="mast-stat">
+      <div class="stat-n">0</div>
+      <div class="stat-l">Required Textbooks</div>
+    </div>
+    <div class="mast-stat">
+      <div class="stat-n">0</div>
+      <div class="stat-l">Exams</div>
+    </div>
+    <div class="mast-stat">
+      <div class="stat-n">3</div>
+      <div class="stat-l">Learning Tracks</div>
+    </div>
+    <div class="mast-stat">
+      <div class="stat-n">4</div>
+      <div class="stat-l">Major Projects</div>
+    </div>
+    <div class="mast-stat">
+      <div class="stat-n">18</div>
+      <div class="stat-l">Weeks · 3 Units</div>
+    </div>
+  </div>
+</header>
+
+<hr class="section-rule">
+
+<!-- WHAT'S DIFFERENT -->
+<section>
+  <div class="section-tag">This vs. Andrew Ng's Original</div>
+  <h2>Same big ideas.<br><em>Radically different</em> pedagogy.</h2>
+  <p class="lead">Andrew Ng's "AI for Everyone" reached millions. It's a superb introduction to AI concepts for executives and professionals. We took it apart and rebuilt it for community college students — people who live inside the systems AI is reshaping, often without being asked.</p>
+
+  <div class="versus">
+    <div class="versus-col theirs">
+      <div class="vs-label">Andrew Ng's Version</div>
+      <div class="vs-title">Expert Lecture → Quiz</div>
+      <ul class="vs-list">
+        <li>6-hour video lecture series, single path</li>
+        <li>Target audience: business professionals and executives</li>
+        <li>Assessment: multiple choice quizzes after each module</li>
+        <li>No hands-on projects or community applications</li>
+        <li>Limited equity and justice framing</li>
+        <li>Assumes stable employment context</li>
+        <li>One speed, one depth, one goal</li>
+      </ul>
+    </div>
+    <div class="versus-col ours">
+      <div class="vs-label">This Course</div>
+      <div class="vs-title">Problem First → Portfolio</div>
+      <ul class="vs-list">
+        <li>Every concept introduced through a real community problem</li>
+        <li>3 tracks: literacy, practitioner, builder — you choose your depth</li>
+        <li>Assessment: 4 portfolio projects you keep after the course</li>
+        <li>Projects rooted in local community — your neighborhood's data</li>
+        <li>Equity, bias, and algorithmic justice are not footnotes — they are curriculum</li>
+        <li>Connects to workforce, civic participation, and transfer</li>
+        <li>Spaced retrieval built into weekly project cycles</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<hr class="section-rule">
+
+<!-- THREE TRACKS -->
+<section>
+  <div class="section-tag">Three Learning Tracks</div>
+  <h2>One course.<br><em>Three depths.</em></h2>
+  <p class="lead">You choose your track at the start of each unit — and can change as you build confidence. All three tracks share the same core readings, discussions, and community projects. They diverge in technical depth.</p>
+
+  <div class="tracks">
+
+    <!-- Track I -->
+    <div class="track t1">
+      <div class="track-left">
+        <div>
+          <div class="track-badge">Track I</div>
+          <div class="track-num">I</div>
+          <div class="track-name">AI Civic<br>Literacy</div>
+        </div>
+        <div class="track-prereq">Prereq: None · Basic internet use</div>
+      </div>
+      <div class="track-mid">
+        <div class="t-label">What You'll Do</div>
+        <p class="t-desc">Understand how AI systems work at a conceptual level. Map AI in your community. Write policy analysis. Participate in civic debate. No coding required — but you'll understand what engineers are building and why it matters to you. This track prepares you to advocate, vote, and organize around AI policy.</p>
+      </div>
+      <div class="track-right">
+        <div class="t-label">Projects in This Track</div>
+        <ul class="proj-list">
+          <li><span class="pn">P1</span>Community AI Audit: Document 5 AI systems affecting your neighborhood</li>
+          <li><span class="pn">P2</span>Algorithmic Impact Report: Who wins, who loses in one deployed system?</li>
+          <li><span class="pn">P3</span>Policy Brief: Draft a regulation proposal for one AI system you studied</li>
+          <li><span class="pn">P4</span>Public Exhibition: Present your findings to a real community audience</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Track II -->
+    <div class="track t2">
+      <div class="track-left">
+        <div>
+          <div class="track-badge">Track II</div>
+          <div class="track-num">II</div>
+          <div class="track-name">AI<br>Practitioner</div>
+        </div>
+        <div class="track-prereq">Prereq: Comfortable with computers · No coding</div>
+      </div>
+      <div class="track-mid">
+        <div class="t-label">What You'll Do</div>
+        <p class="t-desc">Everything in Track I plus hands-on use of AI tools — prompt engineering, workflow automation, generative AI applications. Learn to use AI as a collaborator for real work tasks. By the end, you'll have a portfolio of AI-augmented projects and the critical lens to evaluate what you're using and why it works (or fails).</p>
+      </div>
+      <div class="track-right">
+        <div class="t-label">Projects in This Track</div>
+        <ul class="proj-list">
+          <li><span class="pn">P1</span>Prompt Portfolio: 30 documented prompts with analysis of outputs</li>
+          <li><span class="pn">P2</span>AI-Augmented Work: Use AI tools to complete a real project in your field</li>
+          <li><span class="pn">P3</span>Workflow Design: Map and implement an AI-assisted workflow</li>
+          <li><span class="pn">P4</span>Critical Evaluation: When did AI help vs. harm your work?</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Track III -->
+    <div class="track t3">
+      <div class="track-left">
+        <div>
+          <div class="track-badge">Track III</div>
+          <div class="track-num">III</div>
+          <div class="track-name">AI<br>Builder</div>
+        </div>
+        <div class="track-prereq">Prereq: Basic Python helpful · Taught if needed</div>
+      </div>
+      <div class="track-mid">
+        <div class="t-label">What You'll Do</div>
+        <p class="t-desc">Build AI-powered applications using APIs and open-source tools. Implement simple classifiers and pipelines from scratch. Understand the technical architecture of systems you use daily. By the end, you'll have deployed a working AI application solving a real community need — and understand every component inside it.</p>
+      </div>
+      <div class="track-right">
+        <div class="t-label">Projects in This Track</div>
+        <ul class="proj-list">
+          <li><span class="pn">P1</span>API Explorer: Build 3 mini apps using different AI APIs</li>
+          <li><span class="pn">P2</span>Community Classifier: Train a simple model on local data</li>
+          <li><span class="pn">P3</span>Bias Measurement: Quantify error rates across demographic groups</li>
+          <li><span class="pn">P4</span>Capstone App: Build and deploy an AI tool for a real community need</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<hr class="section-rule">
+
+<!-- PROJECT ARC -->
+<section>
+  <div class="section-tag">18-Week Project Arc</div>
+  <h2>Four projects.<br><em>One coherent argument.</em></h2>
+  <p class="lead">Each unit introduces new concepts through a problem — never the reverse. You encounter the question before you learn the vocabulary. By the end, your four projects form a connected portfolio about AI in your community.</p>
+
+  <div class="arc">
+    <div class="arc-grid">
+      <div class="arc-card">
+        <div class="arc-week">Weeks 1–4</div>
+        <div class="arc-title">What Is AI, Actually?</div>
+        <p class="arc-desc">Start by finding AI in the wild. Before any definitions, you'll document AI systems you interact with daily — before and after you understand how they work. Concepts: supervised learning, decision boundaries, training data.</p>
+        <div class="arc-deliverable">Deliverable → Community AI Audit Report</div>
+      </div>
+      <div class="arc-card">
+        <div class="arc-week">Weeks 5–9</div>
+        <div class="arc-title">Who Wins, Who Loses?</div>
+        <p class="arc-desc">Deep dive into one deployed AI system in housing, hiring, lending, or healthcare. Use public data to ask: who does this system serve? What does it optimize? Concepts: objective functions, error types, fairness definitions.</p>
+        <div class="arc-deliverable">Deliverable → Algorithmic Impact Report</div>
+      </div>
+      <div class="arc-card">
+        <div class="arc-week">Weeks 10–14</div>
+        <div class="arc-title">What Should We Do?</div>
+        <p class="arc-desc">Transform your impact analysis into action. Draft regulatory proposals, redesign problematic systems, or build alternatives. Concepts: AI governance, regulation frameworks, technical standards, community consent.</p>
+        <div class="arc-deliverable">Deliverable → Policy Brief or Working Prototype</div>
+      </div>
+      <div class="arc-card">
+        <div class="arc-week">Weeks 15–18</div>
+        <div class="arc-title">Make It Public</div>
+        <p class="arc-desc">Take your work beyond the classroom. Exhibition nights, community presentations, op-eds, open-source releases. Your portfolio should be legible to someone who never took this course. Concepts: communication, advocacy, transfer.</p>
+        <div class="arc-deliverable">Deliverable → Public Exhibition Portfolio</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-rule">
+
+<!-- KEY CONCEPTS -->
+<section>
+  <div class="section-tag">Core Concepts</div>
+  <h2>What every track<br><em>will understand.</em></h2>
+  <div class="concepts-grid">
+    <div class="concept">
+      <div class="concept-n">01</div>
+      <div class="concept-title">Training Data</div>
+      <p class="concept-body">Every AI model learns from past data — and encodes whatever patterns, biases, and omissions that data contains. Garbage in, garbage out — but so is "normal" in.</p>
+    </div>
+    <div class="concept">
+      <div class="concept-n">02</div>
+      <div class="concept-title">Objective Functions</div>
+      <p class="concept-body">AI optimizes for something specific. Whoever chooses what to optimize makes a value judgment — often hidden. Maximizing "engagement" is not neutral.</p>
+    </div>
+    <div class="concept">
+      <div class="concept-n">03</div>
+      <div class="concept-title">Supervised Learning</div>
+      <p class="concept-body">The most common AI approach: show examples with correct answers, learn the pattern. What counts as a "correct answer" is a human choice, every time.</p>
+    </div>
+    <div class="concept">
+      <div class="concept-n">04</div>
+      <div class="concept-title">Error and Fairness</div>
+      <p class="concept-body">No system is perfect. The question is: whose errors are acceptable? False positives in facial recognition vs. in medical diagnosis carry vastly different stakes.</p>
+    </div>
+    <div class="concept">
+      <div class="concept-n">05</div>
+      <div class="concept-title">Neural Networks</div>
+      <p class="concept-body">Loosely inspired by the brain. Layers of transformations that learn to detect patterns. Not magic — mathematics. Neurons, weights, activation functions.</p>
+    </div>
+    <div class="concept">
+      <div class="concept-n">06</div>
+      <div class="concept-title">Large Language Models</div>
+      <p class="concept-body">Predict the next token, at scale. ChatGPT, Claude, Gemini are autocomplete systems trained on the internet — which reflects the full spectrum of human writing, including its worst.</p>
+    </div>
+    <div class="concept">
+      <div class="concept-n">07</div>
+      <div class="concept-title">Deployment Gap</div>
+      <p class="concept-body">A model performs well in a lab. In the real world, distribution shifts, adversarial inputs, and feedback loops change everything. Lab accuracy ≠ community accuracy.</p>
+    </div>
+    <div class="concept">
+      <div class="concept-n">08</div>
+      <div class="concept-title">Governance &amp; Consent</div>
+      <p class="concept-body">Who decides where AI gets deployed? Who gets to opt out? Community consent and democratic oversight are the missing pieces in most AI deployments.</p>
+    </div>
+    <div class="concept">
+      <div class="concept-n">09</div>
+      <div class="concept-title">The Coded Gaze</div>
+      <p class="concept-body">Joy Buolamwini's term for encoded bias in computer vision. Systems that struggle to see darker skin are not technical failures — they are failures of who was in the room when the data was collected.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PEDAGOGY STRIP -->
+<div class="ped-strip">
+  <div>
+    <div class="ped-quote">"Understanding AI is not a luxury skill for tech workers. It is a civic literacy as essential as reading a ballot or a lease."</div>
+    <div class="ped-source">Course Philosophy · Rooted in Freire, Buolamwini, Ko, hooks</div>
+  </div>
+  <div class="ped-principles">
+    <div class="ped-item">
+      <div class="ped-icon">🔍</div>
+      <div class="ped-text"><strong>Problem-First Learning</strong>Every concept is introduced through a real problem that exists in your community before technical vocabulary is introduced.</div>
+    </div>
+    <div class="ped-item">
+      <div class="ped-icon">🧭</div>
+      <div class="ped-text"><strong>Multiple Entry Points</strong>Three tracks ensure no student is left behind or bored. You choose your depth and can move between tracks as you grow.</div>
+    </div>
+    <div class="ped-item">
+      <div class="ped-icon">📂</div>
+      <div class="ped-text"><strong>Portfolio Over Exams</strong>Your grade is your portfolio. Four real projects you can show an employer, a transfer institution, or your community.</div>
+    </div>
+    <div class="ped-item">
+      <div class="ped-icon">🌍</div>
+      <div class="ped-text"><strong>Community as Curriculum</strong>Your neighborhood's data, your community's AI decisions. Not abstract toy problems — real stakes, real people, real consequences.</div>
+    </div>
+  </div>
+</div>
+
+<hr class="section-rule">
+
+<!-- THINKERS -->
+<section>
+  <div class="section-tag">Intellectual Lineage</div>
+  <h2>Who we're <em>reading.</em></h2>
+  <div class="thinkers">
+    <div class="thinker">
+      <div class="thinker-name">Joy Buolamwini</div>
+      <div class="thinker-tag">MIT · Algorithmic Justice League</div>
+      <p class="thinker-desc">Gender Shades. The coded gaze. Bias in facial recognition systems as a function of whose faces were in the training data. Core reading, Week 3.</p>
+    </div>
+    <div class="thinker">
+      <div class="thinker-name">Safiya Umoja Noble</div>
+      <div class="thinker-tag">UCLA · Information Studies</div>
+      <p class="thinker-desc">Algorithms of Oppression. Google search results as a site of racial and gender bias. How information retrieval encodes power. Core reading, Week 5.</p>
+    </div>
+    <div class="thinker">
+      <div class="thinker-name">Ruha Benjamin</div>
+      <div class="thinker-tag">Princeton · African American Studies</div>
+      <p class="thinker-desc">Race After Technology. The "New Jim Code" — when automation encodes and amplifies racial hierarchy while appearing neutral. Core reading, Week 7.</p>
+    </div>
+    <div class="thinker">
+      <div class="thinker-name">Amy J. Ko</div>
+      <div class="thinker-tag">UW · CS Education</div>
+      <p class="thinker-desc">Equitable, joyous computing education. Questioning who computing is for. Foundational to the course's pedagogical approach throughout.</p>
+    </div>
+    <div class="thinker">
+      <div class="thinker-name">Paulo Freire</div>
+      <div class="thinker-tag">Critical Pedagogy</div>
+      <p class="thinker-desc">Pedagogy of the Oppressed. Students are not empty vessels to be filled. Education is a liberatory practice when students are agents, not objects.</p>
+    </div>
+    <div class="thinker">
+      <div class="thinker-name">Andrew Ng</div>
+      <div class="thinker-tag">DeepLearning.AI · Stanford</div>
+      <p class="thinker-desc">The original "AI For Everyone" — which we use, critique, and extend. Ng's conceptual clarity on AI techniques is unmatched. We add the community lens.</p>
+    </div>
+    <div class="thinker">
+      <div class="thinker-name">Virginia Eubanks</div>
+      <div class="thinker-tag">Automating Inequality</div>
+      <p class="thinker-desc">How high-tech tools profile, police, and punish the poor. Automated eligibility systems, predictive policing, child welfare algorithms. Core reading, Week 9.</p>
+    </div>
+    <div class="thinker">
+      <div class="thinker-name">bell hooks</div>
+      <div class="thinker-tag">Teaching to Transgress</div>
+      <p class="thinker-desc">The classroom as a site of freedom. Education as the practice of freedom. Every student brings knowledge worth centering. Referenced throughout.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-l">
+    Community College Computer Science<br>
+    Andrew Ng's AI For Everyone · Reimagined for Community College<br>
+    No required textbooks · All resources free and open-access<br>
+    <a href="index.html" style="color:rgba(246,242,234,.5);text-decoration:underline;text-underline-offset:2px;">&larr; Teaching Computing Differently</a> · <a href="mailto:henry@henryfan.org" style="color:rgba(246,242,234,.5);">henry@henryfan.org</a>
+  </div>
+  <div class="footer-r">AI For Everyone</div>
+</footer>
+
+</body>
+</html>

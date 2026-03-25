@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Research Agenda — Henry Fan</title>
+  <meta name="description" content="Research agenda: structural equity in introductory CS education. Help-seeking, curriculum structure, STEM departure, and computational tools for instructional auditing.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="site-nav" aria-label="Main navigation">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-name">Henry Fan</a>
+    <button class="nav-toggle" aria-label="Toggle navigation" onclick="document.querySelector('.nav-links').classList.toggle('open')">☰</button>
+    <ul class="nav-links">
+      <li><a href="../">← Curriculum</a></li>
+      <li><a href="research.html" class="active">Research</a></li>
+      <li><a href="projects.html">Projects</a></li>
+      <li><a href="teaching.html">Teaching</a></li>
+      <li><a href="writing.html">Writing</a></li>
+      <li><a href="tools.html">Prototypes</a></li>
+      <li><a href="background.html">Background</a></li>
+      <li><a href="cv.pdf">CV</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="page-container">
+  <div class="page-header">
+    <p class="label">Research Agenda</p>
+    <h1>Four Questions, One Thread</h1>
+    <p class="subtitle">
+      My research investigates structural features of introductory CS courses that predict whether students seek help, persist, and develop belonging — with a focus on community college students. The connecting thread is structural equity: the claim, grounded in Seymour and Hunter's work, that departure from STEM correlates with teaching quality and institutional design, not academic ability.
+    </p>
+  </div>
+
+  <p>
+    I'm building toward a research program that combines qualitative methods (interview studies grounded in Seymour &amp; Hunter), quantitative learning analytics, and computational tool-building. These are early-stage questions — they need data, methods, and collaboration to answer well. The empirical projects designed to address them are described on the <a href="projects.html">projects page</a>.
+  </p>
+
+  <p class="font-sans text-small text-muted mt-md">
+    Target venues: SIGCSE · ICER · EDM · LAK · Learning @ Scale
+  </p>
+
+  <hr>
+
+  <div class="rq-block">
+    <p class="rq-id">Question 1</p>
+    <p class="rq-title">Help-Seeking and Course Structure</p>
+    <p class="rq-text">
+      What observable features of introductory CS course design — assignment framing, office hours culture, peer collaboration norms — predict whether students seek help when stuck? Do these predictors differ across demographic groups, and can they be measured from LMS and discussion forum data?
+    </p>
+    <p class="rq-methods">Methods: Learning analytics · LMS log analysis · Qualitative coding (Seymour &amp; Hunter taxonomy)</p>
+    <p class="rq-methods">→ Addressed by <a href="projects.html#p1">Project P1: HelpMap</a></p>
+  </div>
+
+  <div class="rq-block">
+    <p class="rq-id">Question 2</p>
+    <p class="rq-title">Curriculum Structure and Student Departure</p>
+    <p class="rq-text">
+      Can a graph-based representation of CS curriculum structure reveal which dependency patterns create avoidable confusion bottlenecks? Do community college CS curricula show structural features that research university curricula don't — and do those features predict DFW rates?
+    </p>
+    <p class="rq-methods">Methods: Curriculum graph analysis · Institutional data · NLP analysis of syllabi</p>
+    <p class="rq-methods">→ Addressed by <a href="projects.html#p4">Project P4: CurriculumGraph</a></p>
+  </div>
+
+  <div class="rq-block">
+    <p class="rq-id">Question 3</p>
+    <p class="rq-title">Replicating Seymour &amp; Hunter at Community Colleges</p>
+    <p class="rq-text">
+      Do the departure reasons documented in <em>Talking About Leaving Revisited</em> — teaching quality, weed-out culture, belonging, help-seeking suppression — replicate at community colleges? Are there CC-specific departure pathways not captured in the original taxonomy?
+    </p>
+    <p class="rq-methods">Methods: Semi-structured interviews · Qualitative coding · Grounded theory · IRB study</p>
+    <p class="rq-methods">→ Addressed by <a href="projects.html#p3">Project P3: Why They Left</a></p>
+  </div>
+
+  <div class="rq-block">
+    <p class="rq-id">Question 4</p>
+    <p class="rq-title">Validating Computational Tools for Instructional Auditing</p>
+    <p class="rq-text">
+      Can NLP-based analysis of course materials be validated as a reliable proxy for expert judgment about structural features associated with poor student outcomes — specifically features that suppress help-seeking or create what I'm tentatively calling "motivational debt"? This is fundamentally a validation question: can automated analysis match expert annotation with sufficient reliability (Cohen's κ ≥ 0.65) to be useful to instructors?
+    </p>
+    <p class="rq-methods">Methods: NLP · Annotation studies · Tool validation · Instructional design literature</p>
+    <p class="rq-methods">→ Addressed by <a href="projects.html#p2">Project P2: SyllabusAudit</a></p>
+  </div>
+
+  <hr>
+
+  <h2>Key Ideas and Influences</h2>
+
+  <p>
+    The constructs below draw on existing literature and, in some cases, propose extensions that need empirical validation. I list them here as intellectual commitments that shape the research questions above, not as established theory.
+  </p>
+
+  <div class="detail-section">
+    <p><strong>Structural departure (Seymour &amp; Hunter, 1997; 2019).</strong> The landmark finding that students who leave STEM are not academically weaker than those who stay — departure correlates with teaching quality, institutional culture, and help-seeking suppression. This is the empirical foundation for the entire research program. The open question is whether these findings, established at research universities, replicate at community colleges (Q3).</p>
+
+    <p><strong>The necessity principle (Harel, 1998; applied by Anderson).</strong> Students should experience intellectual need before receiving the tool that answers it. In Harel's formulation for mathematics education: "if math is the medicine, what is the headache?" I'm interested in whether violations of this principle — what I'm tentatively calling "pedagogical debt" by analogy with technical debt — are measurable from course materials and predictive of student outcomes (Q4).</p>
+
+    <p><strong>Belonging as structural feature (Walton &amp; Brady; Margolis &amp; Fisher).</strong> Sense of belonging in CS is not purely interpersonal — it can be signaled (or suppressed) by course design choices visible in materials alone. The question is whether these signals can be reliably coded and validated against student survey data (P5).</p>
+
+    <p><strong>Help-seeking suppression.</strong> The behavioral pattern in which students who need help do not seek it. Predicted by Seymour &amp; Hunter to be structurally caused. I'm interested in whether this can be operationalized as a measurable feature in LMS data (Q1).</p>
+
+    <p><strong>Curriculum graph analysis.</strong> Representing curriculum as a directed graph of learning objectives with typed dependencies (conceptual, procedural, motivational, social). The empirical question is whether structural properties of these graphs — density, longest paths, bottleneck nodes — predict student outcomes. This extends existing prerequisite-chain research by adding dependency types (Q2).</p>
+  </div>
+
+  <hr>
+
+  <h2>Roadmap</h2>
+
+  <div class="mt-lg">
+    <div class="timeline-item">
+      <p class="timeline-date">Now — Spring 2026</p>
+      <p class="timeline-title">IRB Protocol + Corpus Construction</p>
+      <p class="timeline-desc">Submit IRB for P3 interview study. Continue collecting syllabi for P2 corpus (47/100+ collected). Develop annotation schema. PhD program applications.</p>
+    </div>
+
+    <div class="timeline-item">
+      <p class="timeline-date">Summer 2026</p>
+      <p class="timeline-title">P3: Departure Interviews</p>
+      <p class="timeline-desc">Conduct 20–30 semi-structured interviews with students who left STEM at Foothill. Code against S&amp;H taxonomy. Begin grounded theory analysis.</p>
+    </div>
+
+    <div class="timeline-item">
+      <p class="timeline-date">Fall 2026</p>
+      <p class="timeline-title">P2: Annotation Study + P1: LMS Analysis</p>
+      <p class="timeline-desc">Recruit expert annotators for P2. Begin NLP classifier training. In parallel, analyze LMS data for P1 help-seeking feature extraction.</p>
+    </div>
+
+    <div class="timeline-item">
+      <p class="timeline-date">Spring 2027</p>
+      <p class="timeline-title">First Submissions</p>
+      <p class="timeline-desc">Submit P3 (interview study) to ICER 2027. Submit P2 (SyllabusAudit) to Learning @ Scale 2027. Pilot P4 instructor annotation study.</p>
+    </div>
+
+    <div class="timeline-item">
+      <p class="timeline-date">PhD Program</p>
+      <p class="timeline-title">Dissertation Research</p>
+      <p class="timeline-desc">Integrate P1–P5 into a coherent dissertation on structural predictors of help-seeking and STEM departure at community colleges.</p>
+    </div>
+  </div>
+
+  <hr>
+
+  <h2>Research and Teaching as One Practice</h2>
+
+  <p>
+    These research questions did not arise from a literature review. They arose from watching students leave — from financial aid offices, counseling appointments, tutoring sessions, and learning communities where I saw the same structural patterns from every institutional vantage point. The research formalizes what I observed. The <a href="teaching.html">teaching practice</a> attempts to fix it.
+  </p>
+
+  <p>
+    Every course I design is a potential research site: the <a href="../build-a-computer.html">Build a Computer from Scratch</a> project creates a natural laboratory for studying help-seeking behavior (Q1), the effects of physical computing on belonging (Q3), and whether constructionist curriculum design measurably reduces the structural departure patterns that Seymour and Hunter documented (Q3). The build journal entries are qualitative data. The milestone completion patterns are quantitative data. The three-track system is a testable belonging intervention (P5). The research and the teaching are the same activity, observed from different angles.
+  </p>
+
+  <p>
+    See the full <a href="../">curriculum site</a> for the enacted version of this research agenda.
+  </p>
+
+  <p class="font-sans text-small text-muted mt-xl">Last updated: March 2026</p>
+</main>
+
+<footer class="site-footer" style="text-align:center;">
+  <p>© 2026 Henry Fan · SJSU McNair Scholar · Foothill College Science Learning Institute</p>
+  <p style="margin-top:0.25rem;"><a href="mailto:henry@henryfan.org" style="color:var(--color-text-muted);">henry@henryfan.org</a> · <a href="../" style="color:var(--color-text-muted);">← Curriculum Site</a></p>
+</footer>
+
+</body>
+</html>

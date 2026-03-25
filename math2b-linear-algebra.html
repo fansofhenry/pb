@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en" data-course="math2b">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Math 2B — Applied Linear Algebra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<script src="js/progress.js" defer></script>
+<style>
+:root{--void:#0e0e12;--deep:#16161d;--slate:#1e1e28;--panel:#252530;--edge:#2e2e3a;--mist:#6e6e88;--fog:#9090aa;--parch:#e8e4d8;--paper:#f4f1e8;--gold:#c8a84b;--amber:#e8b84b;--violet:#7c6cfc;--lavender:#b8b0f8;--green:#4caf7a;--red:#e05050}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+body{background:var(--void);color:var(--parch);font-family:'Crimson Pro',serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+body::after{content:'';position:fixed;top:0;right:0;width:600px;height:600px;background:radial-gradient(ellipse at top right,rgba(124,108,252,.06) 0%,transparent 60%);pointer-events:none;z-index:0}
+#progress-bar-container{position:sticky;top:0;z-index:100;background:var(--deep);border-bottom:1px solid var(--edge);padding:10px 48px;display:flex;align-items:center;gap:20px}
+#progress-track{flex:1;height:3px;background:var(--edge)}#progress-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--violet),var(--lavender));transition:width .5s ease}
+#progress-text{font-family:'Space Mono',monospace;font-size:10px;color:var(--mist);letter-spacing:.08em;white-space:nowrap}
+#active-track-badge{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--violet);border:1px solid var(--violet);padding:2px 8px}
+.masthead{position:relative;z-index:1;border-bottom:1px solid var(--edge);overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(124,108,252,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(124,108,252,.04) 1px,transparent 1px);background-size:48px 48px;pointer-events:none}
+.mast-nav{display:flex;justify-content:space-between;align-items:center;padding:16px 48px;border-bottom:1px solid var(--edge);font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase}
+.mast-nav-left{color:var(--mist)}.mast-nav-right{color:var(--gold)}
+.mast-body{display:grid;grid-template-columns:1fr 380px}
+.mast-left{padding:60px 48px;border-right:1px solid var(--edge)}
+.mast-eyebrow{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--violet);margin-bottom:20px;display:flex;align-items:center;gap:12px}
+.mast-eyebrow::before{content:'';width:24px;height:1px;background:var(--violet)}
+.mast-course-num{font-family:'Space Mono',monospace;font-size:clamp(64px,8vw,100px);font-weight:700;line-height:.9;letter-spacing:-.02em;color:var(--paper);margin-bottom:8px}
+.mast-course-num span{color:var(--violet)}
+.mast-title{font-family:'Cormorant Garamond',serif;font-size:clamp(26px,3vw,40px);font-weight:300;font-style:italic;color:var(--fog);line-height:1.2;margin-bottom:28px}
+.mast-desc{font-size:17px;line-height:1.85;color:rgba(232,228,216,.6);max-width:520px;font-weight:300;margin-bottom:32px}
+.mast-pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{padding:4px 12px;border:1px solid var(--edge);font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--mist)}
+.pill.accent{border-color:var(--violet);color:var(--lavender)}
+.mast-right{padding:40px 36px;background:var(--deep);display:flex;flex-direction:column}
+.problems-title{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--mist);margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--edge)}
+.problem-item{padding:13px 0;border-bottom:1px solid var(--edge);display:grid;grid-template-columns:24px 1fr;gap:12px;align-items:start}
+.problem-item:last-child{border-bottom:none}
+.prob-num{font-family:'Space Mono',monospace;font-size:11px;color:var(--violet);padding-top:2px}
+.prob-name{font-family:'Cormorant Garamond',serif;font-size:15px;color:var(--parch);margin-bottom:2px}
+.prob-abbr{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.08em;color:var(--mist)}
+.track-selector-wrap{position:relative;z-index:1;padding:18px 48px;background:var(--deep);border-bottom:1px solid var(--edge);display:flex;align-items:center;gap:12px}
+.ts-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--mist);white-space:nowrap}
+.ts-buttons{display:flex;gap:6px}
+.ts-btn{padding:6px 14px;background:transparent;border:1px solid var(--edge);font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--mist);cursor:pointer;transition:all .2s}
+.ts-btn:hover{border-color:var(--violet);color:var(--lavender)}.ts-btn.active{background:var(--violet);border-color:var(--violet);color:white}
+.ts-btn:focus-visible{outline:2px solid var(--violet);outline-offset:2px}
+section{position:relative;z-index:1;padding:56px 48px;border-bottom:1px solid var(--edge)}
+.section-header{display:flex;align-items:baseline;gap:14px;margin-bottom:36px}
+.section-num{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--violet);opacity:.6}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;font-style:italic;color:var(--paper)}
+.section-rule{flex:1;height:1px;background:var(--edge);margin-left:14px}
+.lesson-grid{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--edge)}
+.lesson-cell{padding:24px;border-right:1px solid var(--edge);border-bottom:1px solid var(--edge);transition:background .2s}
+.lesson-cell:hover{background:var(--deep)}.lesson-cell:nth-child(3n){border-right:none}
+.lesson-num{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--mist);margin-bottom:8px}
+.lesson-title{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:var(--paper);margin-bottom:7px;line-height:1.2}
+.lesson-desc{font-size:13.5px;line-height:1.75;color:rgba(232,228,216,.5);margin-bottom:12px}
+.lesson-tag{display:inline-block;padding:2px 8px;border:1px solid var(--edge);font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.08em;color:var(--mist);margin-right:4px;margin-bottom:4px}
+.lesson-tag.highlight{border-color:var(--gold);color:var(--gold)}
+.complete-btn{margin-top:12px;padding:6px 14px;background:transparent;border:1px solid var(--edge);font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--mist);cursor:pointer;transition:all .2s;width:100%;text-align:center}
+.complete-btn:hover{border-color:var(--green);color:var(--green)}.complete-btn.done{background:rgba(76,175,122,.1);border-color:var(--green);color:var(--green)}
+.complete-btn:focus-visible{outline:2px solid var(--violet);outline-offset:2px}
+.recall-box{margin-top:14px;border:1px solid var(--edge);background:var(--slate)}
+.recall-toggle{width:100%;padding:9px 14px;background:transparent;border:none;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--violet);cursor:pointer;text-align:left;display:flex;justify-content:space-between;align-items:center}
+.recall-toggle:hover{color:var(--lavender)}.recall-toggle:focus-visible{outline:2px solid var(--violet)}
+.recall-body{display:none;padding:10px 14px 14px}.recall-body.open{display:block}
+.recall-q{font-family:'Crimson Pro',serif;font-size:13.5px;font-style:italic;color:var(--fog);line-height:1.6;padding:5px 0;border-bottom:1px dashed var(--edge)}
+.recall-q:last-child{border-bottom:none}.recall-q::before{content:'Q: ';color:var(--violet);font-style:normal;font-family:'Space Mono',monospace;font-size:10px}
+.career-box{margin-top:10px;padding:10px 14px;background:rgba(76,175,122,.06);border-left:2px solid var(--green)}
+.career-label{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--green);margin-bottom:6px}
+.career-chips{display:flex;flex-wrap:wrap;gap:4px}
+.career-chip{padding:2px 7px;background:rgba(76,175,122,.12);font-family:'Space Mono',monospace;font-size:8px;color:var(--green)}
+.critical-block{padding:22px 26px;border:1px solid var(--edge);border-left:3px solid var(--amber);background:rgba(232,184,75,.04);margin-top:24px}
+.critical-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--amber);margin-bottom:10px}
+.critical-q{font-family:'Crimson Pro',serif;font-size:14.5px;font-style:italic;color:rgba(232,228,216,.65);line-height:1.7;padding:4px 0;border-bottom:1px dashed rgba(232,184,75,.15);list-style:none}
+.critical-q:last-child{border-bottom:none}.critical-q::before{content:'↳ ';color:var(--amber);font-style:normal}
+.concept-map{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--edge)}
+.cmap-node{padding:22px;border-right:1px solid var(--edge);border-bottom:1px solid var(--edge);position:relative}
+.cmap-node:nth-child(3n){border-right:none}.cmap-node:nth-child(4),.cmap-node:nth-child(5),.cmap-node:nth-child(6){border-bottom:none}
+.cmap-arrow{position:absolute;right:-10px;top:50%;transform:translateY(-50%);font-family:'Space Mono',monospace;font-size:14px;color:var(--violet);z-index:2}
+.cmap-title{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--violet);margin-bottom:8px}
+.cmap-item{font-family:'Crimson Pro',serif;font-size:13px;color:var(--fog);line-height:1.6;padding-left:10px;position:relative;list-style:none}
+.cmap-item::before{content:'—';position:absolute;left:0;color:var(--edge)}
+.succeed-grid{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--edge)}
+.succeed-card{padding:26px;border-right:1px solid var(--edge);border-bottom:1px solid var(--edge)}
+.succeed-card:nth-child(3n){border-right:none}.succeed-card:nth-child(4),.succeed-card:nth-child(5),.succeed-card:nth-child(6){border-bottom:none}
+.succeed-icon{font-size:22px;margin-bottom:10px}.succeed-name{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:var(--paper);margin-bottom:7px}
+.succeed-desc{font-size:13px;line-height:1.8;color:rgba(232,228,216,.5)}
+.dataset-grid{display:grid;grid-template-columns:repeat(2,1fr);border:1px solid var(--edge)}
+.dataset-card{padding:20px 24px;border-right:1px solid var(--edge);border-bottom:1px solid var(--edge)}
+.dataset-card:nth-child(2n){border-right:none}.dataset-name{font-family:'Space Mono',monospace;font-size:11px;color:var(--gold);margin-bottom:6px}
+.dataset-desc{font-size:13px;line-height:1.75;color:rgba(232,228,216,.5);margin-bottom:9px}
+.dataset-link{font-family:'Space Mono',monospace;font-size:9px;color:var(--violet);text-transform:uppercase;text-decoration:none}
+.dataset-link:hover{color:var(--lavender)}
+.badges-row{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--edge)}
+.badge-card{padding:28px;border-right:1px solid var(--edge);text-align:center}
+.badge-card:last-child{border-right:none}
+.badge-icon{font-size:34px;margin-bottom:12px}.badge-name{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--paper);margin-bottom:5px}
+.badge-req{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.1em;color:var(--mist);margin-bottom:10px}
+.badge-earned{display:none;font-family:'Space Mono',monospace;font-size:10px;color:var(--green)}
+.badge-card.unlocked .badge-earned{display:block}.badge-card.unlocked{background:rgba(76,175,122,.04)}
+footer{position:relative;z-index:1;background:var(--deep);padding:36px 48px;border-top:1px solid var(--violet);display:flex;justify-content:space-between;align-items:center}
+.footer-text{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.08em;color:var(--mist);line-height:2}
+.footer-logo{font-family:'Cormorant Garamond',serif;font-size:13px;font-style:italic;color:rgba(232,228,216,.2)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.mast-eyebrow{animation:fadeUp .45s ease .1s both}.mast-course-num{animation:fadeUp .5s ease .2s both}
+.mast-title{animation:fadeUp .5s ease .3s both}.mast-desc{animation:fadeUp .5s ease .4s both}.mast-pills{animation:fadeUp .5s ease .5s both}
+@media(max-width:960px){.mast-body{grid-template-columns:1fr}.mast-right{border-top:1px solid var(--edge)}.mast-left,.section,.mast-nav,.track-selector-wrap,#progress-bar-container,footer{padding-left:24px;padding-right:24px}.lesson-grid,.concept-map,.succeed-grid{grid-template-columns:1fr}.lesson-cell,.cmap-node,.succeed-card{border-right:none!important}.dataset-grid,.badges-row{grid-template-columns:1fr}.dataset-card,.badge-card{border-right:none!important}}
+
+  /* ── CRITERIA UPGRADE: Necessity + Prior Knowledge + Assumptions + Iteration ── */
+  .headache{background:rgba(212,160,23,.07);border-left:3px solid rgba(212,160,23,.45);border-radius:0 4px 4px 0;padding:11px 15px;margin-bottom:9px}
+  .headache strong{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#c9981a;display:block;margin-bottom:5px}
+  .headache p{font-size:12px;line-height:1.6;font-style:italic}
+  .prior-box{background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.18);border-radius:6px;padding:16px 20px;margin:0 0 22px}
+  .prior-box strong{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#10b981;display:block;margin-bottom:8px}
+  .prior-box p,.prior-box li{font-size:12.5px;line-height:1.65;color:inherit;opacity:.8}
+  .prior-box ul{list-style:none;margin:6px 0 0;display:flex;flex-direction:column;gap:5px}
+  .prior-box li{padding-left:14px;position:relative}
+  .prior-box li::before{content:'→';position:absolute;left:0;color:#10b981;font-family:'IBM Plex Mono',monospace}
+  .assume-box{background:rgba(139,92,246,.06);border-left:3px solid rgba(139,92,246,.3);border-radius:0 4px 4px 0;padding:11px 15px;margin-top:9px}
+  .assume-box strong{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#8b5cf6;display:block;margin-bottom:5px}
+  .assume-box p{font-size:12px;line-height:1.6}
+  .iteration-box{background:rgba(6,182,212,.05);border:1px solid rgba(6,182,212,.18);border-radius:6px;padding:14px 18px;margin:10px 0}
+  .iteration-box strong{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#06b6d4;display:block;margin-bottom:8px}
+  .iteration-flow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}
+  .iter-step{background:rgba(6,182,212,.08);border-radius:3px;padding:5px 10px;font-size:11px;color:#06b6d4;font-family:'IBM Plex Mono',monospace}
+  .iter-arrow{color:rgba(6,182,212,.4);font-size:11px}
+  .multi-rep{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+  .rep-chip{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:3px;padding:4px 10px;font-size:10px;font-family:'IBM Plex Mono',monospace;opacity:.7}
+
+</style>
+</head>
+<body>
+<div id="progress-bar-container" role="status" aria-label="Course progress">
+  <div id="progress-track"><div id="progress-fill"></div></div>
+  <span id="progress-text">0 of 0 units</span>
+  <span id="active-track-badge">All Tracks</span>
+</div>
+<header class="masthead">
+  <nav class="mast-nav">
+    <span class="mast-nav-left"><a href="index.html" style="color:var(--mist);text-decoration:none;opacity:.7;transition:opacity .15s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7">&larr; Home</a> &middot; Community College · Mathematics Department</span>
+    <span class="mast-nav-right">Liberatory · Ungraded · Portfolio-Based</span>
+  </nav>
+  <div class="mast-body">
+    <div class="mast-left">
+      <div class="mast-eyebrow">Mathematics · Applied</div>
+      <div class="mast-course-num">MATH <span>2B</span></div>
+      <div class="mast-title">Introduction to Applied Linear Algebra</div>
+      <p class="mast-desc">Six fundamental problems. Twenty-nine lessons. One truth: mathematics is a tool for thinking more clearly about the world — not a collection of formulas to memorize.
+
+We start with real problems that need these ideas. We derive the theory together. Then we use MATLAB to test our results against measured data. Every lesson connects to something real.</p>
+      <div class="mast-pills">
+        <span class="pill accent">6 Fundamental Problems</span>
+        <span class="pill accent">29 Lessons</span>
+        <span class="pill">Ungrading · Portfolio</span>
+        <span class="pill">3 Learning Tracks</span>
+        <span class="pill">Jeff Anderson · ALAF</span>
+        <span class="pill">No Required Textbook Purchase</span>
+      </div>
+    </div>
+    <div class="mast-right">
+      <div class="problems-title">// The 6 Fundamental Problems</div>
+      <div class="problem-item"><span class="prob-num">01</span><div><div class="prob-name">Nonsingular Linear Systems</div><div class="prob-abbr">NLSP · Ax = b, unique solution</div></div></div>
+      <div class="problem-item"><span class="prob-num">02</span><div><div class="prob-name">General Linear Systems</div><div class="prob-abbr">GLSP · many or no solutions</div></div></div>
+      <div class="problem-item"><span class="prob-num">03</span><div><div class="prob-name">Full-Rank Least Squares</div><div class="prob-abbr">FRLSP · best approximate solution</div></div></div>
+      <div class="problem-item"><span class="prob-num">04</span><div><div class="prob-name">Standard Eigenvalue Problem</div><div class="prob-abbr">SEP · Av = λv, resonance</div></div></div>
+      <div class="problem-item"><span class="prob-num">05</span><div><div class="prob-name">Singular Value Decomposition</div><div class="prob-abbr">SVD · data compression, images</div></div></div>
+      <div class="problem-item"><span class="prob-num">06</span><div><div class="prob-name">Generalized Eigenvalue Problem</div><div class="prob-abbr">GEP · coupled systems, physics</div></div></div>
+    </div>
+  </div>
+</header>
+<div class="track-selector-wrap">
+  <span class="ts-label">Learning track:</span>
+  <div class="ts-buttons" role="group" aria-label="Filter content by learning track">
+    <button class="ts-btn active" onclick="setTrack('all')" aria-pressed="true">All Tracks</button>
+    <button class="ts-btn" onclick="setTrack('novice')" aria-pressed="false">Novice</button>
+    <button class="ts-btn" onclick="setTrack('builder')" aria-pressed="false">Builder</button>
+    <button class="ts-btn" onclick="setTrack('architect')" aria-pressed="false">Architect</button>
+  </div>
+</div>
+
+<!-- UNIT 1 -->
+<section id="unit1">
+  <div class="section-header"><span class="section-num">Unit 01</span><h2 class="section-title">Language of Linear Algebra</h2><div class="section-rule"></div></div>
+  <p style="font-size:15px;line-height:1.85;color:rgba(232,228,216,.55);max-width:700px;margin-bottom:32px;">Before we can solve anything, we need a shared language. Sets, functions, vectors, matrices — not as symbols to memorize, but as tools you'll actually use. Each idea will feel abstract until you see the problem it was invented to solve. That's where we start: with the problem.</p>
+  <div class="lesson-grid">
+    <div class="lesson-cell">
+<div class="prior-box">
+  <strong>What You Already Know (Activate Before Lesson 0)</strong>
+  <p>Linear algebra feels abstract at first. But you already have the intuitions:</p>
+  <ul>
+    <li>You've added vectors as arrows on a graph in physics. The same idea applies to any number of dimensions.</li>
+    <li>You've solved two equations with two unknowns. A linear system is exactly that — but possibly with thousands of unknowns.</li>
+    <li>You've used a spreadsheet. A spreadsheet is a matrix. Matrix multiplication is just a compact way of doing all those cell formulas at once.</li>
+  </ul>
+  <p style="margin-top:8px">The goal is not to memorize procedures. The goal is to see the structure behind problems you already know — and then solve problems you couldn't solve before.</p>
+</div>
+      <div class="lesson-num">Lesson 0</div>
+      <div class="lesson-title">Major Problems in Applied Linear Algebra</div>
+      <div class="headache"><strong>The Problem First</strong><p>You have 500 unknowns and 500 equations describing an electrical network. Solving it by hand would take years. What mathematical structure could let a computer solve it in milliseconds?</p></div>
+      <div class="lesson-desc">What are the six fundamental problems? Why do they matter? Where do they appear in engineering, data science, and physics? This lesson gives you the map before we explore the territory.</div>
+      <span class="lesson-tag highlight">Foundation</span>
+      <a href="https://www.youtube.com/playlist?list=PLSt7rwoPGTy10qdPeuqzC-qn5zeHCYoSf" target="_blank" style="display:block;margin-top:10px;font-family:'Space Mono',monospace;font-size:9px;color:var(--violet);text-transform:uppercase;letter-spacing:.1em;text-decoration:none;">▶ Watch Playlist →</a>
+      <div class="recall-box"><button class="recall-toggle" onclick="toggleRecall(this)" aria-expanded="false"><span>🧠 Quick Recall</span><span>+</span></button><div class="recall-body"><div class="recall-q">Name all 6 fundamental problems without looking. What does each acronym stand for?</div><div class="recall-q">Where does the NLSP appear in real life? Give two engineering examples.</div></div></div>
+      <button class="complete-btn" onclick="toggleComplete('m2b-l0',this)">Mark Complete</button>
+    </div>
+    <div class="lesson-cell">
+      <div class="lesson-num">Lessons 1–2</div>
+      <div class="lesson-title">Set Theory & Relations and Functions</div>
+      <div class="headache"><strong>The Problem First</strong><p>You need a precise, unambiguous way to say "all possible input-output pairs." Natural language is too vague. That's why mathematicians invented set notation — not for elegance, but for precision.</p></div>
+      <div class="lesson-desc">Sets, subsets, functions, domain, codomain. Injective, surjective, bijective. You'll learn this vocabulary because it appears everywhere in the course — in vector spaces, transformations, and eigenvalue problems.</div>
+      <a href="https://www.youtube.com/playlist?list=PLSt7rwoPGTy2QZJtnhppR7K5SrF0kBezX" target="_blank" style="display:block;margin-top:6px;font-family:'Space Mono',monospace;font-size:9px;color:var(--violet);text-transform:uppercase;letter-spacing:.1em;text-decoration:none;">▶ Playlist L1 →</a>
+      <div class="career-box"><div class="career-label">// Used In</div><div class="career-chips"><span class="career-chip">Database theory</span><span class="career-chip">Formal verification</span><span class="career-chip">Probability foundations</span></div></div>
+      <div class="recall-box"><button class="recall-toggle" onclick="toggleRecall(this)" aria-expanded="false"><span>🧠 Quick Recall</span><span>+</span></button><div class="recall-body"><div class="recall-q">What is the difference between ∈ and ⊆? Give an example of each.</div><div class="recall-q">A function is bijective if and only if ___. Why does this guarantee an inverse?</div></div></div>
+      <button class="complete-btn" onclick="toggleComplete('m2b-l1',this)">Mark Complete</button>
+    </div>
+    <div class="lesson-cell">
+      <div class="lesson-num">Lessons 3–5</div>
+      <div class="lesson-title">Vectors, Arithmetic & Inner Products</div>
+      <div class="lesson-desc">Vectors as models of real things: prices, forces, pixel intensities. Vector arithmetic, norms, inner products. The geometry of dot products and orthogonality.</div>
+      <span class="lesson-tag highlight">Core</span>
+      <div class="career-box"><div class="career-label">// Used In</div><div class="career-chips"><span class="career-chip">Machine learning</span><span class="career-chip">Recommendation systems</span><span class="career-chip">Signal processing</span></div></div>
+      <div class="recall-box"><button class="recall-toggle" onclick="toggleRecall(this)" aria-expanded="false"><span>🧠 Quick Recall</span><span>+</span></button><div class="recall-body"><div class="recall-q">Write the definition of the Euclidean inner product. What does it measure geometrically?</div><div class="recall-q">State the Cauchy-Schwarz inequality. Prove it from the inner product definition.</div><div class="recall-q">Two vectors are orthogonal iff their inner product is ___. Why does this follow geometrically?</div></div></div>
+      <button class="complete-btn" onclick="toggleComplete('m2b-l3',this)">Mark Complete</button>
+    </div>
+    <div class="lesson-cell">
+      <div class="lesson-num">Lesson 6</div>
+      <div class="lesson-title">Linear Combinations, Span & Linear Independence</div>
+      <div class="lesson-desc">Can any vector in the space be built from this set? Span and independence are the key questions of linear algebra. These ideas unlock everything that follows.</div>
+      <span class="lesson-tag highlight">Core</span>
+      <a href="https://www.youtube.com/playlist?list=PLSt7rwoPGTy094Yu_fFUkGEjuGDMoCKTk" target="_blank" style="display:block;margin-top:6px;font-family:'Space Mono',monospace;font-size:9px;color:var(--violet);text-transform:uppercase;letter-spacing:.1em;text-decoration:none;">▶ Playlist L6 →</a>
+      <div class="career-box"><div class="career-label">// Used In</div><div class="career-chips"><span class="career-chip">PCA (data science)</span><span class="career-chip">Image compression</span><span class="career-chip">Structural analysis</span></div></div>
+      <div class="recall-box"><button class="recall-toggle" onclick="toggleRecall(this)" aria-expanded="false"><span>🧠 Quick Recall</span><span>+</span></button><div class="recall-body"><div class="recall-q">Give the formal definition of linear independence. What goes wrong if vectors are dependent?</div><div class="recall-q">Can the span of 3 vectors in ℝ⁵ be all of ℝ⁵? Explain why or why not.</div></div></div>
+      <button class="complete-btn" onclick="toggleComplete('m2b-l6',this)">Mark Complete</button>
+    </div>
+    <div class="lesson-cell">
+      <div class="lesson-num">Lessons 7–11</div>
+      <div class="lesson-title">Matrices — Structure, Arithmetic & Multiplication</div>
+      <div class="lesson-desc">Matrices as linear transformations that rotate, scale, shear, and project. Four interpretations of Ax. Why matrix multiplication is not commutative and what that means.</div>
+      <span class="lesson-tag highlight">Core</span>
+      <div class="career-box"><div class="career-label">// Used In</div><div class="career-chips"><span class="career-chip">Neural networks</span><span class="career-chip">Google PageRank</span><span class="career-chip">Computer graphics</span><span class="career-chip">GPS</span></div></div>
+      <div class="recall-box"><button class="recall-toggle" onclick="toggleRecall(this)" aria-expanded="false"><span>🧠 Quick Recall</span><span>+</span></button><div class="recall-body"><div class="recall-q">Write out the four interpretations of Ax.</div><div class="recall-q">Prove that matrix multiplication is associative but not commutative. Give a counterexample.</div><div class="recall-q">What is the adjacency matrix of a graph? Build one for a 4-node network.</div></div></div>
+      <button class="complete-btn" onclick="toggleComplete('m2b-l7',this)">Mark Complete</button>
+    </div>
+    <div class="lesson-cell" style="background:var(--deep);">
+      <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--violet);letter-spacing:.15em;text-transform:uppercase;margin-bottom:12px;">// Critical Lens</div>
+      <ul style="list-style:none;">
+        <li style="font-family:'Crimson Pro',serif;font-size:14px;font-style:italic;color:rgba(232,228,216,.55);line-height:1.7;padding:5px 0;border-bottom:1px dashed var(--edge);">Who invented set theory notation, and why was Cantor's work rejected by the establishment?</li>
+        <li style="font-family:'Crimson Pro',serif;font-size:14px;font-style:italic;color:rgba(232,228,216,.55);line-height:1.7;padding:5px 0;border-bottom:1px dashed var(--edge);">Vectors are used to represent people in recommendation systems. What gets lost when a human is reduced to a list of numbers?</li>
+        <li style="font-family:'Crimson Pro',serif;font-size:14px;font-style:italic;color:rgba(232,228,216,.55);line-height:1.7;padding:5px 0;">Facebook's social graph models relationships as matrix entries. Who decides what gets counted and what doesn't?</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- UNIT 2: LINEAR SYSTEMS -->
+<section id="unit2">
+  <div class="section-header"><span class="section-num">Unit 02</span><h2 class="section-title">Solving Linear Systems (NLSP &amp; GLSP)</h2><div class="section-rule"></div></div>
+  <p style="font-size:16px;line-height:1.85;color:rgba(232,228,216,.55);max-width:700px;margin-bottom:32px;">The first two fundamental problems. Can we solve Ax = b? If yes, how many solutions? These questions have been asked since ancient China and Babylon — we now have complete answers.</p>
+  <div class="lesson-grid">
+    <div class="lesson-cell">
+      <div class="lesson-num">Lessons 12–14</div>
+      <div class="lesson-title">NLSP: Nonsingular Systems, Inverses & IMT</div>
+      <div class="lesson-desc">When Ax = b has exactly one solution. Row reduction, the Invertible Matrix Theorem — fifteen equivalent conditions for invertibility.</div>
+      <span class="lesson-tag highlight">NLSP · Problem 1</span>
+      <div class="career-box"><div class="career-label">// Used In</div><div class="career-chips"><span class="career-chip">Circuit analysis</span><span class="career-chip">Supply chain</span><span class="career-chip">Cryptography</span></div></div>
+      <div class="recall-box"><button class="recall-toggle" onclick="toggleRecall(this)" aria-expanded="false"><span>🧠 Quick Recall</span><span>+</span></button><div class="recall-body"><div class="recall-q">State the Invertible Matrix Theorem. List 5 equivalent conditions for A to be invertible.</div><div class="recall-q">Compute the inverse of a 2×2 matrix from memory. Why does the formula work?</div></div></div>
+      <button class="complete-btn" onclick="toggleComplete('m2b-l12',this)">Mark Complete</button>
+    </div>
+    <div class="lesson-cell">
+      <div class="lesson-num">Lessons 15–16</div>
+      <div class="lesson-title">LU Factorization & Determinants</div>
+      <div class="lesson-desc">LU as Gaussian elimination captured in matrix form. Determinants — geometric meaning (volume), computation (permutations), and connection to invertibility.</div>
+      <a href="https://www.youtube.com/playlist?list=PLSt7rwoPGTy0xZQGqZjwAqqQhCjVBRcbf" target="_blank" style="display:block;margin-top:6px;font-family:'Space Mono',monospace;font-size:9px;color:var(--violet);text-transform:uppercase;letter-spacing:.1em;text-decoration:none;">▶ Playlist L15 →</a>
+      <div class="recall-box"><button class="recall-toggle" onclick="toggleRecall(this)" aria-expanded="false"><span>🧠 Quick Recall</span><span>+</span></button><div class="recall-body"><div class="recall-q">What does det(A) = 0 tell you geometrically? Algebraically?</div><div class="recall-q">Why is LU factorization more efficient than computing A⁻¹ when solving many systems?</div></div></div>
+      <button class="complete-btn" onclick="toggleComplete('m2b-l15',this)">Mark Complete</button>
+    </div>
+    <div class="lesson-cell">
+      <div class="lesson-num">Lessons 17–18</div>
+      <div class="lesson-title">GLSP: General Systems & Parametric Solutions</div>
+      <div class="lesson-desc">When systems have no solution or infinitely many. RREF, free variables, the parametric solution space. Understanding what "infinite solutions" means structurally.</div>
+      <span class="lesson-tag highlight">GLSP · Problem 2</span>
+      <div class="career-box"><div class="career-label">// Used In</div><div class="career-chips"><span class="career-chip">Chemical balancing</span><span class="career-chip">Network flow</span><span class="career-chip">Structural mechanics</span></div></div>
+      <div class="recall-box"><button class="recall-toggle" onclick="toggleRecall(this)" aria-expanded="false"><span>🧠 Quick Recall</span><span>+</span></button><div class="recall-body"><div class="recall-q">A linear system can have 0, 1, or ∞ solutions. Prove it cannot have exactly 2.</div><div class="recall-q">What is a free variable? How do you identify them in RREF? Write the general solution.</div></div></div>
+      <button class="complete-btn" onclick="toggleComplete('m2b-l17',this)">Mark Complete</button>
+    </div>
+  </div>
+  <!-- ELSP Project -->
+  <div style="margin-top:32px;padding:26px;border:1px solid var(--gold);background:rgba(200,168,75,.04);">
+    <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">// Major Project</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--paper);margin-bottom:10px;">Electrify Linear-Systems Problem (ELSP)</div>
+    <p style="font-size:14.5px;line-height:1.85;color:rgba(232,228,216,.55);max-width:640px;margin-bottom:14px;">Build and measure a real electrical circuit. Use Kirchhoff's laws to model it as a linear system. Solve with LU factorization. Compare mathematical predictions to measured values. Why do they differ?</p>
+    <a href="http://www.appliedlinearalgebra.com/blog/for-teachers/linear-algebra-laboratory-exercises/electrify-linear-systems" target="_blank" style="font-family:'Space Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);text-decoration:none;border:1px solid var(--gold);padding:6px 14px;">Project Website →</a>
+  </div>
+</section>
+
+<!-- UNIT 3: SPACES & SPECTRAL -->
+<section id="unit3">
+  <div class="section-header"><span class="section-num">Unit 03</span><h2 class="section-title">Vector Spaces, Least Squares & Eigentheory</h2><div class="section-rule"></div></div>
+  <div class="lesson-grid">
+    <div class="lesson-cell">
+      <div class="lesson-num">Lessons 19–21</div>
+      <div class="lesson-title">Vector Spaces, Null & Column Spaces, Rank</div>
+      <div class="lesson-desc">Abstract vector spaces with the same axioms in infinitely many settings. The four fundamental subspaces of a matrix. Rank-Nullity Theorem.</div>
+      <span class="lesson-tag highlight">Core</span>
+      <div class="recall-box"><button class="recall-toggle" onclick="toggleRecall(this)" aria-expanded="false"><span>🧠 Quick Recall</span><span>+</span></button><div class="recall-body"><div class="recall-q">What are the 10 axioms of a vector space? Why can't you remove any of them?</div><div class="recall-q">State the Rank-Nullity Theorem and prove it using the four fundamental subspaces.</div></div></div>
+      <button class="complete-btn" onclick="toggleComplete('m2b-l19',this)">Mark Complete</button>
+    </div>
+    <div class="lesson-cell">
+      <div class="lesson-num">Lessons 22–26</div>
+      <div class="lesson-title">Least Squares, Projections & QR Factorization</div>
+      <div class="lesson-desc">When Ax = b has no solution, find the best approximation. Normal equations, orthogonal projections, Gram-Schmidt algorithm, QR as a clean numerical strategy.</div>
+      <span class="lesson-tag highlight">FRLSP · Problem 3</span>
+      <div class="career-box"><div class="career-label">// Used In</div><div class="career-chips"><span class="career-chip">Linear regression</span><span class="career-chip">GPS location fitting</span><span class="career-chip">Image reconstruction</span></div></div>
+      <div class="recall-box"><button class="recall-toggle" onclick="toggleRecall(this)" aria-expanded="false"><span>🧠 Quick Recall</span><span>+</span></button><div class="recall-body"><div class="recall-q">Derive the normal equations (AᵀAx̂ = Aᵀb) from first principles. What geometric fact does this rely on?</div><div class="recall-q">Walk through Gram-Schmidt for 3 vectors. What property do the output vectors have?</div></div></div>
+      <button class="complete-btn" onclick="toggleComplete('m2b-l22',this)">Mark Complete</button>
+    </div>
+    <div class="lesson-cell">
+      <div class="lesson-num">Lessons 27–29</div>
+      <div class="lesson-title">Eigenvalues, Eigenvectors & Diagonalization</div>
+      <div class="lesson-desc">The SEP: Av = λv. Resonant modes of physical systems. Characteristic polynomial. Diagonalization. Why PageRank is an eigenvalue problem.</div>
+      <span class="lesson-tag highlight">SEP · Problem 4</span>
+      <div class="career-box"><div class="career-label">// Used In</div><div class="career-chips"><span class="career-chip">Google PageRank</span><span class="career-chip">Vibration analysis</span><span class="career-chip">Quantum mechanics</span><span class="career-chip">PCA</span></div></div>
+      <div class="recall-box"><button class="recall-toggle" onclick="toggleRecall(this)" aria-expanded="false"><span>🧠 Quick Recall</span><span>+</span></button><div class="recall-body"><div class="recall-q">What does it mean for a vector to be an eigenvector? Describe it geometrically.</div><div class="recall-q">How do you find eigenvalues? Write out the procedure from det(A − λI) = 0.</div><div class="recall-q">Why is PageRank an eigenvalue problem? Write the defining equation.</div></div></div>
+      <button class="complete-btn" onclick="toggleComplete('m2b-l27',this)">Mark Complete</button>
+    </div>
+  </div>
+  <div class="critical-block">
+    <div class="critical-label">// Critical Lens — Units 2 & 3</div>
+    <ul>
+      <li class="critical-q">Least squares is used to find "patterns" in data. Whose data shapes what pattern gets found?</li>
+      <li class="critical-q">PageRank determines what millions of people see. The algorithm encodes assumptions about what counts as "authority." Who built those assumptions in?</li>
+      <li class="critical-q">Eigenvalue analysis determines structural integrity of bridges. What responsibilities do engineers have when math affects physical safety?</li>
+    </ul>
+  </div>
+</section>
+
+<!-- HOW TO SUCCEED -->
+<section id="succeed">
+  <div class="section-header"><span class="section-num">◈</span><h2 class="section-title">How to Succeed in This Course</h2><div class="section-rule"></div></div>
+  <div class="succeed-grid">
+    <div class="succeed-card"><div class="succeed-icon">✍️</div><div class="succeed-name">Derive Before You Look</div><div class="succeed-desc">Before reading notes on a theorem, try to prove it yourself. 20 minutes of honest struggle beats 2 hours of passive reading. Struggle is how the brain encodes structure.</div></div>
+    <div class="succeed-card"><div class="succeed-icon">📐</div><div class="succeed-name">Draw Every Object</div><div class="succeed-desc">Vectors are arrows. Matrices are transformations. Subspaces are planes. Always draw a picture. If you can't visualize it, you don't yet understand it.</div></div>
+    <div class="succeed-card"><div class="succeed-icon">🔁</div><div class="succeed-name">Teach One Concept Weekly</div><div class="succeed-desc">Explain a concept to a study partner or out loud to yourself. Teaching exposes every gap you didn't know you had. Jeff's "concept image" practice: describe the object, its properties, where it breaks.</div></div>
+    <div class="succeed-card"><div class="succeed-icon">🔗</div><div class="succeed-name">Connect to the 6 Problems</div><div class="succeed-desc">Every lesson connects to at least one fundamental problem. Ask: which problem does this help solve? This transforms isolated facts into a coherent structure you can actually use.</div></div>
+    <div class="succeed-card"><div class="succeed-icon">📓</div><div class="succeed-name">Keep a Living Portfolio</div><div class="succeed-desc">Your portfolio is not a final product — it's a living record. Update it weekly. Include failed attempts, revised proofs, honest reflections. Authenticity matters more than polish.</div></div>
+    <div class="succeed-card"><div class="succeed-icon">❓</div><div class="succeed-name">The 2-Minute Rule</div><div class="succeed-desc">Jeff Anderson's rule: if you've been stuck for 2 minutes, write down exactly what you're stuck on and ask. Asking good questions is the highest-level skill in mathematics.</div></div>
+  </div>
+</section>
+
+<!-- CONCEPT MAP -->
+<section id="concept-map">
+  <div class="section-header"><span class="section-num">◈</span><h2 class="section-title">How the Course Connects</h2><div class="section-rule"></div></div>
+  <div class="concept-map">
+    <div class="cmap-node"><div class="cmap-title">Language Layer</div><ul><li class="cmap-item">Sets & Functions</li><li class="cmap-item">Vectors & Norms</li><li class="cmap-item">Linear Combinations</li><li class="cmap-item">Span & Independence</li></ul><div class="cmap-arrow">→</div></div>
+    <div class="cmap-node"><div class="cmap-title">Matrix Machinery</div><ul><li class="cmap-item">Matrix Arithmetic</li><li class="cmap-item">Transformations</li><li class="cmap-item">Determinants</li><li class="cmap-item">LU & QR Factorizations</li></ul><div class="cmap-arrow">→</div></div>
+    <div class="cmap-node"><div class="cmap-title">Linear Systems</div><ul><li class="cmap-item">NLSP (unique solution)</li><li class="cmap-item">GLSP (0 or ∞ solutions)</li><li class="cmap-item">FRLSP (least squares)</li><li class="cmap-item">Normal equations</li></ul></div>
+    <div class="cmap-node"><div class="cmap-title">Abstract Spaces</div><ul><li class="cmap-item">Vector space axioms</li><li class="cmap-item">Null & column spaces</li><li class="cmap-item">Dimension & rank</li><li class="cmap-item">Rank-nullity theorem</li></ul><div class="cmap-arrow">→</div></div>
+    <div class="cmap-node"><div class="cmap-title">Spectral Theory</div><ul><li class="cmap-item">Eigenvalues & vectors</li><li class="cmap-item">Diagonalization</li><li class="cmap-item">Resonant modes</li><li class="cmap-item">PageRank</li></ul><div class="cmap-arrow">→</div></div>
+    <div class="cmap-node"><div class="cmap-title">Critical Thread</div><ul><li class="cmap-item">Who built this math?</li><li class="cmap-item">Who benefits from it?</li><li class="cmap-item">Who is harmed by it?</li><li class="cmap-item">What should change?</li></ul></div>
+  </div>
+</section>
+
+<!-- DATASETS -->
+<section id="datasets">
+  <div class="section-header"><span class="section-num">◈</span><h2 class="section-title">Real Datasets to Work With</h2><div class="section-rule"></div></div>
+  <div class="dataset-grid">
+    <div class="dataset-card"><div class="dataset-name">COMPAS Recidivism Data (ProPublica)</div><div class="dataset-desc">Apply least squares regression. See how predictions vary by race. What does it mean to optimize a model that affects who goes to prison?</div><a href="https://github.com/propublica/compas-analysis" target="_blank" class="dataset-link">Access Dataset →</a></div>
+    <div class="dataset-card"><div class="dataset-name">ACS PUMS Census Income</div><div class="dataset-desc">Build regression models for income prediction. Which features matter? What does the least squares solution encode about society?</div><a href="https://www.census.gov/programs-surveys/acs/microdata.html" target="_blank" class="dataset-link">Access Dataset →</a></div>
+    <div class="dataset-card"><div class="dataset-name">SNAP Network Datasets (Stanford)</div><div class="dataset-desc">Web crawls, social networks, citation graphs. Perfect for matrix modeling, PageRank, and eigenvalue applications.</div><a href="https://snap.stanford.edu/data/" target="_blank" class="dataset-link">Access Dataset →</a></div>
+    <div class="dataset-card"><div class="dataset-name">Bay Area BART Ridership</div><div class="dataset-desc">Model ridership as a linear system. Identify patterns. Explore which communities are served by transit and which aren't.</div><a href="https://www.bart.gov/about/reports/ridership" target="_blank" class="dataset-link">Access Dataset →</a></div>
+    <div class="dataset-card"><div class="dataset-name">ELSP Circuit Measurements</div><div class="dataset-desc">Your own measured data from the Electrify project. The most important dataset — because you collected it and know its uncertainty.</div><a href="http://www.appliedlinearalgebra.com/blog/for-teachers/linear-algebra-laboratory-exercises/electrify-linear-systems" target="_blank" class="dataset-link">Project Site →</a></div>
+    <div class="dataset-card"><div class="dataset-name">ImageNet Sample (PCA Practice)</div><div class="dataset-desc">Apply SVD to real image data. Compress images and watch quality degrade. Understand what the eigenvalue decomposition is capturing.</div><a href="https://www.kaggle.com/competitions/imagenet-object-localization-challenge" target="_blank" class="dataset-link">Access Dataset →</a></div>
+  </div>
+</section>
+
+<!-- BADGES -->
+<section id="badges">
+  <div class="section-header"><span class="section-num">◈</span><h2 class="section-title">Learning Milestones</h2><div class="section-rule"></div></div>
+  <div class="badges-row">
+    <div class="badge-card" id="badge-1" data-threshold="3"><div class="badge-icon">📐</div><div class="badge-name">Foundations Builder</div><div class="badge-req">Complete 3+ lesson units</div><div class="badge-earned">✓ Milestone Reached</div></div>
+    <div class="badge-card" id="badge-2" data-threshold="6"><div class="badge-icon">⚡</div><div class="badge-name">Linear Systems Solver</div><div class="badge-req">Complete 6+ lesson units</div><div class="badge-earned">✓ Milestone Reached</div></div>
+    <div class="badge-card" id="badge-3" data-threshold="9"><div class="badge-icon">λ</div><div class="badge-name">Spectral Theorist</div><div class="badge-req">Complete all 9 lesson units</div><div class="badge-earned">✓ Milestone Reached</div></div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-text">Math 2B · Applied Linear Algebra<br>Jeff Anderson · ALAF Textbook · Ungraded · Portfolio-Based<br>All resources free and open-access<br><a href="build-a-computer.html" style="color:var(--violet);text-decoration:underline;text-underline-offset:2px;">See Linear Algebra in action: Build a Computer from Scratch &rarr;</a> · <a href="index.html" style="color:var(--mist);text-decoration:underline;text-underline-offset:2px;">&larr; Teaching Computing Differently</a> · <a href="mailto:henry@henryfan.org" style="color:var(--mist);">henry@henryfan.org</a></div>
+  <div class="footer-logo">Ax = b</div>
+</footer>
+</body>
+</html>

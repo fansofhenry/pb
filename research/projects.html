@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projects — Henry Fan</title>
+  <meta name="description" content="Five research projects in CS education: interview studies, NLP analysis of course materials, learning analytics, curriculum graph analysis, and belonging measurement.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="site-nav" aria-label="Main navigation">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-name">Henry Fan</a>
+    <button class="nav-toggle" aria-label="Toggle navigation" onclick="document.querySelector('.nav-links').classList.toggle('open')">☰</button>
+    <ul class="nav-links">
+      <li><a href="../">← Curriculum</a></li>
+      <li><a href="research.html">Research</a></li>
+      <li><a href="projects.html" class="active">Projects</a></li>
+      <li><a href="teaching.html">Teaching</a></li>
+      <li><a href="writing.html">Writing</a></li>
+      <li><a href="tools.html">Prototypes</a></li>
+      <li><a href="background.html">Background</a></li>
+      <li><a href="cv.pdf">CV</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="page-container">
+  <div class="page-header">
+    <p class="label">Research Projects</p>
+    <h1>Five Projects, 2025–2027</h1>
+    <p class="subtitle">
+      Projects are listed in the order I intend to execute them. P3 (interviews) produces the conceptual foundation that P1 and P2 need. Status is shown honestly: what exists, what's in progress, what's proposed. No project claims results it hasn't earned yet.
+    </p>
+  </div>
+
+  <!-- ================================ P3 ================================ -->
+  <div id="p3" class="card" style="margin-top: var(--space-xl);">
+    <span class="status proposed">Proposed · Target ICER 2027</span>
+    <span class="card-label">Qualitative Research · Interview Study · STEM Departure</span>
+    <p class="card-title" style="font-size: 1.3rem;">P3 · Why They Left: A Seymour &amp; Hunter Replication at Community Colleges</p>
+    <p class="card-desc">
+      Seymour and Hunter documented that students who leave STEM are not academically weaker than those who stay — they leave for structural reasons: teaching quality, weed-out culture, help-seeking suppression, belonging. Their landmark studies were conducted at research universities. This project asks whether those findings replicate at community colleges, which serve a demographically different population within a different institutional structure.
+    </p>
+
+    <details>
+      <summary>Full research design</summary>
+      <div class="detail-content">
+        <h3>Research Question</h3>
+        <p>Do the departure reasons documented by Seymour &amp; Hunter at research universities replicate at community colleges, and are there CC-specific structural departure pathways not captured in the original taxonomy?</p>
+
+        <h3>Why This First</h3>
+        <p>This is the empirical foundation the other projects need. Before building computational tools to address structural problems, I need to confirm which structural problems actually exist in this context. This is also the most IRB-feasible first study.</p>
+
+        <h3>Methods</h3>
+        <p>20–30 semi-structured interviews with students who left STEM at Foothill College within 2 years. Coding against the Seymour &amp; Hunter taxonomy (deductive) plus open coding for emergent themes (inductive). Grounded theory analysis with member-checking.</p>
+
+        <h3>Key Literature</h3>
+        <p>Seymour &amp; Hunter (1997, 2019); Margolis &amp; Fisher, <em>Unlocking the Clubhouse</em>; Walton &amp; Brady on belonging; SEISMIC Consortium data; PERTS Mindset Meter.</p>
+
+        <h3>IRB Requirements</h3>
+        <p>Full IRB protocol (not exempt). Informed consent for recording. Participant confidentiality procedures. Deidentification before analysis.</p>
+
+        <h3>Expected Contribution</h3>
+        <p>CC-specific extension of the Seymour &amp; Hunter taxonomy. Open coding manual for replication. Empirical grounding for P1 feature selection. Public dataset (deidentified transcripts, IRB-permitting).</p>
+
+        <p class="font-sans text-small text-muted mt-lg">Addresses <a href="research.html">Research Question 3</a></p>
+      </div>
+    </details>
+  </div>
+
+  <!-- ================================ P2 ================================ -->
+  <div id="p2" class="card">
+    <span class="status in-progress">In Progress · Target Learning @ Scale 2027</span>
+    <span class="card-label">NLP · Static Analysis · Instructional Design</span>
+    <p class="card-title" style="font-size: 1.3rem;">P2 · SyllabusAudit: NLP-Based Structural Analysis of CS Course Materials</p>
+    <p class="card-desc">
+      Can automated analysis of syllabi and assignment descriptions reliably identify structural features associated with poor student outcomes? This project builds a corpus of 100+ CS1/CS2 syllabi, develops an annotation schema grounded in Harel's necessity principle, and trains a lightweight NLP classifier on expert annotations. The validation question is central: can this match expert judgment with sufficient reliability?
+    </p>
+
+    <details>
+      <summary>Full research design</summary>
+      <div class="detail-content">
+        <h3>Research Question</h3>
+        <p>Can automated analysis of CS course materials identify motivational structure features that predict student help-seeking rates, and can this analysis be validated against instructor expert judgment (Cohen's κ ≥ 0.65)?</p>
+
+        <h3>Current Status</h3>
+        <p>Corpus construction underway: 47 syllabi collected as of February 2026. Annotation schema drafted. Expert annotator recruitment planned for Spring 2026.</p>
+
+        <h3>Methods</h3>
+        <p>Corpus of 100+ CS1/CS2 syllabi (public + IRB-approved). Annotation schema based on the necessity principle. Fine-tune a BERT-class model on expert annotations. Validate against student outcome data. Inter-rater reliability measured on real annotated data.</p>
+
+        <h3>Annotation Scheme</h3>
+        <p>Four dimensions: motivational debt (formalism introduced before student need), scaffolding regularity (dependency load per unit), verification opportunities (self-check affordances), and belonging signals (framing and example selection).</p>
+
+        <h3>Technical Stack</h3>
+        <p>HuggingFace Transformers, Label Studio for annotation, Python NLP pipeline, R for inter-rater reliability analysis.</p>
+
+        <h3>Open Science Plan</h3>
+        <p>Annotation schema released as open standard. Annotated corpus released (IRB-permitting). Model weights open-source. Web tool for instructor upload.</p>
+
+        <p class="font-sans text-small text-muted mt-lg">Addresses <a href="research.html">Research Question 4</a></p>
+      </div>
+    </details>
+  </div>
+
+  <!-- ================================ P1 ================================ -->
+  <div id="p1" class="card">
+    <span class="status proposed">Proposed · Target SIGCSE 2027</span>
+    <span class="card-label">Learning Analytics · NLP · LMS Data</span>
+    <p class="card-title" style="font-size: 1.3rem;">P1 · HelpMap: Detecting Help-Seeking Suppression in Introductory CS</p>
+    <p class="card-desc">
+      What behavioral signals in LMS and discussion forum data predict whether students seek help when stuck — and do these signals differ by demographic group? This project builds a validated feature set for help-seeking suppression from Canvas logs and discussion forum data across intro CS sections at Foothill College and SJSU.
+    </p>
+
+    <details>
+      <summary>Full research design</summary>
+      <div class="detail-content">
+        <h3>Research Question</h3>
+        <p>Which LMS behavioral features predict help-seeking suppression in CS1, and does the feature importance differ across first-generation, URM, and continuing-generation students?</p>
+
+        <h3>Analytical Approach</h3>
+        <p>I hypothesize that help-seeking suppression will be detectable through three feature families: temporal patterns (latency between assignment access and first forum post), linguistic patterns (question specificity and hedging language in posts), and engagement patterns (ratio of reading to posting behavior). I chose logistic regression as the primary model for interpretability — the goal is instructor-actionable features, not prediction accuracy. Gradient boosting serves as a comparison to test whether nonlinear interactions among features substantially improve detection, which would suggest the underlying phenomenon is more complex than a linear model captures.</p>
+
+        <h3>Datasets</h3>
+        <p>Foothill College CS course logs (IRB required). Public PSLC DataShop CS datasets. Publicly available CS1 discussion forums.</p>
+
+        <h3>Expected Contribution</h3>
+        <p>Validated feature set for help-seeking suppression. Open-source instructor dashboard. Extension of Seymour &amp; Hunter's qualitative findings to behavioral data.</p>
+
+        <p class="font-sans text-small text-muted mt-lg">Addresses <a href="research.html">Research Question 1</a>. Feature selection informed by P3 interview findings.</p>
+      </div>
+    </details>
+  </div>
+
+  <!-- ================================ P4 ================================ -->
+  <div id="p4" class="card">
+    <span class="status proposed">Proposed · Target SIGCSE 2027</span>
+    <span class="card-label">Graph Theory · Curriculum Design · Tool Development</span>
+    <p class="card-title" style="font-size: 1.3rem;">P4 · CurriculumGraph: Mapping and Analyzing CS Dependency Structures</p>
+    <p class="card-desc">
+      A graph-based representation of CS curriculum structure, built as an annotation tool for instructors. Instructors annotate their curriculum with typed dependencies; the tool computes structural statistics (longest path, fan-in/fan-out, bottleneck detection). The empirical question is whether these structural features predict DFW rates — and whether community college curricula show different structural signatures than research university curricula.
+    </p>
+
+    <details>
+      <summary>Full research design</summary>
+      <div class="detail-content">
+        <h3>Research Question</h3>
+        <p>Can a graph-based representation of CS curriculum dependency structure reveal bottleneck patterns that predict student confusion and DFW rates, and do these patterns vary between community colleges and research universities?</p>
+
+        <h3>Methods</h3>
+        <p>React-based annotation tool for instructors. Pilot with 5–10 instructors at Foothill and SJSU. Graph structural analysis using NetworkX. Correlation with grade distribution and DFW rates.</p>
+
+        <h3>Connection to Existing Work</h3>
+        <p>Extends existing prerequisite-chain research (e.g., Auvinen et al.) by adding typed dependencies — conceptual, procedural, motivational, and social — which allow finer-grained analysis of where curricula create unnecessary confusion versus necessary productive struggle.</p>
+
+        <p class="font-sans text-small text-muted mt-lg">Addresses <a href="research.html">Research Question 2</a>. Interactive prototype available on the <a href="tools.html">prototypes page</a>.</p>
+      </div>
+    </details>
+  </div>
+
+  <!-- ================================ P5 ================================ -->
+  <div id="p5" class="card">
+    <span class="status proposed">Proposed · Target ICER 2027</span>
+    <span class="card-label">Belonging · Course Design · Survey Methods</span>
+    <p class="card-title" style="font-size: 1.3rem;">P5 · BelongingSignals: Coding Course Materials for Structural Belonging Features</p>
+    <p class="card-desc">
+      Which observable features of introductory CS course design predict students' sense of belonging — and can those features be reliably coded from course materials alone? This project develops a coding scheme grounded in Walton &amp; Brady's belonging literature and Margolis &amp; Fisher's <em>Unlocking the Clubhouse</em>, applies it to CS1 materials, and validates coding against belonging survey data.
+    </p>
+
+    <details>
+      <summary>Full research design</summary>
+      <div class="detail-content">
+        <h3>Research Question</h3>
+        <p>Which codeable features of CS1 course design predict student belonging scores (Walton 3-item scale), and can a reliable coding instrument be developed that instructors can use to audit their own materials?</p>
+
+        <h3>Methods</h3>
+        <p>Coding scheme development (Walton + Margolis &amp; Fisher). Corpus of CS1 materials from willing instructors. Prospective belonging survey (IRB-approved). Validation of coding against survey outcomes.</p>
+
+        <h3>Expected Output</h3>
+        <p>Open coding instrument. Validated belonging feature set. Actionable instructor guidance. Connection to P1 (help-seeking) and P3 (departure).</p>
+
+        <p class="font-sans text-small text-muted mt-lg">Addresses <a href="research.html">Research Questions 1 and 3</a>.</p>
+      </div>
+    </details>
+  </div>
+
+  <p class="font-sans text-small text-muted mt-xl">Last updated: March 2026</p>
+
+  <hr>
+
+  <h2>Curriculum Design Projects</h2>
+
+  <p>
+    In parallel with the empirical research above, I design and teach curriculum that operationalizes the same structural equity principles. These are not separate from the research — they are the intervention side of the same question, and each is a potential research site.
+  </p>
+
+  <div class="card" style="border-left:3px solid var(--color-accent);">
+    <p class="card-label">Curriculum Design · Constructionism · Completed</p>
+    <p class="card-title">Build a Computer from Scratch: A 20-Week Cross-STEM Signature Project</p>
+    <p class="card-desc">
+      Teams of community college students build a working 8-bit breadboard computer from logic gates. Seven learning science frameworks. Explicit STEM bridges to physics, discrete math, linear algebra, differential equations, and chemistry. Three-track agency system. Portfolio assessment with student-proposed grades. Designed as both a curriculum and a future research site for studying the effects of physical computing on belonging, help-seeking, and persistence in introductory CS.
+    </p>
+    <p style="margin-top:var(--space-sm);font-size:0.88rem;">
+      <a href="../build-a-computer.html">Full project page →</a> ·
+      <a href="teaching.html">Teaching philosophy →</a>
+    </p>
+  </div>
+
+  <div class="card">
+    <p class="card-label">Platform Design · Next.js · Supabase · Completed</p>
+    <p class="card-title">ProjectBridge: A Project-Based Learning Platform for Community Colleges</p>
+    <p class="card-desc">
+      A campus-wide platform where students discover, join, lead, and document meaningful projects. Includes project directory, collaborator marketplace, build journals, milestone tracking, weekly check-ins, and faculty dashboards. Designed with first-generation community college students as the primary user. Built with Next.js 14, TypeScript, Tailwind CSS, Supabase (PostgreSQL + Row Level Security). Deployed on Vercel.
+    </p>
+    <p style="margin-top:var(--space-sm);font-size:0.88rem;">
+      <a href="tools.html">Platform details →</a>
+    </p>
+  </div>
+
+  <div class="card">
+    <p class="card-label">Curriculum Framework · 6 Courses · 12 Pages · Completed</p>
+    <p class="card-title">Teaching Computing Differently: A Six-Course CS Curriculum for Community Colleges</p>
+    <p class="card-desc">
+      A complete curriculum framework: CS 180 (AI), CS 185 (ML), CS 210 (Data Structures), CS 175 (How Things Work), Math 2B (Linear Algebra), ENGR 11 (MATLAB). All courses: no exams, no required textbooks, portfolio assessment, three-track system, equity as design. Grounded in Papert, Ko, Anderson, Freire, hooks, Knuth, Noble, and Benjamin. Open-access.
+    </p>
+    <p style="margin-top:var(--space-sm);font-size:0.88rem;">
+      <a href="../">Visit the curriculum site →</a> ·
+      <a href="teaching.html">Teaching philosophy →</a>
+    </p>
+  </div>
+</main>
+
+<footer class="site-footer" style="text-align:center;">
+  <p>© 2026 Henry Fan · SJSU McNair Scholar · Foothill College Science Learning Institute</p>
+  <p style="margin-top:0.25rem;"><a href="mailto:henry@henryfan.org" style="color:var(--color-text-muted);">henry@henryfan.org</a> · <a href="../" style="color:var(--color-text-muted);">← Curriculum Site</a></p>
+</footer>
+
+</body>
+</html>

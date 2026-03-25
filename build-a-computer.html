@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Build a Computer from Scratch — Teaching Computing Differently</title>
+<meta name="description" content="A 20-week hands-on project where community college students build a working 8-bit computer on breadboards — and encounter the physics, mathematics, and chemistry that make it possible. Grounded in learning science. Designed for cross-STEM transfer.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@300;400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0d0d0d;--paper:#f5f0e8;--cream:#ede8d8;--red:#c1121f;--orange:#e36414;--teal:#0a7c6e;--gold:#d4a017;--dim:#5a5a5a;--copper:#b87333;--phys:#2563eb;--math:#7c3aed;--chem:#059669;--diffeq:#dc2626;--linalg:#0891b2;}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
+body{background:var(--paper);color:var(--ink);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+.site-nav{position:sticky;top:0;z-index:100;background:var(--ink);border-bottom:1px solid rgba(255,255,255,.08);padding:0 60px;display:flex;align-items:center;justify-content:space-between;height:52px;}
+.nav-brand{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(245,240,232,.5);text-decoration:none;}.nav-brand strong{color:var(--red);font-weight:400;}
+.nav-links{display:flex;list-style:none;}.nav-links a{display:block;padding:0 18px;height:52px;line-height:52px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(245,240,232,.4);text-decoration:none;transition:color .15s;border-left:1px solid rgba(255,255,255,.05);}.nav-links a:hover{color:var(--paper);}
+.hero{background:var(--ink);color:var(--paper);border-bottom:5px solid var(--copper);overflow:hidden;}
+.hero-top{padding:12px 60px;border-bottom:1px solid rgba(255,255,255,.1);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;opacity:.5;display:flex;justify-content:space-between;}
+.hero-main{padding:72px 60px 64px;display:grid;grid-template-columns:1fr 420px;gap:80px;align-items:end;max-width:1300px;}
+.hero-kicker{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--copper);margin-bottom:20px;animation:fadeUp .5s ease .1s both;}
+.hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,7vw,96px);letter-spacing:.02em;line-height:.88;margin-bottom:28px;animation:fadeUp .6s ease .25s both;}.hero-title span{color:var(--copper);}
+.hero-desc{font-size:15px;line-height:1.9;color:rgba(245,240,232,.6);max-width:560px;font-weight:300;animation:fadeUp .6s ease .4s both;}
+.hero-pills{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px;animation:fadeUp .6s ease .55s both;}.pill{padding:5px 14px;border:1px solid rgba(255,255,255,.15);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(245,240,232,.5);}
+.hero-aside{border-left:1px solid rgba(255,255,255,.1);padding-left:60px;animation:fadeUp .7s ease .5s both;}
+.aside-label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(245,240,232,.3);margin-bottom:28px;}
+.aside-stat{margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid rgba(255,255,255,.06);}.aside-stat:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.aside-stat-num{font-family:'Bebas Neue',sans-serif;font-size:48px;line-height:1;color:var(--copper);}.aside-stat-label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(245,240,232,.35);margin-top:4px;}
+.s2{max-width:1300px;margin:0 auto;padding:80px 60px;display:grid;grid-template-columns:280px 1fr;gap:80px;align-items:start;}
+.sf{max-width:1300px;margin:0 auto;padding:80px 60px;}
+.sl{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--red);display:flex;align-items:flex-start;gap:10px;padding-top:4px;}.sl::before{content:'//';color:var(--ink);opacity:.25;}
+.si{font-size:15px;line-height:1.85;color:var(--dim);max-width:640px;}
+.bt{border-top:2px solid var(--ink);}.bb{border-bottom:2px solid var(--ink);}.bgc{background:var(--cream);}.bgd{background:var(--ink);color:var(--paper);}
+.ptext p{font-size:16px;line-height:1.9;color:var(--ink);margin-bottom:20px;}.ptext p:last-child{margin-bottom:0;}.ptext strong{font-weight:500;}.ptext em{font-family:'DM Serif Display',serif;font-style:italic;font-size:17px;}.ptext a{color:var(--copper);text-decoration:underline;text-decoration-color:rgba(184,115,51,.3);text-underline-offset:3px;}
+.dw{margin:40px 0;background:white;border:2px solid var(--ink);padding:32px;overflow-x:auto;}.dw svg{display:block;margin:0 auto;max-width:100%;height:auto;}.dc{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);text-align:center;margin-top:16px;}.dw-dark{background:var(--ink);border-color:rgba(255,255,255,.15);}.dw-dark .dc{color:rgba(245,240,232,.35);}
+.dtag{display:inline-block;padding:2px 7px;font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.1em;text-transform:uppercase;border-radius:2px;margin-right:4px;margin-top:4px;}
+.dtag-phys{background:rgba(37,99,235,.1);color:var(--phys);border:1px solid rgba(37,99,235,.25);}.dtag-math{background:rgba(124,58,237,.1);color:var(--math);border:1px solid rgba(124,58,237,.25);}.dtag-chem{background:rgba(5,150,105,.1);color:var(--chem);border:1px solid rgba(5,150,105,.25);}.dtag-diffeq{background:rgba(220,38,38,.08);color:var(--diffeq);border:1px solid rgba(220,38,38,.2);}.dtag-linalg{background:rgba(8,145,178,.1);color:var(--linalg);border:1px solid rgba(8,145,178,.25);}
+.mh{display:grid;grid-template-columns:280px 1fr;gap:80px;margin-bottom:56px;align-items:start;}
+.mg{display:grid;grid-template-columns:repeat(3,1fr);border:2px solid var(--ink);}.mc{padding:32px 32px 36px;border-right:2px solid var(--ink);border-bottom:2px solid var(--ink);}.mc:nth-child(3n){border-right:none;}.mc:nth-last-child(-n+3){border-bottom:none;}
+.mc-num{font-family:'Bebas Neue',sans-serif;font-size:52px;line-height:.85;color:var(--cream);margin-bottom:12px;}.mc-weeks{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--copper);margin-bottom:8px;}
+.mc-title{font-family:'DM Serif Display',serif;font-size:19px;font-style:italic;line-height:1.2;margin-bottom:8px;}.mc-body{font-size:12.5px;line-height:1.75;color:var(--dim);margin-bottom:12px;}
+.mc-builds{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.06em;color:var(--dim);opacity:.7;line-height:1.6;}.mc-builds strong{color:var(--ink);opacity:1;display:block;margin-bottom:2px;font-size:8px;letter-spacing:.15em;text-transform:uppercase;}
+.mc-bridge{margin-top:10px;padding:8px 10px;border-left:3px solid var(--phys);background:rgba(37,99,235,.03);font-size:11px;line-height:1.65;color:var(--ink);}
+.mc-bridge-label{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--phys);display:block;margin-bottom:3px;}
+.timeline{display:grid;grid-template-columns:72px 1fr;gap:0;margin-top:48px;}
+.wm{padding:24px 0;border-right:2px solid var(--cream);text-align:center;position:relative;}.wm::after{content:'';position:absolute;right:-6px;top:30px;width:10px;height:10px;border-radius:50%;background:var(--copper);border:2px solid var(--paper);}
+.wn{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--cream);}.ws{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);}
+.wc{padding:20px 0 20px 32px;border-bottom:1px solid var(--cream);}.wt{font-family:'DM Serif Display',serif;font-size:17px;font-style:italic;margin-bottom:6px;}.wd{font-size:13px;line-height:1.8;color:var(--dim);}
+.wbr{margin-top:6px;font-size:11px;line-height:1.6;color:var(--phys);padding:6px 8px;border-left:2px solid var(--phys);background:rgba(37,99,235,.02);}
+.wtag{display:inline-block;margin-top:8px;margin-right:6px;padding:2px 8px;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;border-radius:2px;}
+.t-b{background:rgba(184,115,51,.12);color:var(--copper);border:1px solid rgba(184,115,51,.3);}.t-i{background:rgba(10,124,110,.12);color:var(--teal);border:1px solid rgba(10,124,110,.3);}.t-r{background:rgba(193,18,31,.08);color:var(--red);border:1px solid rgba(193,18,31,.2);}.t-e{background:rgba(212,160,23,.1);color:#8a6500;border:1px solid rgba(212,160,23,.3);}
+.bridge-grid{display:grid;grid-template-columns:repeat(5,1fr);border:2px solid var(--ink);margin-top:48px;}.bridge-card{padding:24px 20px;border-right:2px solid var(--ink);}.bridge-card:last-child{border-right:none;}
+.bridge-subj{font-family:'Bebas Neue',sans-serif;font-size:26px;line-height:1;margin-bottom:4px;}.bridge-sub{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;}
+.bridge-list{font-size:11px;line-height:1.6;color:var(--dim);}.bridge-list div{padding:3px 0;border-bottom:1px solid var(--cream);}.bridge-list div:last-child{border-bottom:none;}.bridge-wk{font-family:'IBM Plex Mono',monospace;font-size:8px;color:var(--copper);margin-left:3px;}
+.cstrip{background:var(--copper);color:white;padding:56px 60px;display:grid;grid-template-columns:1fr 1fr;gap:48px;}.ccol h3{font-family:'DM Serif Display',serif;font-size:22px;font-style:italic;margin-bottom:14px;}.ccol p{font-size:13.5px;line-height:1.8;opacity:.85;}.ccol-label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;opacity:.6;margin-bottom:10px;}
+.tg{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid rgba(255,255,255,.1);margin-top:40px;}.tc{padding:36px 32px;border-right:1px solid rgba(255,255,255,.1);}.tc:last-of-type{border-right:none;}
+.tr{font-family:'Bebas Neue',sans-serif;font-size:48px;line-height:1;margin-bottom:12px;}.tr-i{color:rgba(255,255,255,.2);}.tr-ii{color:rgba(255,255,255,.5);}.tr-iii{color:var(--paper);}
+.tn{font-family:'DM Serif Display',serif;font-size:17px;font-style:italic;margin-bottom:10px;color:var(--paper);}.tb{font-size:13px;line-height:1.8;color:rgba(245,240,232,.45);}
+.te{margin-top:16px;display:flex;flex-direction:column;gap:6px;}.tex{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.06em;color:rgba(245,240,232,.3);padding:6px 10px;border-left:2px solid rgba(255,255,255,.1);}
+.ls-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0;border:2px solid var(--ink);margin-top:48px;}.ls-card{padding:32px 28px;border-right:2px solid var(--ink);border-bottom:2px solid var(--ink);}.ls-card:nth-child(2n){border-right:none;}.ls-card:nth-last-child(-n+2){border-bottom:none;}
+.ls-num{font-family:'Bebas Neue',sans-serif;font-size:48px;line-height:.85;color:var(--cream);margin-bottom:12px;}.ls-title{font-family:'DM Serif Display',serif;font-size:18px;font-style:italic;margin-bottom:3px;line-height:1.2;}.ls-src{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.06em;color:var(--copper);margin-bottom:10px;}
+.ls-body{font-size:12.5px;line-height:1.75;color:var(--dim);margin-bottom:12px;}
+.ls-in{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.04em;color:var(--ink);line-height:1.6;padding:8px 10px;border-left:3px solid var(--copper);background:rgba(184,115,51,.04);}.ls-in strong{display:block;font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:2px;}
+.ai{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:32px;}.ait{padding:28px 32px;border:1px solid var(--cream);background:rgba(0,0,0,.01);}
+.ai-pct{font-family:'Bebas Neue',sans-serif;font-size:44px;color:var(--copper);line-height:1;}.ai-name{font-family:'DM Serif Display',serif;font-size:16px;font-style:italic;margin:6px 0 8px;}.ai-desc{font-size:12px;line-height:1.7;color:var(--dim);}
+.qstrip{background:var(--ink);color:var(--paper);padding:56px 60px;border-top:5px solid var(--copper);}.qt{font-family:'DM Serif Display',serif;font-size:clamp(20px,2.4vw,30px);font-style:italic;line-height:1.4;max-width:900px;}.qs{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;opacity:.4;margin-top:16px;}
+footer{background:var(--ink);color:var(--paper);padding:40px 60px;display:flex;justify-content:space-between;align-items:center;border-top:3px solid var(--copper);}
+.fl{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;color:rgba(245,240,232,.35);line-height:2;}.fl a{color:rgba(245,240,232,.5);text-decoration:none;}.fl a:hover{color:var(--paper);}.fr{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.05em;color:rgba(245,240,232,.15);}
+.dedication{background:var(--ink);color:var(--paper);padding:20px 60px;border-bottom:3px solid var(--copper);display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:center;}
+.ded-badge{font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--copper);background:rgba(184,115,51,.12);border:1px solid rgba(184,115,51,.3);padding:6px 14px;white-space:nowrap;}
+.ded-text{font-size:13px;line-height:1.7;color:rgba(245,240,232,.6);}
+.ded-text strong{color:var(--paper);font-weight:500;}
+.ded-text a{color:var(--copper);text-decoration:underline;text-decoration-color:rgba(184,115,51,.3);text-underline-offset:2px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+@media(max-width:1100px){.hero-main,.s2,.mh{grid-template-columns:1fr;gap:28px;}.hero-aside{border-left:none;border-top:1px solid rgba(255,255,255,.08);padding-left:0;padding-top:32px;}}
+@media(max-width:1000px){.mg,.ls-grid{grid-template-columns:1fr;}.mc,.ls-card{border-right:none!important;border-bottom:2px solid var(--ink);}.mc:last-child,.ls-card:last-child{border-bottom:none;}.tg,.bridge-grid{grid-template-columns:1fr;}.tc,.bridge-card{border-right:none!important;border-bottom:2px solid var(--ink);}.bridge-card:last-child{border-bottom:none;}.cstrip,.ai{grid-template-columns:1fr;}.site-nav,.hero-top,.hero-main,.s2,.sf,.qstrip,.cstrip,.dedication{padding-left:28px;padding-right:28px;}.dedication{grid-template-columns:1fr;gap:12px;}footer{flex-direction:column;gap:16px;text-align:center;padding:28px;}.nav-links{display:none;}.timeline{grid-template-columns:56px 1fr;}}
+</style>
+</head>
+<body>
+
+<nav class="site-nav"><a class="nav-brand" href="index.html">Teaching <strong>Computing</strong> Differently</a><ul class="nav-links"><li><a href="index.html">Home</a></li><li><a href="#premise">Why</a></li><li><a href="#bridges">STEM Bridges</a></li><li><a href="#theory">Learning Science</a></li><li><a href="#modules">Modules</a></li><li><a href="#schedule">Schedule</a></li><li><a href="#tracks">Tracks</a></li><li><a href="#assessment">Assessment</a></li></ul></nav>
+
+<header class="hero">
+<div class="dedication">
+<div class="ded-badge">Mentorship &amp; Influence</div>
+<div class="ded-text">This curriculum is built on the pedagogical foundation of <strong>Jeff Anderson</strong>, Mathematics &amp; Engineering Instructor at <a href="https://foothill.edu/directory/profile/anderson_jeff.html">Foothill College</a>. Jeff&rsquo;s work in antiracist learning science, ungrading, strategic deep learning, and his conviction that every decision in a classroom should map back to research in cognitive science and the science of expertise &mdash; these principles are the invisible architecture of everything on this page. His five research-based, learner-centered objectives, his flipped classroom model, and his belief that the top 100% of learners deserve the best teaching in the world have shaped how I think about curriculum, assessment, and what it means to serve community college students. &mdash; <strong>Henry Fan</strong></div>
+</div>
+<div class="hero-top"><span>Community College CS</span><span>Signature Project</span><span>20 Weeks &middot; Cross-STEM &middot; Collaborative</span></div>
+<div class="hero-main">
+<div>
+<div class="hero-kicker">Signature Project &mdash; How Things Work</div>
+<div class="hero-title">Build a<br><span>Computer</span><br>from Scratch.</div>
+<p class="hero-desc">A 20-week project where teams of community college students build a working, programmable 8-bit computer on breadboards from logic gates. Along the way, they encounter the physics, mathematics, linear algebra, differential equations, and chemistry that make it possible &mdash; not as separate subjects, but as the living foundation of the machine in front of them.</p>
+<div class="hero-pills"><span class="pill">No Prior Electronics</span><span class="pill">Team-Built</span><span class="pill">Ben Eater Inspired</span><span class="pill">Cross-STEM Transfer</span><span class="pill">Portfolio Exhibition</span></div>
+</div>
+<div class="hero-aside">
+<div class="aside-label">Project at a Glance</div>
+<div class="aside-stat"><div class="aside-stat-num">20</div><div class="aside-stat-label">Weeks &middot; One Full Semester</div></div>
+<div class="aside-stat"><div class="aside-stat-num">7</div><div class="aside-stat-label">Modules Built by Student Teams</div></div>
+<div class="aside-stat"><div class="aside-stat-num">5</div><div class="aside-stat-label">STEM Disciplines Bridged</div></div>
+<div class="aside-stat"><div class="aside-stat-num">~$65</div><div class="aside-stat-label">Per Student Kit Cost</div></div>
+<div class="aside-stat"><div class="aside-stat-num">1</div><div class="aside-stat-label">Working Computer at Semester End</div></div>
+</div></div></header>
+
+<section id="premise" class="bgc bb"><div class="s2"><div class="sl">The Premise</div><div class="ptext">
+<p>Every student uses a computer. Almost none understand how one works. Not at the level of &ldquo;it has a processor and memory&rdquo; &mdash; but at the level of <em>why does flipping a switch produce a number.</em> This gap is not a failure of student preparation. It is a failure of curriculum design. We teach computing through abstraction first, then wonder why students can&rsquo;t connect the abstraction to anything real.</p>
+<p>A computer is not a CS artifact. It is a <strong>STEM artifact.</strong> The clock module is an RC circuit &mdash; physics and differential equations. The ALU performs binary arithmetic &mdash; discrete mathematics. The control logic is a truth table realized in hardware &mdash; Boolean algebra and linear algebra. The semiconductors inside every chip are doped silicon &mdash; chemistry. When students build a computer from scratch, they don&rsquo;t just learn CS. They encounter the foundations of every STEM course on their transcript, and they encounter them as <em>necessary</em>, not abstract. Jeff Anderson calls this &ldquo;making math useful the moment it is introduced.&rdquo; This project extends that principle across five disciplines simultaneously.</p>
+<p>The structural principle is Perkins and Salomon&rsquo;s transfer research: <strong>transfer does not happen automatically.</strong> It requires deliberate, explicit bridging &mdash; what Perkins and Salomon call &ldquo;high road transfer.&rdquo; Every module includes a &ldquo;STEM Bridge Moment&rdquo; where the instructor pauses the build to name the connection: &ldquo;The equation governing this capacitor is the same first-order ODE you&rsquo;ll solve in Math 1D. The truth table you just built for the control logic is a matrix operation you&rsquo;ll formalize in Math 2B.&rdquo; Without this bridging, students build a computer and learn CS. With it, they build a map of STEM &mdash; and they arrive in their next math, physics, or chemistry course having already touched the ideas with their hands.</p>
+<p>The assessment philosophy follows Anderson&rsquo;s ungrading framework: <strong>timed exams don&rsquo;t reveal anything meaningful about learning.</strong> They measure anxiety management and test-taking strategy, not understanding. In this project, students build a learning portfolio, write structured self-reflections, and propose their own grade with evidence. The computer itself &mdash; working or not &mdash; is the most honest assessment instrument there is. It either adds correctly or it doesn&rsquo;t. No partial credit. No curve. Just voltage.</p>
+</div></div></section>
+
+<!-- STEM BRIDGE MAP -->
+<section id="bridges" class="bb"><div class="sf">
+<div class="mh"><div class="sl">Cross-STEM Bridge Map</div><p class="si">A computer is a convergence point for five STEM disciplines. This project makes every connection explicit &mdash; giving students a head start in every course they take next. Anderson&rsquo;s principle: math should be &ldquo;useful the moment it is introduced.&rdquo; Perkins and Salomon&rsquo;s principle: transfer requires the instructor to name the bridge out loud. The map below shows every connection students encounter, and the bridge cards show the specific week each concept appears.</p></div>
+<div class="dw">
+<svg viewBox="0 0 860 480" xmlns="http://www.w3.org/2000/svg" style="font-family:'DM Sans',sans-serif;">
+<rect x="310" y="180" width="240" height="120" rx="6" fill="#0d0d0d"/>
+<text x="430" y="222" text-anchor="middle" fill="#b87333" font-size="10" font-family="'IBM Plex Mono',monospace" letter-spacing="2">THE PROJECT</text>
+<text x="430" y="250" text-anchor="middle" fill="#f5f0e8" font-size="18" font-family="'Bebas Neue',sans-serif" letter-spacing="1">8-BIT BREADBOARD</text>
+<text x="430" y="274" text-anchor="middle" fill="#f5f0e8" font-size="18" font-family="'Bebas Neue',sans-serif" letter-spacing="1">COMPUTER</text>
+<rect x="30" y="20" width="220" height="130" rx="6" fill="none" stroke="#2563eb" stroke-width="2"/>
+<text x="140" y="50" text-anchor="middle" fill="#2563eb" font-size="13" font-family="'Bebas Neue',sans-serif" letter-spacing="1">PHYSICS</text>
+<text x="140" y="70" text-anchor="middle" fill="#5a5a5a" font-size="10">V = IR &middot; Ohm&rsquo;s Law</text>
+<text x="140" y="86" text-anchor="middle" fill="#5a5a5a" font-size="10">RC circuit time constants</text>
+<text x="140" y="102" text-anchor="middle" fill="#5a5a5a" font-size="10">Signal propagation speed</text>
+<text x="140" y="118" text-anchor="middle" fill="#5a5a5a" font-size="10">Energy &amp; power dissipation</text>
+<text x="140" y="134" text-anchor="middle" fill="#5a5a5a" font-size="10">Electromagnetic interference</text>
+<line x1="250" y1="130" x2="320" y2="195" stroke="#2563eb" stroke-width="1.5" opacity=".4"/>
+<rect x="610" y="20" width="220" height="130" rx="6" fill="none" stroke="#7c3aed" stroke-width="2"/>
+<text x="720" y="50" text-anchor="middle" fill="#7c3aed" font-size="13" font-family="'Bebas Neue',sans-serif" letter-spacing="1">DISCRETE MATH</text>
+<text x="720" y="70" text-anchor="middle" fill="#5a5a5a" font-size="10">Binary &amp; hex number systems</text>
+<text x="720" y="86" text-anchor="middle" fill="#5a5a5a" font-size="10">Boolean algebra</text>
+<text x="720" y="102" text-anchor="middle" fill="#5a5a5a" font-size="10">Two&rsquo;s complement</text>
+<text x="720" y="118" text-anchor="middle" fill="#5a5a5a" font-size="10">Truth tables &amp; logic proofs</text>
+<text x="720" y="134" text-anchor="middle" fill="#5a5a5a" font-size="10">Combinatorics (instruction sets)</text>
+<line x1="610" y1="130" x2="540" y2="195" stroke="#7c3aed" stroke-width="1.5" opacity=".4"/>
+<rect x="10" y="220" width="220" height="110" rx="6" fill="none" stroke="#0891b2" stroke-width="2"/>
+<text x="120" y="248" text-anchor="middle" fill="#0891b2" font-size="13" font-family="'Bebas Neue',sans-serif" letter-spacing="1">LINEAR ALGEBRA</text>
+<text x="120" y="268" text-anchor="middle" fill="#5a5a5a" font-size="10">Registers as state vectors</text>
+<text x="120" y="284" text-anchor="middle" fill="#5a5a5a" font-size="10">Control matrix transformations</text>
+<text x="120" y="300" text-anchor="middle" fill="#5a5a5a" font-size="10">ALU as linear operation</text>
+<text x="120" y="316" text-anchor="middle" fill="#5a5a5a" font-size="10">Binary encoding as basis vectors</text>
+<line x1="230" y1="270" x2="310" y2="250" stroke="#0891b2" stroke-width="1.5" opacity=".4"/>
+<rect x="80" y="375" width="220" height="95" rx="6" fill="none" stroke="#dc2626" stroke-width="2"/>
+<text x="190" y="400" text-anchor="middle" fill="#dc2626" font-size="13" font-family="'Bebas Neue',sans-serif" letter-spacing="1">DIFFERENTIAL EQUATIONS</text>
+<text x="190" y="420" text-anchor="middle" fill="#5a5a5a" font-size="10">RC charging: V(t) = V&#8320;(1 &#8722; e&#8315;&#7511;&#8725;&#7488;&#7580;)</text>
+<text x="190" y="436" text-anchor="middle" fill="#5a5a5a" font-size="10">555 timer oscillation period</text>
+<text x="190" y="452" text-anchor="middle" fill="#5a5a5a" font-size="10">Recurrence relations (Fibonacci)</text>
+<line x1="270" y1="385" x2="370" y2="300" stroke="#dc2626" stroke-width="1.5" opacity=".4"/>
+<rect x="560" y="375" width="220" height="95" rx="6" fill="none" stroke="#059669" stroke-width="2"/>
+<text x="670" y="400" text-anchor="middle" fill="#059669" font-size="13" font-family="'Bebas Neue',sans-serif" letter-spacing="1">CHEMISTRY</text>
+<text x="670" y="420" text-anchor="middle" fill="#5a5a5a" font-size="10">Silicon semiconductors &amp; doping</text>
+<text x="670" y="436" text-anchor="middle" fill="#5a5a5a" font-size="10">PN junctions in every transistor</text>
+<text x="670" y="452" text-anchor="middle" fill="#5a5a5a" font-size="10">Electron flow vs. convention</text>
+<line x1="590" y1="385" x2="490" y2="300" stroke="#059669" stroke-width="1.5" opacity=".4"/>
+<text x="430" y="475" text-anchor="middle" fill="#5a5a5a" font-size="10" font-family="'IBM Plex Mono',monospace" letter-spacing="1">One project &middot; Five disciplines &middot; Every connection made explicit</text>
+</svg>
+<div class="dc">Cross-STEM Bridge Map &mdash; The computer as a convergence point for five STEM disciplines</div>
+</div>
+
+<!-- BRIDGE CARDS -->
+<div class="bridge-grid">
+<div class="bridge-card"><div class="bridge-subj" style="color:var(--phys);">Physics</div><div class="bridge-sub" style="color:var(--phys);">Concepts encountered</div><div class="bridge-list"><div>Ohm&rsquo;s Law sizing every resistor <span class="bridge-wk">Wk 1</span></div><div>Current limiting for LEDs <span class="bridge-wk">Wk 1</span></div><div>RC time constants in 555 timer <span class="bridge-wk">Wk 4</span></div><div>Signal propagation delay <span class="bridge-wk">Wk 6</span></div><div>Power dissipation &amp; heat <span class="bridge-wk">Wk 14</span></div><div>Electromagnetic interference <span class="bridge-wk">Wk 16</span></div></div></div>
+<div class="bridge-card"><div class="bridge-subj" style="color:var(--math);">Math</div><div class="bridge-sub" style="color:var(--math);">Concepts encountered</div><div class="bridge-list"><div>Binary &amp; hex number systems <span class="bridge-wk">Wk 3</span></div><div>Boolean algebra &amp; truth tables <span class="bridge-wk">Wk 2</span></div><div>Two&rsquo;s complement <span class="bridge-wk">Wk 7</span></div><div>Modular arithmetic (overflow) <span class="bridge-wk">Wk 8</span></div><div>Combinatorics (4 bits = 16 opcodes) <span class="bridge-wk">Wk 13</span></div><div>Functions &amp; composition <span class="bridge-wk">Wk 17</span></div></div></div>
+<div class="bridge-card"><div class="bridge-subj" style="color:var(--linalg);">Linear Alg</div><div class="bridge-sub" style="color:var(--linalg);">Concepts encountered</div><div class="bridge-list"><div>Registers as 8-D binary vectors <span class="bridge-wk">Wk 5</span></div><div>Control matrix: state &rarr; signals <span class="bridge-wk">Wk 13</span></div><div>ALU as linear transformation <span class="bridge-wk">Wk 7</span></div><div>Binary encoding as basis <span class="bridge-wk">Wk 3</span></div><div>State transitions as matrices <span class="bridge-wk">Wk 14</span></div></div></div>
+<div class="bridge-card"><div class="bridge-subj" style="color:var(--diffeq);">Diff Eq</div><div class="bridge-sub" style="color:var(--diffeq);">Concepts encountered</div><div class="bridge-list"><div>Capacitor charge curve <span class="bridge-wk">Wk 4</span></div><div>555 period: T = ln(2)&middot;RC <span class="bridge-wk">Wk 4</span></div><div>Rise/fall time of signals <span class="bridge-wk">Wk 6</span></div><div>Damped oscillation (debounce) <span class="bridge-wk">Wk 4</span></div><div>Recurrence relations <span class="bridge-wk">Wk 15</span></div></div></div>
+<div class="bridge-card"><div class="bridge-subj" style="color:var(--chem);">Chemistry</div><div class="bridge-sub" style="color:var(--chem);">Concepts encountered</div><div class="bridge-list"><div>Silicon crystal structure <span class="bridge-wk">Wk 2</span></div><div>N-type &amp; P-type doping <span class="bridge-wk">Wk 2</span></div><div>PN junctions (every transistor) <span class="bridge-wk">Wk 2</span></div><div>Electron sea model (copper) <span class="bridge-wk">Wk 1</span></div><div>Oxidation in chip packaging <span class="bridge-wk">Wk 10</span></div></div></div>
+</div>
+</div></section>
+
+<!-- COMPARISON -->
+<div class="cstrip">
+<div class="ccol"><div class="ccol-label">Ben Eater&rsquo;s Approach</div><h3>Brilliant &mdash; But Siloed</h3><p>One person teaching CS to a camera. No connections to physics, math, or chemistry made explicit. No scaffolding for beginners. No collaboration. No structured reflection. No assessment of understanding. No metacognitive prompts. The most extraordinary CS education content ever produced &mdash; and structurally a solo, single-discipline experience that cannot reach the students who need it most.</p></div>
+<div class="ccol"><div class="ccol-label">This Project&rsquo;s Approach</div><h3>Cross-STEM, Learner-Centered, Antiracist by Design</h3><p>Every module includes an explicit STEM Bridge Moment. Assessment is portfolio-based and ungraded &mdash; students propose their own grade with evidence. Reflection is structured around Kolb&rsquo;s cycle. The track system honors student agency. The 555 timer IS the RC circuit from physics. The truth table IS Boolean algebra. The chip IS a chemistry artifact. Students leave with momentum for five courses, not one &mdash; and they leave knowing they built something real, not that they survived a test.</p></div>
+</div>
+
+<!-- LEARNING SCIENCE -->
+<section id="theory" class="bb"><div class="sf">
+<div class="mh"><div class="sl">Learning Science Foundations</div><p class="si">Jeff Anderson writes: &ldquo;I work tirelessly to map every decision I make in my classroom back to research results in cognitive science, the psychology of learning, the science of expertise, and the scholarship of anti-racism and anti-oppression.&rdquo; That standard governs this project. Seven bodies of research ground every structural decision. The seventh &mdash; Transfer Theory &mdash; is the foundation for the entire cross-STEM design.</p></div>
+<div class="dw">
+<svg viewBox="0 0 820 300" xmlns="http://www.w3.org/2000/svg" style="font-family:'DM Sans',sans-serif;">
+<defs><marker id="aC" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#b87333"/></marker></defs>
+<rect x="20" y="70" width="170" height="150" rx="6" fill="#b87333"/>
+<text x="105" y="104" text-anchor="middle" fill="rgba(255,255,255,.5)" font-size="9" font-family="'IBM Plex Mono',monospace" letter-spacing="1.5">KOLB PHASE 1</text>
+<text x="105" y="130" text-anchor="middle" fill="#fff" font-size="14" font-weight="500">Concrete</text>
+<text x="105" y="150" text-anchor="middle" fill="#fff" font-size="14" font-weight="500">Experience</text>
+<text x="105" y="185" text-anchor="middle" fill="rgba(255,255,255,.7)" font-size="10" font-family="'IBM Plex Mono',monospace">Wire the circuit.</text>
+<text x="105" y="201" text-anchor="middle" fill="rgba(255,255,255,.7)" font-size="10" font-family="'IBM Plex Mono',monospace">Watch it fail.</text>
+<line x1="200" y1="135" x2="230" y2="135" stroke="#b87333" stroke-width="2" marker-end="url(#aC)"/>
+<rect x="230" y="70" width="170" height="150" rx="6" fill="none" stroke="#b87333" stroke-width="2"/>
+<text x="315" y="104" text-anchor="middle" fill="#b87333" font-size="9" font-family="'IBM Plex Mono',monospace" letter-spacing="1.5">KOLB PHASE 2</text>
+<text x="315" y="130" text-anchor="middle" fill="#0d0d0d" font-size="14" font-weight="500">Reflective</text>
+<text x="315" y="150" text-anchor="middle" fill="#0d0d0d" font-size="14" font-weight="500">Observation</text>
+<text x="315" y="185" text-anchor="middle" fill="#5a5a5a" font-size="10" font-family="'IBM Plex Mono',monospace">Build journal entry.</text>
+<text x="315" y="201" text-anchor="middle" fill="#2563eb" font-size="10" font-family="'IBM Plex Mono',monospace" font-weight="500">Name the STEM bridge.</text>
+<line x1="410" y1="135" x2="440" y2="135" stroke="#b87333" stroke-width="2" marker-end="url(#aC)"/>
+<rect x="440" y="70" width="170" height="150" rx="6" fill="none" stroke="#b87333" stroke-width="2"/>
+<text x="525" y="104" text-anchor="middle" fill="#b87333" font-size="9" font-family="'IBM Plex Mono',monospace" letter-spacing="1.5">KOLB PHASE 3</text>
+<text x="525" y="130" text-anchor="middle" fill="#0d0d0d" font-size="14" font-weight="500">Abstract</text>
+<text x="525" y="150" text-anchor="middle" fill="#0d0d0d" font-size="14" font-weight="500">Conceptualization</text>
+<text x="525" y="185" text-anchor="middle" fill="#5a5a5a" font-size="10" font-family="'IBM Plex Mono',monospace">Read the datasheet.</text>
+<text x="525" y="201" text-anchor="middle" fill="#5a5a5a" font-size="10" font-family="'IBM Plex Mono',monospace">Connect to the equation.</text>
+<line x1="620" y1="135" x2="650" y2="135" stroke="#b87333" stroke-width="2" marker-end="url(#aC)"/>
+<rect x="650" y="70" width="150" height="150" rx="6" fill="none" stroke="#b87333" stroke-width="2"/>
+<text x="725" y="104" text-anchor="middle" fill="#b87333" font-size="9" font-family="'IBM Plex Mono',monospace" letter-spacing="1.5">KOLB PHASE 4</text>
+<text x="725" y="130" text-anchor="middle" fill="#0d0d0d" font-size="14" font-weight="500">Active</text>
+<text x="725" y="150" text-anchor="middle" fill="#0d0d0d" font-size="14" font-weight="500">Experimentation</text>
+<text x="725" y="185" text-anchor="middle" fill="#5a5a5a" font-size="10" font-family="'IBM Plex Mono',monospace">Fix the bug. Change</text>
+<text x="725" y="201" text-anchor="middle" fill="#5a5a5a" font-size="10" font-family="'IBM Plex Mono',monospace">a variable. Predict.</text>
+<path d="M725,230 L725,268 L105,268 L105,230" fill="none" stroke="#b87333" stroke-width="1.5" stroke-dasharray="5,4"/>
+<polygon points="105,230 100,240 110,240" fill="#b87333"/>
+<text x="415" y="290" text-anchor="middle" fill="#5a5a5a" font-size="10" font-family="'IBM Plex Mono',monospace">Phase 2 now includes naming the STEM bridge &mdash; forward-reaching high road transfer</text>
+</svg>
+<div class="dc">Kolb&rsquo;s Experiential Learning Cycle &mdash; With Cross-STEM Bridging in Phase 2</div>
+</div>
+<div class="ls-grid">
+<div class="ls-card"><div class="ls-num">01</div><div class="ls-title">Constructionism</div><div class="ls-src">Papert (1980) &middot; Harel (1991)</div><p class="ls-body">Students learn most deeply when they build a public, shareable artifact. The construction is simultaneously external (the computer) and internal (the understanding).</p><div class="ls-in"><strong>In This Project</strong>Every module is tangible. The final computer is exhibited publicly. The construction is the assessment.</div></div>
+<div class="ls-card"><div class="ls-num">02</div><div class="ls-title">Embodied Cognition</div><div class="ls-src">Wilson (2002) &middot; Barsalou (2008)</div><p class="ls-body">The body is part of cognition. Physical manipulation produces deeper understanding than symbolic manipulation alone. Wiring circuits forms sensorimotor representations no simulation replicates.</p><div class="ls-in"><strong>In This Project</strong>Real breadboards, chips, wires. Weeks 1&ndash;3 use no ICs &mdash; just batteries, switches, LEDs, transistors.</div></div>
+<div class="ls-card"><div class="ls-num">03</div><div class="ls-title">Intellectual Need</div><div class="ls-src">Harel (2013) &middot; DNR Framework</div><p class="ls-body">New tools are meaningful only when they resolve a genuine need. A register appears as the answer to &ldquo;how do we hold a number still while the ALU works?&rdquo; &mdash; not as a vocabulary word.</p><div class="ls-in"><strong>In This Project</strong>Every module introduced through the problem it solves. Derive before compute.</div></div>
+<div class="ls-card"><div class="ls-num">04</div><div class="ls-title">Productive Failure</div><div class="ls-src">Kapur (2008, 2016)</div><p class="ls-body">Struggling before instruction produces deeper understanding and better transfer. Integration sessions are designed to fail first &mdash; the debugging IS the learning.</p><div class="ls-in"><strong>In This Project</strong>Integration sessions fail. The debugging process &mdash; tracing signals, finding floating pins &mdash; teaches more than the build.</div></div>
+<div class="ls-card"><div class="ls-num">05</div><div class="ls-title">Legitimate Peripheral Participation</div><div class="ls-src">Lave &amp; Wenger (1991)</div><p class="ls-body">Learning is becoming a participant in a community of practice. Students do real engineering work, at a novice level, from Week 1. No distinction between learning and doing.</p><div class="ls-in"><strong>In This Project</strong>Teams function as communities of practice. The exhibition makes participation public and legitimate.</div></div>
+<div class="ls-card"><div class="ls-num">06</div><div class="ls-title">Self-Determination Theory</div><div class="ls-src">Deci &amp; Ryan (1985, 2000)</div><p class="ls-body">Intrinsic motivation requires autonomy (track choice), competence (scaffolded progression), and relatedness (team structure and exhibition). All three are structurally guaranteed.</p><div class="ls-in"><strong>In This Project</strong>Tracks provide autonomy. Scaffolding provides competence. Teams and exhibition provide relatedness.</div></div>
+<div class="ls-card" style="grid-column:1/-1;border-bottom:none;background:rgba(37,99,235,.02);"><div class="ls-num" style="color:var(--phys);">07</div><div class="ls-title">Transfer Theory &mdash; The Cross-STEM Foundation</div><div class="ls-src">Perkins &amp; Salomon (1988, 1992) &middot; High Road / Low Road Transfer</div><p class="ls-body">Transfer does not happen automatically. &ldquo;High road&rdquo; transfer &mdash; the kind that lets a student recognize the RC circuit from their breadboard in a differential equations textbook &mdash; requires <strong>explicit bridging:</strong> the instructor names the connection, abstracts the principle, and prompts the student to look for it in future contexts. Without deliberate bridging, students build a computer and learn CS. With it, they build a map of STEM. This is the theoretical foundation for every STEM Bridge Moment in this project.</p><div class="ls-in"><strong>In This Project</strong>Every module includes a structured STEM Bridge Moment. The build journal asks &ldquo;What other course does this connect to?&rdquo; each week. Track II students solve a related problem from the connected discipline. Track III students formalize the connection mathematically. Forward-reaching high road transfer by design.</div></div>
+</div>
+</div></section>
+
+<!-- SCAFFOLDING -->
+<section class="bgd"><div class="sf">
+<div class="dw dw-dark">
+<svg viewBox="0 0 820 240" xmlns="http://www.w3.org/2000/svg" style="font-family:'DM Sans',sans-serif;">
+<rect x="20" y="170" width="140" height="44" rx="3" fill="#b87333"/>
+<text x="90" y="196" text-anchor="middle" fill="#fff" font-size="11" font-weight="500">LED + Switch</text>
+<text x="90" y="162" text-anchor="middle" fill="rgba(245,240,232,.3)" font-size="9" font-family="'IBM Plex Mono',monospace">WK 1</text>
+<text x="90" y="226" text-anchor="middle" fill="rgba(245,240,232,.2)" font-size="8" font-family="'IBM Plex Mono',monospace">PHYSICS: V=IR</text>
+<rect x="170" y="136" width="140" height="78" rx="3" fill="#b87333" opacity=".85"/>
+<text x="240" y="168" text-anchor="middle" fill="#fff" font-size="11" font-weight="500">Transistor Gates</text>
+<text x="240" y="186" text-anchor="middle" fill="rgba(255,255,255,.6)" font-size="9" font-family="'IBM Plex Mono',monospace">AND, OR, NOT</text>
+<text x="240" y="128" text-anchor="middle" fill="rgba(245,240,232,.3)" font-size="9" font-family="'IBM Plex Mono',monospace">WK 2</text>
+<text x="240" y="226" text-anchor="middle" fill="rgba(245,240,232,.2)" font-size="8" font-family="'IBM Plex Mono',monospace">CHEM: SEMICONDUCTORS</text>
+<rect x="320" y="102" width="140" height="112" rx="3" fill="#b87333" opacity=".7"/>
+<text x="390" y="134" text-anchor="middle" fill="#fff" font-size="11" font-weight="500">Half-Adder</text>
+<text x="390" y="152" text-anchor="middle" fill="rgba(255,255,255,.6)" font-size="9" font-family="'IBM Plex Mono',monospace">Binary Arithmetic</text>
+<text x="390" y="94" text-anchor="middle" fill="rgba(245,240,232,.3)" font-size="9" font-family="'IBM Plex Mono',monospace">WK 3</text>
+<text x="390" y="226" text-anchor="middle" fill="rgba(245,240,232,.2)" font-size="8" font-family="'IBM Plex Mono',monospace">MATH: BOOLEAN ALGEBRA</text>
+<rect x="470" y="68" width="140" height="146" rx="3" fill="#b87333" opacity=".55"/>
+<text x="540" y="100" text-anchor="middle" fill="#fff" font-size="11" font-weight="500">IC Modules</text>
+<text x="540" y="118" text-anchor="middle" fill="rgba(255,255,255,.6)" font-size="9" font-family="'IBM Plex Mono',monospace">74LS Series</text>
+<text x="540" y="60" text-anchor="middle" fill="rgba(245,240,232,.3)" font-size="9" font-family="'IBM Plex Mono',monospace">WK 4-16</text>
+<text x="540" y="226" text-anchor="middle" fill="rgba(245,240,232,.2)" font-size="8" font-family="'IBM Plex Mono',monospace">DIFFEQ: RC CIRCUITS</text>
+<rect x="620" y="34" width="180" height="180" rx="3" fill="#b87333" opacity=".4"/>
+<text x="710" y="70" text-anchor="middle" fill="#fff" font-size="11" font-weight="500">Complete Computer</text>
+<text x="710" y="88" text-anchor="middle" fill="rgba(255,255,255,.6)" font-size="9" font-family="'IBM Plex Mono',monospace">Integration + Software</text>
+<text x="710" y="26" text-anchor="middle" fill="rgba(245,240,232,.3)" font-size="9" font-family="'IBM Plex Mono',monospace">WK 17-20</text>
+<text x="710" y="226" text-anchor="middle" fill="rgba(245,240,232,.2)" font-size="8" font-family="'IBM Plex Mono',monospace">LINALG: STATE MATRICES</text>
+</svg>
+<div class="dc" style="color:rgba(245,240,232,.35);">Scaffolding Progression &mdash; Each level introduces a new STEM discipline alongside the CS concept</div>
+</div>
+</div></section>
+
+<!-- MODULES -->
+<section id="modules" class="bb"><div class="sf">
+<div class="mh"><div class="sl">Seven Modules</div><p class="si">Each module is assigned to a team of 2&ndash;3 students. Inspired by Jeff Anderson&rsquo;s choose-your-own-adventure approach to curriculum: students are not told &ldquo;this math works, trust me.&rdquo; They are asked &ldquo;tell me how well this works and why.&rdquo; Every module card shows what students build, the learning science principle in play, and the explicit STEM Bridge &mdash; the cross-disciplinary connection the instructor names during the build, using the exact language a student will hear again in their next STEM course.</p></div>
+<div class="mg">
+<div class="mc"><div class="mc-num">01</div><div class="mc-weeks">Weeks 4-6</div><div class="mc-title">Clock Module</div><p class="mc-body">A 555 timer producing a square wave. Students see that clock frequency is governed by a capacitor charging through a resistor &mdash; a physical process, not a setting.</p><div class="mc-builds"><strong>Students Build</strong>Astable 555 timer &middot; Bistable manual clock &middot; Clock selector &middot; LED indicator</div><div class="mc-bridge"><span class="mc-bridge-label">STEM Bridge</span>&ldquo;The frequency is f = 1/(ln2 &middot; R &middot; C). That&rsquo;s a first-order ODE solved for steady-state. You&rsquo;ll solve this same equation in Diff Eq.&rdquo; <span class="dtag dtag-phys">Physics</span><span class="dtag dtag-diffeq">Diff Eq</span></div></div>
+<div class="mc"><div class="mc-num">02</div><div class="mc-weeks">Weeks 6-8</div><div class="mc-title">Registers &amp; Bus</div><p class="mc-body">Two 8-bit registers connected to a shared bus. A register holds a value as a pattern of high/low voltages &mdash; an 8-dimensional binary vector.</p><div class="mc-builds"><strong>Students Build</strong>A Register &middot; B Register &middot; 8-bit bus &middot; Tri-state buffers</div><div class="mc-bridge"><span class="mc-bridge-label">STEM Bridge</span>&ldquo;This register holds [0,1,0,0,0,1,1,0]. That&rsquo;s a vector in an 8-dimensional binary space. In Linear Algebra, you&rsquo;ll call this a vector in F&#8322;&#8312;.&rdquo; <span class="dtag dtag-linalg">Linear Algebra</span></div></div>
+<div class="mc"><div class="mc-num">03</div><div class="mc-weeks">Weeks 8-10</div><div class="mc-title">ALU</div><p class="mc-body">Two 74LS283 adders and XOR gates for two&rsquo;s complement subtraction. Binary addition becomes physical reality on LEDs.</p><div class="mc-builds"><strong>Students Build</strong>8-bit adder &middot; Subtraction via XOR &middot; Carry/zero flags &middot; LED output</div><div class="mc-bridge"><span class="mc-bridge-label">STEM Bridge</span>&ldquo;Two&rsquo;s complement is modular arithmetic: -1 = 255 (mod 256). In Number Theory you&rsquo;ll formalize this. The ALU is a function f: F&#8322;&#8312; &times; F&#8322;&#8312; &rarr; F&#8322;&#8312;.&rdquo; <span class="dtag dtag-math">Math</span><span class="dtag dtag-linalg">Linear Algebra</span></div></div>
+<div class="mc"><div class="mc-num">04</div><div class="mc-weeks">Weeks 10-12</div><div class="mc-title">RAM &amp; Program Counter</div><p class="mc-body">16 bytes of memory. The stored program concept becomes physical: behavior is voltage patterns in memory, not wiring.</p><div class="mc-builds"><strong>Students Build</strong>16&times;8 RAM &middot; 4-bit counter &middot; Address register &middot; Run/program switch</div><div class="mc-bridge"><span class="mc-bridge-label">STEM Bridge</span>&ldquo;Addressing 16 locations with 4 bits: log&#8322;(16) = 4. Logarithms from math govern hardware. RAM stores charge on capacitors &mdash; electrostatics from physics.&rdquo; <span class="dtag dtag-math">Math</span><span class="dtag dtag-phys">Physics</span></div></div>
+<div class="mc"><div class="mc-num">05</div><div class="mc-weeks">Weeks 12-14</div><div class="mc-title">Output &amp; Display</div><p class="mc-body">EEPROM lookup table drives 7-segment displays. Students program the EEPROM with an Arduino &mdash; first code on hardware they built.</p><div class="mc-builds"><strong>Students Build</strong>Output register &middot; EEPROM display &middot; Signed/unsigned mode &middot; Arduino programmer</div><div class="mc-bridge"><span class="mc-bridge-label">STEM Bridge</span>&ldquo;The EEPROM is a mathematical function: f: {0..255} &rarr; {segment patterns}. A mapping from one finite set to another. You&rsquo;ll formalize this in Discrete Math.&rdquo; <span class="dtag dtag-math">Math</span></div></div>
+<div class="mc"><div class="mc-num">06</div><div class="mc-weeks">Weeks 14-16</div><div class="mc-title">Control Logic</div><p class="mc-body">Three EEPROMs generate control signals. Students design microcode: a truth table mapping (instruction, step) &rarr; control signals. The lowest level of programming.</p><div class="mc-builds"><strong>Students Build</strong>Instruction register &middot; Step counter &middot; 3&times; EEPROM control matrix &middot; Reset/halt</div><div class="mc-bridge"><span class="mc-bridge-label">STEM Bridge</span>&ldquo;This control matrix IS a matrix: rows are states, columns are signals. You just built a matrix transformation in hardware. This is Linear Algebra made physical.&rdquo; <span class="dtag dtag-linalg">Linear Algebra</span></div></div>
+<div class="mc" style="border-bottom:none;"><div class="mc-num">07</div><div class="mc-weeks">Weeks 16-18</div><div class="mc-title">Integration &amp; Programming</div><p class="mc-body">All modules integrate. Collaborative debugging. The computer runs Fibonacci &mdash; a recurrence relation solved in hardware, one clock tick at a time.</p><div class="mc-builds"><strong>Students Build</strong>Complete 8-bit computer &middot; Instruction set (LDA, ADD, SUB, STA, OUT, HLT, JMP, JC, JZ)</div><div class="mc-bridge"><span class="mc-bridge-label">STEM Bridge</span>&ldquo;Fibonacci is F(n) = F(n-1) + F(n-2) &mdash; a second-order recurrence. In Diff Eq you&rsquo;ll solve it analytically and get the golden ratio. Your computer solves it numerically.&rdquo; <span class="dtag dtag-diffeq">Diff Eq</span><span class="dtag dtag-math">Math</span></div></div>
+</div>
+</div></section>
+
+<!-- ABBREVIATED TIMELINE -->
+<section id="schedule" class="bgc bb"><div class="s2"><div class="sl">20-Week Schedule</div><div>
+<p class="si">Every week includes a build session (2 hrs), concept session (1 hr), and reflection journal with &ldquo;What other course does this connect to?&rdquo; prompt. Key weeks with STEM bridge moments highlighted below.</p>
+<div class="timeline">
+<div class="wm"><div class="wn">01</div><div class="ws">Week</div></div><div class="wc"><div class="wt">Electricity Is Real</div><div class="wd">Battery, LED, resistor, breadboard. Students calculate R using V=IR to protect the LED. Electricity is not metaphor &mdash; it is voltage moving through copper.</div><div class="wbr">&ldquo;You just used V=IR to protect a component. Same equation you&rsquo;ll use in Physics for every circuit.&rdquo;</div><span class="wtag t-b">Hands-On</span> <span class="dtag dtag-phys">Physics</span></div>
+
+<div class="wm"><div class="wn">02</div><div class="ws">Week</div></div><div class="wc"><div class="wt">Logic from Transistors</div><div class="wd">AND, OR, NOT from transistors. Instructor opens a chip and asks: what is this made of? Silicon, doping, PN junctions. Every chip is a chemistry artifact.</div><div class="wbr">&ldquo;This transistor is a sandwich of doped silicon. N-type has extra electrons. You&rsquo;ll study this in Chemistry: atomic structure and bonding.&rdquo;</div><span class="wtag t-b">Hands-On</span> <span class="dtag dtag-chem">Chemistry</span> <span class="dtag dtag-math">Math</span></div>
+
+<div class="wm"><div class="wn">04</div><div class="ws">Week</div></div><div class="wc"><div class="wt">Clock Module &amp; the RC Equation</div><div class="wd">555 timer build begins. Instructor derives V(t) = V&#8320;(1 - e^(-t/RC)). Students adjust R and C, observe frequency change, plot the relationship.</div><div class="wbr">&ldquo;That exponential curve is the solution to dV/dt = -V/RC. You&rsquo;ll solve this exact ODE in Differential Equations. You&rsquo;re seeing the solution before you derive it.&rdquo;</div><span class="wtag t-b">Build Begins</span> <span class="dtag dtag-diffeq">Diff Eq</span> <span class="dtag dtag-phys">Physics</span></div>
+
+<div class="wm"><div class="wn">07</div><div class="ws">Week</div></div><div class="wc"><div class="wt">ALU &amp; Two&rsquo;s Complement</div><div class="wd">Subtraction without a subtraction circuit. Students derive that flipping bits + adding 1 = negation, then verify on hardware.</div><div class="wbr">&ldquo;Two&rsquo;s complement is modular arithmetic: -1 = 255 (mod 256). In Number Theory and Abstract Algebra, you&rsquo;ll formalize modular arithmetic. You just used it to subtract.&rdquo;</div><span class="wtag t-b">Hands-On</span> <span class="dtag dtag-math">Math</span></div>
+
+<div class="wm"><div class="wn">09</div><div class="ws">Week</div></div><div class="wc"><div class="wt">The Human Computer</div><div class="wd">Mid-project pause. Whole class becomes the computer: groups physically perform fetch-decode-execute passing index cards. CS Unplugged adaptation. No STEM bridge &mdash; pure embodied cognition.</div><span class="wtag t-r">Reflection</span></div>
+
+<div class="wm"><div class="wn">13</div><div class="ws">Week</div></div><div class="wc"><div class="wt">Microcode &amp; the Control Matrix</div><div class="wd">Students design the control signal truth table: for each (instruction, step), which signals activate? Instructor draws it as a matrix on the board.</div><div class="wbr">&ldquo;Each row is a state vector. Each column is a control signal. You built a matrix transformation in hardware. In Linear Algebra, you&rsquo;ll multiply matrices to compose transformations. This is the same idea.&rdquo;</div><span class="wtag t-b">Hands-On</span> <span class="dtag dtag-linalg">Linear Algebra</span></div>
+
+<div class="wm"><div class="wn">15</div><div class="ws">Week</div></div><div class="wc"><div class="wt">Fibonacci &amp; Recurrence Relations</div><div class="wd">Conditional jumps enable loops. Students program Fibonacci and write F(n) = F(n-1) + F(n-2) both as machine code and as a recurrence.</div><div class="wbr">&ldquo;This recurrence has a closed-form solution involving the golden ratio: (1+&radic;5)/2. In Diff Eq, you&rsquo;ll derive it. Your computer is solving it numerically, one tick at a time.&rdquo;</div><span class="wtag t-b">Programming</span> <span class="dtag dtag-diffeq">Diff Eq</span> <span class="dtag dtag-math">Math</span></div>
+
+<div class="wm"><div class="wn">17</div><div class="ws">Week</div></div><div class="wc"><div class="wt">Write an Assembler</div><div class="wd">Hand-assemble a program, then automate in Python. An assembler is a function: string &rarr; binary. A compiler is function composition.</div><div class="wbr">&ldquo;Function composition &mdash; applying one function to the output of another &mdash; is one of the most powerful ideas in math. You just built one.&rdquo;</div><span class="wtag t-e">Software</span> <span class="dtag dtag-math">Math</span></div>
+
+<div class="wm"><div class="wn">19</div><div class="ws">Week</div></div><div class="wc"><div class="wt">Documentation &amp; STEM Map</div><div class="wd">Build journal, Abuelita test, and personal STEM bridge map: students draw every cross-disciplinary connection they encountered across 20 weeks.</div><span class="wtag t-r">Portfolio</span></div>
+
+<div class="wm"><div class="wn">20</div><div class="ws">Week</div></div><div class="wc"><div class="wt">Public Exhibition</div><div class="wd">Computer runs live. Students present modules, build journals, extensions, and their STEM bridge maps. No final exam. The computer &mdash; and the map of connections it created &mdash; is the exam.</div><span class="wtag t-r">Exhibition</span></div>
+</div>
+</div></div></section>
+
+<!-- TRACKS -->
+<section id="tracks" class="bgd"><div class="s2">
+<div class="sl" style="color:var(--copper);">&nbsp;Three Tracks</div>
+<div><p style="font-size:15px;line-height:1.85;color:rgba(245,240,232,.55);margin-bottom:16px;">Same computer, different depth of cross-STEM engagement. Tracks are not ability groups &mdash; they are depth choices. Anderson&rsquo;s principle: learner-centered means the student determines their path, not the instructor. Track I students build a working module, document STEM connections, and present at exhibition &mdash; that is more real engineering than most exam-based courses produce in a full semester. Track III students formalize the connections mathematically and write research-quality technical papers. Both are serious, complete outcomes. Tracks are chosen weekly. No grade penalty for choosing Track I. Ever.</p>
+<div class="tg">
+<div class="tc"><div class="tr tr-i">I</div><div class="tn">Build &amp; Understand</div><p class="tb">Build the module. Document it. Identify 3+ connections to other STEM courses in the build journal. Complete the Abuelita Test. Draw a personal STEM bridge map.</p><div class="te"><div class="tex">Build clock module; document the V=IR calculation</div><div class="tex">Identify STEM connections in weekly journal entries</div><div class="tex">Present module + STEM map at exhibition</div></div></div>
+<div class="tc"><div class="tr tr-ii">II</div><div class="tn">Implement &amp; Connect</div><p class="tb">All of Track I, plus: read datasheets. Write the assembler. For each STEM bridge, solve one related problem from the connected discipline.</p><div class="te"><div class="tex">Solve the 555 timer frequency equation for a target clock speed</div><div class="tex">Write control logic as a formal matrix; verify by hand</div><div class="tex">Implement Python assembler; add one new instruction</div></div></div>
+<div class="tc" style="border-right:none;"><div class="tr tr-iii">III</div><div class="tn">Architect &amp; Formalize</div><p class="tb">All of Track II, plus: write a technical paper formalizing one STEM bridge mathematically. Expand the instruction set. Connect the project to a textbook reading.</p><div class="te"><div class="tex">Derive the full RC circuit ODE and verify experimentally</div><div class="tex">Prove two&rsquo;s complement correctness using modular arithmetic</div><div class="tex">Write a 3-page paper connecting the build to Linear Algebra</div></div></div>
+</div></div></div></section>
+
+<!-- ASSESSMENT -->
+<section id="assessment" class="bb"><div class="s2"><div class="sl">Assessment</div><div>
+<p class="si">No exams. No quizzes. No letter grades assigned by the instructor. Following Jeff Anderson&rsquo;s ungrading framework: timed exams measure anxiety and test-taking strategy, not learning. Instead, students build a learning portfolio across the semester, write structured self-reflections at midterm and end of term, and propose their own grade with evidence from their work. The build journal includes a &ldquo;STEM Bridge&rdquo; section each week. The computer either works or it doesn&rsquo;t &mdash; the most honest assessment instrument there is.</p>
+<div class="ai">
+<div class="ait"><div class="ai-pct">30%</div><div class="ai-name">Build Journal + STEM Map</div><div class="ai-desc">Weekly entries: what was built, what went wrong, what was learned, and what other STEM course this connects to. Final entry: a hand-drawn STEM bridge map showing every connection.</div></div>
+<div class="ait"><div class="ai-pct">25%</div><div class="ai-name">Working Module</div><div class="ai-desc">Your team&rsquo;s module works when tested. Live demo. Binary: the clock oscillates, the register holds, the ALU adds.</div></div>
+<div class="ait"><div class="ai-pct">20%</div><div class="ai-name">Integration &amp; Debugging</div><div class="ai-desc">Participation in cross-module debugging. Documented contributions. Ability to explain how your module connects to the system and to other STEM disciplines.</div></div>
+<div class="ait"><div class="ai-pct">15%</div><div class="ai-name">Exhibition &amp; Abuelita Test</div><div class="ai-desc">Live demo, STEM map presentation, written Abuelita explanation. Can you explain the physics, math, and chemistry behind the module you built?</div></div>
+<div class="ait" style="grid-column:1/-1;"><div class="ai-pct">10%</div><div class="ai-name">Self-Evaluation &amp; Grade Proposal</div><div class="ai-desc">A written self-assessment against the course learning goals, modeled on Jeff Anderson&rsquo;s mid-term and final learning self-reflection activities. Students propose their grade with evidence from their portfolio. This is not a formality &mdash; it is the most important piece of writing in the course. As Anderson argues: the act of self-assessment, done rigorously, produces deeper metacognitive awareness than any rubric or exam score. The instructor has final say, but the process itself is a learning outcome.</div></div>
+</div></div></div></section>
+
+<!-- QUOTE -->
+<div class="qstrip">
+<div class="qt">&ldquo;A student who builds a computer from scratch doesn&rsquo;t just learn CS. They encounter the physics that governs the signals, the mathematics that structures the logic, the chemistry that makes the silicon work, and the differential equations that determine how fast the clock ticks. They leave the course knowing how to learn &mdash; not because someone told them how, but because they proved it to themselves with copper and voltage and their own two hands. One project. Five disciplines. Every connection named. Every student capable.&rdquo;</div>
+<div class="qs">Course Design Philosophy &mdash; Antiracist Learning Science &middot; High Road Transfer (Perkins &amp; Salomon) &middot; Ungrading (Anderson)</div>
+</div>
+
+<!-- RESOURCES -->
+<section class="bb"><div class="s2"><div class="sl">Standing On These Shoulders</div><div class="ptext">
+<p><strong>Jeff Anderson</strong> &mdash; <a href="https://jeffandersonmath.wordpress.com/">jeffandersonmath.wordpress.com</a> &middot; <a href="http://www.appliedlinearalgebra.com/">appliedlinearalgebra.com</a>. Mathematics and Engineering instructor at Foothill College. Creator of the Applied Linear Algebra Fundamentals (ALAF) textbook, the Strategic Deep Learning framework, and a pioneering ungrading practice. Jeff&rsquo;s five anti-racist, research-based, learner-centered learning objectives are the pedagogical foundation for this project&rsquo;s assessment design, reflection structure, and commitment to serving the top 100% of learners. His work demonstrates that every classroom decision can and should map back to research in cognitive science, the psychology of learning, and the scholarship of anti-racism.</p>
+<p><strong>Ben Eater</strong> &mdash; <a href="https://eater.net/8bit">eater.net/8bit</a>. The 8-bit breadboard computer series. The direct technical foundation. Every student watches the first three videos before Week 1.</p>
+<p><strong>Nand2Tetris</strong> &mdash; <a href="https://www.nand2tetris.org">nand2tetris.org</a>. Nisan &amp; Schocken. <em>The Elements of Computing Systems.</em> The full-stack narrative from NAND gates to Tetris. The intellectual aspiration: understand the entire stack, bottom to top. Track III reading.</p>
+<p><strong>Perkins &amp; Salomon</strong> &mdash; &ldquo;Teaching for Transfer&rdquo; (<em>Educational Leadership</em>, 1988); &ldquo;Transfer of Learning&rdquo; (<em>International Encyclopedia of Education</em>, 1992). High road transfer requires deliberate abstraction and explicit connection-making. The theoretical backbone of the STEM Bridge design.</p>
+<p><strong>Seymour Papert</strong> &mdash; <em>Mindstorms: Children, Computers, and Powerful Ideas</em> (1980). The foundational text on constructionism: students learn most deeply when they build things that matter in the world. The reason this project uses physical breadboards, not simulators.</p>
+<p><strong>Manu Kapur</strong> &mdash; &ldquo;Productive Failure in Mathematical Problem Solving&rdquo; (<em>Instructional Science</em>, 2008, 2016). Why integration sessions are designed to fail first. The struggle before instruction produces deeper conceptual understanding and better transfer than direct instruction alone.</p>
+<p><strong>David Kolb</strong> &mdash; <em>Experiential Learning: Experience as the Source of Learning and Development</em> (1984). The four-phase cycle (experience &rarr; reflection &rarr; conceptualization &rarr; experimentation) structuring every weekly build session and every build journal entry.</p>
+<p><strong>Lave &amp; Wenger</strong> &mdash; <em>Situated Learning: Legitimate Peripheral Participation</em> (1991). Learning is not the acquisition of propositions &mdash; it is the process of becoming a participant in a community of practice. Students do real engineering work from Week 1.</p>
+<p><strong>Deci &amp; Ryan</strong> &mdash; Self-Determination Theory (1985, 2000). Intrinsic motivation requires autonomy, competence, and relatedness. The structural basis for the track system, the scaffolding progression, and the team-based design.</p>
+<p><strong>Guershon Harel</strong> &mdash; The DNR Framework: Duality, Necessity, Repeated Reasoning (2013). Mathematical concepts are meaningful only when they resolve a genuine intellectual need. The &ldquo;Derive Before Compute&rdquo; principle that governs how every module is introduced.</p>
+<p><strong>Code</strong> by Charles Petzold &mdash; The best popular book on how computers work. Recommended for all students who want the conceptual story alongside the physical build.</p>
+<p><strong>CS Unplugged</strong> &mdash; <a href="https://csunplugged.org">csunplugged.org</a>. The Human Computer exercise (Week 9) is adapted from their activities. Free, equity-centered, and proven across hundreds of classrooms worldwide.</p>
+</div></div></section>
+
+<footer><div class="fl">Community College Computer Science &middot; All resources free and open-access &middot; No required textbook purchases<br>Pedagogical foundation: <a href="https://jeffandersonmath.wordpress.com/">Jeff Anderson</a> &middot; Technical foundation: <a href="https://eater.net/8bit">Ben Eater</a><br><a href="mailto:henry@henryfan.org">henry@henryfan.org</a> &middot; <a href="index.html">&larr; Back to Teaching Computing Differently</a></div><div class="fr">Build a Computer from Scratch</div></footer>
+</body></html>

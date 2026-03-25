@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Writing — Henry Fan</title>
+  <meta name="description" content="Research statement, teaching philosophy, annotated reading list, and working papers on structural equity, help-seeking, and physical computing in CS education.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="site-nav" aria-label="Main navigation">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-name">Henry Fan</a>
+    <button class="nav-toggle" aria-label="Toggle navigation" onclick="document.querySelector('.nav-links').classList.toggle('open')">☰</button>
+    <ul class="nav-links">
+      <li><a href="../">← Curriculum</a></li>
+      <li><a href="research.html">Research</a></li>
+      <li><a href="projects.html">Projects</a></li>
+      <li><a href="teaching.html">Teaching</a></li>
+      <li><a href="writing.html" class="active">Writing</a></li>
+      <li><a href="tools.html">Prototypes</a></li>
+      <li><a href="background.html">Background</a></li>
+      <li><a href="cv.pdf">CV</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="page-container">
+  <div class="page-header">
+    <p class="label">Writing</p>
+    <h1>Statements, Papers, and Reading</h1>
+    <p class="subtitle">
+      Formal statements, working papers, and an annotated reading list organized around the intellectual territory this work occupies. The annotations describe what each work contributes to my thinking — not just what it says, but where I agree, where I push back, and how it shapes specific research questions and curriculum decisions.
+    </p>
+  </div>
+
+  <!-- ============================================
+       SECTION 1: FORMAL STATEMENTS
+       ============================================ -->
+
+  <h2>Formal Statements</h2>
+
+  <div class="writing-item">
+    <p class="writing-type">Research Statement · March 2026</p>
+    <p class="writing-title">Structural Predictors of Help-Seeking and Departure in Introductory CS: A Research Program for Community Colleges</p>
+    <p class="writing-desc">
+      A formal statement of my research agenda, written for PhD applications. Covers the problem space (structural equity in introductory CS), four research questions, theoretical grounding (Seymour &amp; Hunter, Harel, Walton &amp; Brady), methodological approach (mixed-methods: qualitative interviews + learning analytics + NLP), and why this work requires doctoral training. The central argument: students leave introductory CS not because they lack ability but because course structures suppress the help-seeking behavior that persistence requires — and those structures are measurable, changeable, and unevenly distributed across institution types.
+    </p>
+    <p class="mt-sm"><a href="research-statement.pdf">Read the research statement (PDF) →</a></p>
+  </div>
+
+  <div class="writing-item">
+    <p class="writing-type">Teaching Philosophy · March 2026</p>
+    <p class="writing-title">Derive Before Compute: A Teaching Philosophy for Introductory CS at Community Colleges</p>
+    <p class="writing-desc">
+      A statement of pedagogical commitments grounded in constructionism (Papert), productive failure (Kapur), self-determination theory (Deci &amp; Ryan), and antiracist learning science (Anderson, Ko, Freire). Three core principles: (1) <em>Derive before compute</em> — every concept arrives as the answer to a question the student already owns. (2) <em>Build before import</em> — students implement data structures, circuits, and algorithms from scratch before using abstractions. (3) <em>Equity as design</em> — the social implications of technical systems are part of understanding what those systems do, not an afterthought.
+    </p>
+    <p class="writing-desc">
+      The philosophy is enacted through a three-track system (Novice / Builder / Architect), portfolio assessment with student-proposed grades following Anderson's ungrading framework, and a signature project — <a href="../build-a-computer.html">Build a Computer from Scratch</a> — where teams construct a working 8-bit breadboard computer and encounter physics, linear algebra, and chemistry along the way. The argument: hands-on, first-principles construction is the most equitable form of CS instruction because it produces understanding that doesn't depend on prior exposure to computing culture.
+    </p>
+    <p class="mt-sm"><a href="teaching-philosophy.pdf">Read the teaching philosophy (PDF) →</a></p>
+  </div>
+
+  <!-- ============================================
+       SECTION 2: WORKING PAPERS
+       ============================================ -->
+
+  <h2>Working Papers</h2>
+
+  <div class="writing-item">
+    <p class="writing-type">Working Paper · In Progress</p>
+    <p class="writing-title">Help-Seeking Suppression in CS Education: A Literature Synthesis</p>
+    <p class="writing-desc">
+      A synthesis of the existing literature on help-seeking behavior in introductory CS, organized around three themes: structural predictors (course design features that suppress help-seeking), measurement approaches (how help-seeking has been operationalized in learning analytics research), and equity dimensions (how help-seeking patterns differ across demographic groups). Draws on Seymour &amp; Hunter, Newman (2002), Karabenick &amp; Berger, Ryan &amp; Pintrich, and recent SIGCSE/ICER papers on LMS behavioral analysis. The synthesis identifies a gap: most help-seeking research has been conducted at four-year research universities, and the structural conditions of community colleges — open admissions, high work obligations, limited office hours culture — may produce qualitatively different suppression patterns.
+    </p>
+    <p class="font-sans text-small text-muted mt-sm">Targeting 3,000–4,000 words · Expected: Spring 2026</p>
+  </div>
+
+  <div class="writing-item">
+    <p class="writing-type">Methods Note · In Progress</p>
+    <p class="writing-title">Why Mixed Methods: Combining Qualitative Interviews with Computational Analysis in CS Education Research</p>
+    <p class="writing-desc">
+      A methodological reflection on why computational analysis of course materials and LMS data must be grounded in qualitative interview studies rather than pursued independently. The argument: NLP features for detecting help-seeking suppression are only meaningful if the construct itself has been validated through interviews with actual students — otherwise, we build classifiers that are predictive but not actionable (Wise &amp; Shaffer, 2015). This is why P3 (interviews) precedes P1 (learning analytics) in my execution timeline. The note engages with debates about mixed-methods research in CS education (Margulieux et al., 2019), learning analytics (Wise &amp; Shaffer, 2015), and the broader philosophy-of-methods question of when quantification helps and when it obscures.
+    </p>
+    <p class="font-sans text-small text-muted mt-sm">Expected: Spring 2026</p>
+  </div>
+
+  <div class="writing-item">
+    <p class="writing-type">Curriculum Design Paper · In Progress</p>
+    <p class="writing-title">Building Understanding: Cross-STEM Transfer in a First-Principles Computer Architecture Course for Community Colleges</p>
+    <p class="writing-desc">
+      A design paper describing the pedagogical rationale, structure, and theoretical grounding of a 20-week team-based project in which community college students build a working 8-bit computer on breadboards. The paper argues that physical computing creates transfer opportunities across five STEM disciplines (physics, discrete mathematics, linear algebra, differential equations, chemistry) and that these transfer moments must be explicitly named by the instructor to achieve Perkins &amp; Salomon's "high road" transfer. Describes the three-track system, the assessment model (portfolio + ungrading), and seven learning science principles that ground the curriculum: constructionism, productive failure, experiential learning, self-determination theory, transfer theory, situated learning, and intellectual need. Targets SIGCSE 2027 Experience Reports track.
+    </p>
+    <p class="font-sans text-small text-muted mt-sm">Draft in preparation · Targeting SIGCSE 2027</p>
+  </div>
+
+  <hr>
+
+  <!-- ============================================
+       SECTION 3: ANNOTATED READING LIST
+       ============================================ -->
+
+  <h2>Annotated Reading List</h2>
+
+  <p>
+    Key papers and books that shape this research program and curriculum practice. Annotations describe what each contributes to my thinking — not just what it says, but how it informs specific research questions and teaching decisions. The list is organized by intellectual lineage rather than chronology.
+  </p>
+
+  <!-- ---- CATEGORY 1: STEM DEPARTURE ---- -->
+
+  <h3>Foundations: STEM Departure and Structural Equity</h3>
+
+  <div class="writing-item">
+    <p class="writing-title">Seymour, E., &amp; Hunter, A.-B. (2019). <em>Talking About Leaving Revisited.</em> Springer.</p>
+    <p class="writing-desc">
+      The empirical foundation for this entire research program. Seymour and Hunter's central finding — that students who leave STEM are not academically weaker than those who stay, and that departure correlates with teaching quality and institutional culture — motivates every project on this site. Their taxonomy of departure reasons (weed-out culture, help-seeking suppression, belonging threats) provides the deductive coding framework for P3 and the feature selection rationale for P1. The key open question for my work: their studies were conducted at research universities. Do the findings replicate at community colleges, where the structural conditions — open admissions, compressed schedules, part-time faculty — differ fundamentally?
+    </p>
+  </div>
+
+  <div class="writing-item">
+    <p class="writing-title">Margolis, J., &amp; Fisher, A. (2002). <em>Unlocking the Clubhouse: Women in Computing.</em> MIT Press.</p>
+    <p class="writing-desc">
+      Foundational qualitative work on how CS culture systematically excludes students who don't match the "geek mythology" profile. Margolis and Fisher's analysis of how belonging is structurally communicated (or denied) through course design, peer culture, and institutional signals directly informs P5's coding scheme for belonging signals in course materials. Their methodological approach — in-depth interviews combined with institutional analysis — is a model for P3. What I carry forward: the insight that exclusion isn't always intentional — it's often structural, embedded in choices that seem neutral but aren't.
+    </p>
+  </div>
+
+  <div class="writing-item">
+    <p class="writing-title">Walton, G. M., &amp; Brady, S. T. (2017). The many questions of belonging. In <em>Handbook of Competence and Motivation</em> (2nd ed.). Guilford Press.</p>
+    <p class="writing-desc">
+      Walton and Brady distinguish interpersonal belonging (do I have friends here?) from structural belonging (does this institution signal that people like me are expected to succeed?). This distinction is critical for my work — P5 specifically measures structural belonging features that are visible in course materials, not interpersonal dynamics that require observational methods. The Walton 3-item belonging scale is the validation target for P5. I find myself returning to their phrase "belonging uncertainty" — the not-knowing whether you belong — as the most precise description of what first-generation community college students experience in introductory CS.
+    </p>
+  </div>
+
+  <div class="writing-item">
+    <p class="writing-title">Lewis, C. M., et al. (2017). Building belonging in an introductory CS course. <em>SIGCSE '17.</em></p>
+    <p class="writing-desc">
+      A practical intervention study that operationalizes belonging in an intro CS context. Lewis et al. show that specific, concrete changes to course design — not just instructor warmth — can measurably increase belonging. This paper is a bridge between the theoretical belonging literature (Walton &amp; Brady) and the actionable curriculum design that my teaching practice aims for. It validates the premise that belonging is designable, not just personality-dependent.
+    </p>
+  </div>
+
+  <!-- ---- CATEGORY 2: HELP-SEEKING ---- -->
+
+  <h3>Learning Analytics and Help-Seeking</h3>
+
+  <div class="writing-item">
+    <p class="writing-title">Karabenick, S. A., &amp; Berger, J.-L. (2013). Help seeking as a self-regulated learning strategy. In <em>Applications of Self-Regulated Learning.</em></p>
+    <p class="writing-desc">
+      Establishes help-seeking as a self-regulated learning strategy rather than a sign of weakness — a reframing that matters for P1. Karabenick and Berger's framework distinguishes adaptive help-seeking (seeking understanding) from executive help-seeking (seeking answers). P1's NLP classification of discussion forum posts attempts to operationalize this distinction computationally. The challenge I see: this framework was developed for traditional classroom settings. In LMS discussion forums, the line between adaptive and executive help-seeking may be blurred by the public nature of the medium and the norms of the course.
+    </p>
+  </div>
+
+  <div class="writing-item">
+    <p class="writing-title">Wise, A. F., &amp; Shaffer, D. W. (2015). Why theory matters more than ever in the age of big data. <em>JLAC, 2</em>(2).</p>
+    <p class="writing-desc">
+      A crucial methodological argument: learning analytics without theoretical grounding produces features that are predictive but not actionable. This paper is the reason P3 (qualitative interviews) precedes P1 (learning analytics) in my timeline. The features I extract from LMS data must be interpretable through the theoretical lens that P3's interviews establish. Wise and Shaffer's critique directly shapes my methods note on mixed-methods design. I take their argument one step further: theory isn't just necessary for interpretation — it's necessary for construct definition. Without P3, I don't know what "help-seeking suppression" looks like in community college LMS data.
+    </p>
+  </div>
+
+  <div class="writing-item">
+    <p class="writing-title">Newman, R. S. (2002). How self-regulated learners cope with academic difficulty: The role of adaptive help seeking. <em>Theory Into Practice, 41</em>(2).</p>
+    <p class="writing-desc">
+      Newman's framework on adaptive help-seeking provides the motivational model underlying P1: students who don't seek help aren't lazy — they're making a rational cost-benefit calculation based on their perception of the learning environment. If the perceived cost of asking (looking incompetent, wasting the instructor's time, revealing a "basic" gap) exceeds the perceived benefit, help-seeking is suppressed. My contribution: I believe these perceived costs are structurally produced by course design features that are measurable in course materials — assignment framing, syllabus language, grading policy.
+    </p>
+  </div>
+
+  <!-- ---- CATEGORY 3: CONSTRUCTIONISM ---- -->
+
+  <h3>Constructionism, Physical Computing, and Hands-On Learning</h3>
+
+  <div class="writing-item">
+    <p class="writing-title">Papert, S. (1980). <em>Mindstorms: Children, Computers, and Powerful Ideas.</em> Basic Books.</p>
+    <p class="writing-desc">
+      The foundational text for everything I build as an instructor. Papert's central insight — that students learn most deeply when they construct public, shareable artifacts — is the theoretical basis for the Build a Computer project, for ProjectBridge, and for portfolio-based assessment. What strikes me on re-reading is how precisely Papert diagnosed the failure mode of traditional CS education: the belief that you teach programming by explaining syntax rather than by creating an environment where programming is the natural tool for doing something the student already cares about. The breadboard computer is my attempt to create that environment for computer architecture.
+    </p>
+  </div>
+
+  <div class="writing-item">
+    <p class="writing-title">Harel, I., &amp; Papert, S. (1991). <em>Constructionism.</em> Ablex.</p>
+    <p class="writing-desc">
+      Extends Papert's initial formulation into a research program. The key addition: constructionism is not just "learning by doing" — it's learning by building something public, for an audience, that the student cares about. This publicness matters. When students build a breadboard computer that has to work in front of the class, the artifact is both the learning product and the assessment. The computer works or it doesn't — no rubric required. Harel and Papert's emphasis on "objects to think with" directly shapes my curriculum design: every module produces a physical, testable artifact.
+    </p>
+  </div>
+
+  <div class="writing-item">
+    <p class="writing-title">Blikstein, P. (2013). Digital fabrication and "making" in education: The democratization of invention. In <em>FabLabs: Of Machines, Makers and Inventors.</em></p>
+    <p class="writing-desc">
+      Blikstein connects the maker movement to Papert's constructionism and argues that digital fabrication tools democratize invention in ways that traditional lab equipment doesn't. I'm interested in a more specific version of this claim: does the physicality of breadboard construction create learning outcomes that simulation cannot? My hypothesis — informed by embodied cognition research — is yes, specifically for students who lack prior computing cultural capital. The physical artifact serves as proof of understanding that no amount of tutorial-following can replicate.
+    </p>
+  </div>
+
+  <div class="writing-item">
+    <p class="writing-title">Sentance, S., et al. (2017). Creating cool stuff: Pupils' experience of the BBC micro:bit. <em>SIGCSE '17.</em></p>
+    <p class="writing-desc">
+      One of the few empirical studies of physical computing in CS education at scale. Sentance et al. report that physical computing increased engagement and confidence, particularly among students who were less interested in CS beforehand. This finding maps directly to my argument that hands-on construction is an equity intervention: it provides an entry point for students who don't identify with traditional CS culture. The limitation I want to address: the micro:bit is pre-designed. What happens when students build the computer itself, rather than programming someone else's?
+    </p>
+  </div>
+
+  <div class="writing-item">
+    <p class="writing-title">Przybylla, M., &amp; Romeike, R. (2014). Physical computing and its scope — towards a constructionist computer science curriculum. <em>Informatics in Education, 13</em>(2).</p>
+    <p class="writing-desc">
+      Przybylla and Romeike define physical computing as a distinct pedagogical approach (not just "using sensors") and argue for its inclusion in CS curricula. Their framework helps me articulate why the Build a Computer project is qualitatively different from a Raspberry Pi tutorial: it's physical computing applied to the computer itself, making the normally invisible visible. The question they leave open — and that my curriculum attempts to answer — is how physical computing scales to a full semester course rather than isolated activities.
+    </p>
+  </div>
+
+  <!-- ---- CATEGORY 4: CURRICULUM DESIGN ---- -->
+
+  <h3>Curriculum Design and the Necessity Principle</h3>
+
+  <div class="writing-item">
+    <p class="writing-title">Harel, G. (1998). Two dual assertions: The first on learning and the second on teaching. <em>AMM, 105</em>(6).</p>
+    <p class="writing-desc">
+      The necessity principle: students must experience intellectual need before receiving the tool that addresses it. Harel's formulation for mathematics ("if math is the medicine, what is the headache?") generalizes to CS education. P2's annotation scheme for "motivational debt" is a direct operationalization of necessity principle violations — moments where courses introduce formalism before students have experienced the problem the formalism solves. In my curriculum, every module begins with a problem the students can't yet solve — and the week's content is the tool that resolves it.
+    </p>
+  </div>
+
+  <div class="writing-item">
+    <p class="writing-title">Anderson, J. <em>Applied Linear Algebra Fundamentals.</em> (Textbook and twelve modeling criteria.)</p>
+    <p class="writing-desc">
+      Jeff Anderson's textbook and teaching practice are the existence proof that the necessity principle works at scale. His twelve modeling criteria for curriculum design provide the practical grounding for P4's graph-based curriculum analysis. Anderson's broader pedagogical framework — antiracist learning science, ungrading, strategic deep learning, five learner-centered objectives — is the foundation of my own teaching philosophy. His conviction that "every classroom decision should map back to research in cognitive science, the psychology of learning, and the scholarship of anti-racism" is the standard I hold my curriculum to.
+    </p>
+  </div>
+
+  <div class="writing-item">
+    <p class="writing-title">Ko, A. J. (2022). <em>Critically Conscious Computing.</em> Online: criticallyconsciouscomputing.org.</p>
+    <p class="writing-desc">
+      Ko's free textbook redefines what it means to teach CS with equity as a design principle, not an add-on module. Her read-before-write sequencing, emphasis on student agency, and insistence that social implications are inseparable from technical understanding directly inform my curriculum structure. What I find most valuable is her framework for connecting coding activities to students' lived experiences — a challenge I face every day with community college students who ask "why does this matter to my life?" Ko gives a principled answer rather than a motivational one.
+    </p>
+  </div>
+
+  <!-- ---- CATEGORY 5: LEARNING SCIENCE ---- -->
+
+  <h3>Learning Science Frameworks</h3>
+
+  <div class="writing-item">
+    <p class="writing-title">Kolb, D. A. (1984). <em>Experiential Learning: Experience as the Source of Learning and Development.</em> Prentice Hall.</p>
+    <p class="writing-desc">
+      The four-phase cycle — concrete experience, reflective observation, abstract conceptualization, active experimentation — structures every week of the Build a Computer curriculum. Students build (experience), write build journal entries (reflection), connect to theory and cross-STEM bridges (conceptualization), and attempt modifications or extensions (experimentation). What I've learned from implementing this: the reflection phase is the one students and instructors most want to skip, and it's the one that produces the deepest learning. The 20-minute daily reflection in my curriculum is non-negotiable because Kolb says the cycle is incomplete without it.
+    </p>
+  </div>
+
+  <div class="writing-item">
+    <p class="writing-title">Kapur, M. (2008). Productive failure in mathematical problem solving. <em>Instructional Science, 36</em>(6).</p>
+    <p class="writing-desc">
+      Kapur demonstrates that students who struggle with a problem before receiving instruction develop deeper understanding than those who receive direct instruction first. This finding is the theoretical basis for the Build a Computer project's integration sessions — the moments when teams connect their independently built modules and face the reality that the system doesn't work yet. The debugging process is not a failure of instruction; it is the instruction. Kapur gives me the language to defend this design choice to administrators who worry about student frustration.
+    </p>
+  </div>
+
+  <div class="writing-item">
+    <p class="writing-title">Perkins, D. N., &amp; Salomon, G. (1992). Transfer of learning. <em>International Encyclopedia of Education</em> (2nd ed.).</p>
+    <p class="writing-desc">
+      The distinction between "low road" transfer (automatic, through practiced routines) and "high road" transfer (deliberate, through conscious abstraction and connection-making) is the theoretical foundation for every STEM Bridge Moment in my curriculum. Perkins and Salomon's key finding: high road transfer does not happen automatically — the instructor must explicitly name the connection. This is why every module in the Build a Computer curriculum includes a scripted bridge sentence for the instructor: "The equation governing this clock circuit is the same equation you'll solve in Differential Equations. You've already seen what the solution looks like."
+    </p>
+  </div>
+
+  <div class="writing-item">
+    <p class="writing-title">Deci, E. L., &amp; Ryan, R. M. (2000). The "what" and "why" of goal pursuits: Human needs and the self-determination of behavior. <em>Psychological Inquiry, 11</em>(4).</p>
+    <p class="writing-desc">
+      Self-determination theory identifies three conditions for intrinsic motivation: autonomy (choice), competence (calibrated challenge), and relatedness (belonging). My three-track system maps directly to SDT: Track I/II/III provide autonomy through genuine choice, calibrated challenge through differentiated depth, and the team-based structure provides relatedness. The design test for every week: does this structure guarantee all three conditions, or does it rely on hope? SDT says the conditions must be structural, not aspirational.
+    </p>
+  </div>
+
+  <div class="writing-item">
+    <p class="writing-title">Ambrose, S. A., et al. (2010). <em>How Learning Works: Seven Research-Based Principles for Smart Teaching.</em> Jossey-Bass.</p>
+    <p class="writing-desc">
+      The most practically useful book on pedagogy I've read. Each of the seven principles — prior knowledge, knowledge organization, motivation, mastery, practice and feedback, course climate, self-directed learning — has immediate implications for curriculum design. I return to Chapter 6 (course climate) most often: the finding that students' perception of the learning environment determines whether they take intellectual risks, which determines whether they learn. The Build a Computer curriculum's portfolio assessment, celebration moments, and "no wrong track" framing are all attempts to create the climate that Ambrose et al. describe.
+    </p>
+  </div>
+
+  <div class="writing-item">
+    <p class="writing-title">Meyer, J. H. F., &amp; Land, R. (2003). Threshold concepts and troublesome knowledge. In <em>Improving Student Learning.</em></p>
+    <p class="writing-desc">
+      Threshold concepts are transformative and irreversible — once understood, they permanently change how a student thinks. Meyer and Land argue that these concepts require extended engagement and toleration of uncertainty. In the Build a Computer curriculum, I've identified three threshold concepts: two's complement representation, the fetch-decode-execute cycle, and the idea that "programs" are just numbers stored in the same memory as data. Each gets extra time, extra scaffolding, and explicit acknowledgment that the confusion is expected and productive.
+    </p>
+  </div>
+
+  <!-- ---- CATEGORY 6: CC RESEARCH ---- -->
+
+  <h3>Community College Research</h3>
+
+  <div class="writing-item">
+    <p class="writing-title">Bailey, T., Jaggars, S. S., &amp; Jenkins, D. (2015). <em>Redesigning America's Community Colleges: A Clearer Path to Student Success.</em> Harvard University Press.</p>
+    <p class="writing-desc">
+      The "guided pathways" framework argues that community college students are not well served by the cafeteria model of course selection. Bailey, Jaggars, and Jenkins show that structured pathways with built-in advising produce dramatically better completion rates. I find myself in partial agreement: structure matters, but so does agency. My three-track system attempts to combine the structure of guided pathways with the autonomy of student-directed learning. The tension between these two design goals — structure for persistence, agency for motivation — is one of the most interesting design problems in community college CS.
+    </p>
+  </div>
+
+  <div class="writing-item">
+    <p class="writing-title">SEISMIC Consortium. (Ongoing). Large-scale equity analysis of STEM education.</p>
+    <p class="writing-desc">
+      Multi-institutional dataset and methodology for studying equity in STEM at scale. Relevant to P1's learning analytics approach and to the eventual scaling of this work beyond a single institution. The SEISMIC approach of combining institutional data with equity analysis is a model for what I hope P1 can contribute at the community college level — where the data infrastructure is often less mature but the equity stakes are higher.
+    </p>
+  </div>
+
+  <!-- ---- CATEGORY 7: CS ED METHODS ---- -->
+
+  <h3>CS Education Research Methods</h3>
+
+  <div class="writing-item">
+    <p class="writing-title">Fincher, S., &amp; Robins, A. (Eds.). (2019). <em>The Cambridge Handbook of Computing Education Research.</em> Cambridge University Press.</p>
+    <p class="writing-desc">
+      The most comprehensive survey of CS education research methods, findings, and open questions. I treat this as a reference rather than a cover-to-cover read, but Chapter 1 (What is CS Ed Research?), Chapter 4 (Introductory Programming), Chapter 8 (Assessment), and Chapter 14 (Equity) have been formative. The handbook reveals how young this field is — many fundamental questions remain open, which is both humbling and encouraging for a researcher entering the field.
+    </p>
+  </div>
+
+  <div class="writing-item">
+    <p class="writing-title">Margulieux, L. E., et al. (2019). When and how to guide CS students. <em>ICER '19.</em></p>
+    <p class="writing-desc">
+      Important for my understanding of when instructional scaffolding helps versus hinders CS students — directly relevant to P2's annotation scheme, which attempts to measure scaffolding regularity in course materials. Margulieux et al. show that the relationship between scaffolding and learning is non-monotonic: too little guidance causes unproductive floundering, but too much prevents the productive failure that Kapur shows is necessary for deep understanding. My curriculum design attempts to navigate this by providing structure (milestones, checkpoints) without providing answers (no step-by-step instructions for the build).
+    </p>
+  </div>
+
+  <div class="writing-item">
+    <p class="writing-title">Guzdial, M. (2015). <em>Learner-Centered Design of Computing Education: Research on Computing for Everyone.</em> Morgan &amp; Claypool.</p>
+    <p class="writing-desc">
+      Guzdial's monograph makes the case for computing education as a field with its own research questions, not just a subfield of either CS or education. His insistence on "computing for everyone" — not just for future software engineers — directly informs my decision to teach computer architecture as a cross-STEM liberal arts experience rather than as vocational training. The most provocative claim: most students will not become programmers, so CS education must be justified on grounds other than workforce preparation. I agree, though I'd add: for community college students, the workforce argument and the intellectual argument must both be present.
+    </p>
+  </div>
+
+  <!-- ---- CATEGORY 8: AI IN CS ED ---- -->
+
+  <h3>AI in CS Education</h3>
+
+  <div class="writing-item">
+    <p class="writing-title">Porter, L., &amp; Zingaro, D. (2024). <em>Learn AI-Assisted Python Programming.</em> Manning.</p>
+    <p class="writing-desc">
+      The first serious textbook on integrating AI code generation into introductory CS pedagogy. Porter and Zingaro don't treat AI as a threat to be managed — they design a curriculum around it. What I take from this work: the argument that AI changes what students need to learn (reading and evaluating code becomes more important than writing it from scratch). Where I push back: for community college students who have never built anything, I believe the act of construction — even if AI could do it faster — is irreplaceable. The Build a Computer project is my strongest argument for this position: no AI can debug a floating pin on a breadboard.
+    </p>
+  </div>
+
+  <div class="writing-item">
+    <p class="writing-title">Denny, P., MacNeil, S., Savelka, J., Porter, L., &amp; Luxton-Reilly, A. (2024). Desirable characteristics for AI teaching assistants in programming education. <em>ITiCSE '24.</em></p>
+    <p class="writing-desc">
+      Denny et al. identify what instructors want from AI teaching tools: not replacement of human interaction, but amplification of it. The characteristics they identify — scaffolding rather than answer-giving, Socratic questioning, sensitivity to student frustration — map directly to how I think about AI integration in my curriculum: AI as copilot, not author. In the Build a Computer curriculum, AI is introduced in Layer 5 (Weeks 17–20), after students have built the foundational knowledge to evaluate its output. The order matters.
+    </p>
+  </div>
+
+  <!-- ---- CATEGORY 9: PEDAGOGICAL FOUNDATIONS ---- -->
+
+  <h3>Equity Frameworks and Pedagogical Foundations</h3>
+
+  <div class="writing-item">
+    <p class="writing-title">Freire, P. (1968/1970). <em>Pedagogy of the Oppressed.</em> Continuum.</p>
+    <p class="writing-desc">
+      The banking model of education — instructor deposits knowledge into passive students — is the default mode of introductory CS, and it is the structural root of the departure problem that Seymour and Hunter document. Freire's alternative — education as dialogue, as co-investigation, as liberation — is the animating principle behind project-based learning, student-proposed grades, and the design of ProjectBridge as a platform where students are builders, not consumers. Every capstone in my curriculum is student-chosen and connected to a problem in the student's community because Freire says knowledge is liberatory only when connected to lived experience.
+    </p>
+  </div>
+
+  <div class="writing-item">
+    <p class="writing-title">hooks, b. (1994). <em>Teaching to Transgress: Education as the Practice of Freedom.</em> Routledge.</p>
+    <p class="writing-desc">
+      hooks extends Freire into the American classroom and insists on two things: bringing the full self to learning, and the instructor's own vulnerability as a pedagogical tool. I take this seriously. The reflective writing I require alongside every project is not an assessment gimmick — it's hooks' argument that learning involves the whole person, not just the cognitive apparatus. Students write about struggle, confusion, and discovery, and I write back. The classroom is a site of intellectual community, not a delivery mechanism for content.
+    </p>
+  </div>
+
+  <div class="writing-item">
+    <p class="writing-title">Washington, A. N. (2020). When twice as good isn't enough: The case for cultural competence in computing. <em>SIGCSE '20.</em></p>
+    <p class="writing-desc">
+      Washington argues that the computing field's equity interventions have focused too narrowly on access and pipeline — getting students in the door — without addressing the cultural environment they encounter once inside. This reframes the problem: the issue is not that community college students lack preparation; it's that the computing culture they encounter was not designed with them in mind. My research program is an attempt to make that cultural environment measurable and changeable through curriculum design.
+    </p>
+  </div>
+
+  <p class="font-sans text-small text-muted mt-xl">
+    This list is not comprehensive — it reflects the works that most directly shape active projects and teaching practice. A fuller bibliography is available in each project's research design. See also: <a href="../">Teaching Computing Differently</a>, where these readings are enacted as curriculum.
+  </p>
+
+  <p class="font-sans text-small text-muted">Last updated: March 2026</p>
+</main>
+
+<footer class="site-footer" style="text-align:center;">
+  <p>© 2026 Henry Fan · SJSU McNair Scholar · Foothill College Science Learning Institute</p>
+  <p style="margin-top:0.25rem;"><a href="mailto:henry@henryfan.org" style="color:var(--color-text-muted);">henry@henryfan.org</a> · <a href="../" style="color:var(--color-text-muted);">← Curriculum Site</a></p>
+</footer>
+
+</body>
+</html>

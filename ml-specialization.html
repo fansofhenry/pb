@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en" data-course="ml-spec">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Machine Learning Specialization — Community College Edition</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Lora:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void:    #08060f;
+  --deep:    #0e0b1a;
+  --surface: #151025;
+  --lift:    #1d1733;
+  --violet:  #8b5cf6;
+  --violet-lt:#c4b5fd;
+  --lime:    #84cc16;
+  --amber:   #f59e0b;
+  --muted:   rgba(220,210,255,0.45);
+  --text:    rgba(232,226,255,0.92);
+  --border:  rgba(139,92,246,0.14);
+  --mono:    'JetBrains Mono', monospace;
+  --display: 'Syne', sans-serif;
+  --body:    'Lora', serif;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
+body {
+  background:var(--void);
+  color:var(--text);
+  font-family:var(--display);
+  overflow-x:hidden;
+}
+
+/* grid background */
+body::before {
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background-image:
+    linear-gradient(rgba(139,92,246,0.04) 1px, transparent 1px),
+    linear-gradient(90deg,rgba(139,92,246,0.04) 1px, transparent 1px);
+  background-size:48px 48px;
+}
+body::after {
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:9999; opacity:.02;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ── NAV ── */
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  padding:16px 56px;
+  display:flex; justify-content:space-between; align-items:center;
+  background:rgba(8,6,15,0.88); backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+}
+.nav-home {
+  font-family:var(--mono); font-size:11px; letter-spacing:.15em;
+  text-transform:uppercase; color:var(--violet); text-decoration:none;
+}
+.nav-home:hover { color:var(--violet-lt); }
+.nav-label {
+  font-family:var(--mono); font-size:10px; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--muted);
+}
+
+/* ── HERO ── */
+.hero {
+  min-height:100vh;
+  display:grid; grid-template-columns:1fr 480px;
+  align-items:center;
+  padding:120px 56px 80px;
+  position:relative; z-index:1; overflow:hidden;
+}
+.hero-blob {
+  position:absolute; border-radius:50%; filter:blur(130px); pointer-events:none;
+}
+.blob-1 { width:500px; height:500px; background:rgba(139,92,246,0.08); top:-100px; right:-50px; }
+.blob-2 { width:300px; height:300px; background:rgba(132,204,22,0.05); bottom:100px; left:30%; }
+
+.hero-tag {
+  font-family:var(--mono); font-size:11px; letter-spacing:.22em;
+  text-transform:uppercase; color:var(--violet); margin-bottom:28px;
+  display:flex; align-items:center; gap:12px;
+}
+.hero-tag .blink {
+  width:7px; height:7px; border-radius:50%; background:var(--violet);
+  animation:blink 1.4s steps(1) infinite;
+}
+@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0;} }
+
+.hero-h1 {
+  font-family:var(--display); font-size:clamp(56px,8vw,110px);
+  font-weight:800; line-height:.9; margin-bottom:28px; letter-spacing:-.02em;
+}
+.hero-h1 span { color:var(--violet); }
+.hero-h1 em { font-style:italic; font-weight:400; color:var(--violet-lt); }
+
+.hero-sub {
+  font-family:var(--body); font-size:16.5px; font-style:italic;
+  color:var(--muted); max-width:520px; line-height:1.9;
+  font-weight:400; margin-bottom:48px;
+}
+
+.hero-bar {
+  display:flex; gap:0; border:1px solid var(--border); width:fit-content;
+}
+.hero-stat {
+  padding:14px 26px; border-right:1px solid var(--border);
+  font-family:var(--mono); font-size:10px; letter-spacing:.1em;
+  color:var(--muted);
+}
+.hero-stat:last-child { border-right:none; }
+.hero-stat strong {
+  display:block; font-family:var(--display); font-size:24px;
+  font-weight:700; color:var(--text); margin-bottom:2px; letter-spacing:-.01em;
+}
+.hero-stat strong.v { color:var(--violet); }
+.hero-stat strong.l { color:var(--lime); }
+.hero-stat strong.a { color:var(--amber); }
+
+/* ── GRADIENT DESCENT VIZ ── */
+.gd-container {
+  position:relative; z-index:2;
+  display:flex; flex-direction:column; align-items:center; gap:16px;
+}
+.gd-label {
+  font-family:var(--mono); font-size:9px; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--muted);
+}
+.gd-canvas { width:100%; max-width:440px; }
+.loss-curve { fill:none; stroke:var(--violet); stroke-width:2; opacity:.7; }
+.gd-point {
+  fill:var(--violet);
+  animation:gd-roll 4s ease-in-out infinite;
+}
+@keyframes gd-roll {
+  0%   { cx:60; cy:30; opacity:1; }
+  15%  { cx:100; cy:80; opacity:1; }
+  30%  { cx:145; cy:115; opacity:1; }
+  45%  { cx:190; cy:138; opacity:1; }
+  60%  { cx:235; cy:150; opacity:1; }
+  75%  { cx:275; cy:154; opacity:1; }
+  90%  { cx:310; cy:156; opacity:1; }
+  100% { cx:60; cy:30; opacity:.1; }
+}
+.gd-axis { stroke:rgba(139,92,246,0.3); stroke-width:1; }
+.gd-text { font-family:var(--mono); font-size:10px; fill:var(--muted); }
+.gd-eq {
+  font-family:var(--mono); font-size:10px; fill:rgba(139,92,246,0.5);
+}
+
+.math-floats {
+  position:absolute; inset:0; pointer-events:none; overflow:hidden;
+}
+.mf {
+  position:absolute; font-family:var(--mono); font-size:10px;
+  color:rgba(139,92,246,0.1); white-space:nowrap;
+}
+.mf:nth-child(1) { top:15%; left:5%; }
+.mf:nth-child(2) { top:40%; right:10%; }
+.mf:nth-child(3) { bottom:25%; left:8%; }
+.mf:nth-child(4) { top:60%; left:15%; }
+
+/* ── SECTION ── */
+.section-rule { border:none; border-top:1px solid var(--border); margin:0; }
+section { padding:90px 56px; max-width:1280px; margin:0 auto; position:relative; z-index:1; }
+
+.overline {
+  font-family:var(--mono); font-size:10px; letter-spacing:.24em;
+  text-transform:uppercase; color:var(--violet); margin-bottom:20px;
+  display:flex; align-items:center; gap:10px;
+}
+.overline::before { content:'//'; color:rgba(139,92,246,.3); }
+
+h2 {
+  font-family:var(--display); font-size:clamp(32px,4.5vw,58px);
+  font-weight:800; letter-spacing:-.02em; line-height:.95; margin-bottom:20px;
+}
+h2 em { font-style:italic; font-weight:400; color:var(--violet); }
+h2 span { color:var(--violet); }
+
+.lead {
+  font-family:var(--body); font-size:16px; font-style:italic;
+  line-height:1.9; color:var(--muted); max-width:680px;
+  font-weight:400; margin-bottom:52px;
+}
+
+/* ── VERSUS ── */
+.versus {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:2px; background:var(--border); margin-bottom:60px;
+}
+.versus-col { padding:38px 34px; background:var(--deep); }
+.vs-label {
+  font-family:var(--mono); font-size:9px; letter-spacing:.2em;
+  text-transform:uppercase; margin-bottom:14px; color:var(--muted);
+}
+.versus-col.ours .vs-label { color:var(--violet); }
+.vs-title { font-family:var(--display); font-size:20px; font-weight:700; margin-bottom:16px; }
+.versus-col.theirs .vs-title { color:rgba(220,210,255,.5); }
+.versus-col.ours .vs-title { color:var(--text); }
+.vs-list { list-style:none; display:flex; flex-direction:column; gap:9px; }
+.vs-list li {
+  display:flex; gap:10px; align-items:flex-start;
+  font-family:var(--body); font-style:italic;
+  font-size:14px; line-height:1.65; color:var(--muted);
+}
+.versus-col.ours .vs-list li { color:rgba(220,210,255,.75); }
+.vs-list li::before {
+  content:''; width:5px; height:5px; border-radius:50%;
+  flex-shrink:0; margin-top:7px;
+}
+.versus-col.theirs .vs-list li::before { background:rgba(139,92,246,.25); }
+.versus-col.ours .vs-list li::before { background:var(--violet); }
+
+/* ── TRACKS ── */
+.tracks { display:flex; flex-direction:column; gap:2px; margin-top:48px; }
+.track {
+  display:grid; grid-template-columns:240px 1fr 1fr;
+  background:var(--deep); border:1px solid var(--border);
+  transition:border-color .2s; overflow:hidden;
+}
+.track:hover { border-color:rgba(139,92,246,.3); }
+.track-left {
+  padding:34px 28px; border-right:1px solid var(--border);
+  display:flex; flex-direction:column; justify-content:space-between;
+}
+.track-badge {
+  font-family:var(--mono); font-size:8.5px; letter-spacing:.2em;
+  text-transform:uppercase; padding:4px 10px; width:fit-content;
+  margin-bottom:12px; background:rgba(139,92,246,.08);
+  border:1px solid rgba(139,92,246,.2); color:var(--violet);
+}
+.t2 .track-badge { background:rgba(132,204,22,.07); border-color:rgba(132,204,22,.2); color:var(--lime); }
+.t3 .track-badge { background:rgba(245,158,11,.07); border-color:rgba(245,158,11,.2); color:var(--amber); }
+.track-num {
+  font-family:var(--display); font-size:54px; font-weight:800;
+  letter-spacing:-.03em; line-height:1; margin-bottom:6px; color:var(--violet);
+}
+.t2 .track-num { color:var(--lime); }
+.t3 .track-num { color:var(--amber); }
+.track-name { font-family:var(--body); font-size:19px; font-style:italic; color:var(--muted); line-height:1.25; }
+.track-prereq {
+  font-family:var(--mono); font-size:8.5px; letter-spacing:.1em;
+  text-transform:uppercase; color:rgba(220,210,255,.2); margin-top:12px;
+}
+.track-mid, .track-right { padding:30px 26px; }
+.track-mid { border-right:1px solid var(--border); }
+.t-label {
+  font-family:var(--mono); font-size:8.5px; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--muted); margin-bottom:12px;
+}
+.t-desc { font-family:var(--body); font-style:italic; font-size:13.5px; color:var(--muted); line-height:1.75; }
+.proj-list { list-style:none; display:flex; flex-direction:column; gap:7px; }
+.proj-list li {
+  display:flex; gap:10px; font-size:12.5px; line-height:1.6;
+  align-items:flex-start; color:var(--muted);
+  padding-bottom:7px; border-bottom:1px solid var(--border);
+}
+.proj-list li:last-child { border-bottom:none; padding-bottom:0; }
+.proj-num {
+  font-family:var(--mono); font-size:8px; color:var(--violet);
+  flex-shrink:0; margin-top:3px;
+}
+.t2 .proj-num { color:var(--lime); }
+.t3 .proj-num { color:var(--amber); }
+
+/* ── 18-WEEK ARC ── */
+.arc-grid {
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:2px; background:var(--border); margin-top:48px;
+}
+.arc-block { background:var(--deep); padding:34px 28px; transition:background .2s; }
+.arc-block:hover { background:var(--surface); }
+.arc-week {
+  font-family:var(--mono); font-size:9px; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--violet); margin-bottom:10px;
+}
+.arc-title {
+  font-family:var(--display); font-size:20px; font-weight:700;
+  letter-spacing:-.01em; margin-bottom:10px;
+}
+.arc-desc { font-family:var(--body); font-style:italic; font-size:13px; color:var(--muted); line-height:1.75; }
+.arc-tag {
+  margin-top:14px; padding:10px 13px;
+  background:rgba(139,92,246,.06); border-left:2px solid var(--violet);
+  font-family:var(--mono); font-size:11px; color:rgba(196,181,253,.7);
+  line-height:1.5; letter-spacing:.02em;
+}
+.arc-block:nth-child(2) .arc-week,
+.arc-block:nth-child(2) .arc-tag { color:var(--lime); }
+.arc-block:nth-child(2) .arc-tag { border-color:var(--lime); background:rgba(132,204,22,.05); }
+.arc-block:nth-child(3) .arc-week,
+.arc-block:nth-child(3) .arc-tag { color:var(--amber); }
+.arc-block:nth-child(3) .arc-tag { border-color:var(--amber); background:rgba(245,158,11,.05); }
+.arc-block:nth-child(4) .arc-week { color:#f472b6; }
+.arc-block:nth-child(4) .arc-tag { border-color:#f472b6; background:rgba(244,114,182,.05); color:rgba(244,114,182,.7); }
+.arc-block:nth-child(5) .arc-week { color:#34d399; }
+.arc-block:nth-child(5) .arc-tag { border-color:#34d399; background:rgba(52,211,153,.05); color:rgba(52,211,153,.7); }
+.arc-block:nth-child(6) .arc-week { color:#60a5fa; }
+.arc-block:nth-child(6) .arc-tag { border-color:#60a5fa; background:rgba(96,165,250,.05); color:rgba(96,165,250,.7); }
+
+/* ── CONCEPTS ── */
+.concepts { display:grid; grid-template-columns:repeat(4,1fr); gap:2px; background:var(--border); margin-top:48px; }
+.concept-tile { background:var(--deep); padding:28px 24px; transition:background .2s; cursor:default; }
+.concept-tile:hover { background:var(--lift); }
+.cn { font-family:var(--mono); font-size:8.5px; color:var(--violet); letter-spacing:.18em; margin-bottom:10px; }
+.ct { font-family:var(--display); font-size:16px; font-weight:700; margin-bottom:8px; }
+.cb { font-family:var(--body); font-style:italic; font-size:12.5px; color:var(--muted); line-height:1.7; }
+
+/* ── PHIL STRIP ── */
+.phil {
+  background:var(--surface); border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+  padding:56px; display:grid; grid-template-columns:1fr 1fr; gap:56px; align-items:center;
+  position:relative; z-index:1;
+}
+.phil-eq { font-family:var(--mono); font-size:28px; color:rgba(139,92,246,.5); margin-bottom:14px; letter-spacing:-.02em; }
+.phil-quote { font-family:var(--body); font-size:clamp(18px,2.4vw,26px); font-style:italic; line-height:1.5; color:var(--text); }
+.phil-source { font-family:var(--mono); font-size:9.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-top:14px; }
+.phil-items { display:flex; flex-direction:column; gap:12px; }
+.phi {
+  padding:16px 18px; border:1px solid var(--border); display:flex; gap:14px;
+  align-items:flex-start; transition:border-color .2s;
+}
+.phi:hover { border-color:rgba(139,92,246,.3); }
+.phi-ico { font-size:16px; flex-shrink:0; }
+.phi-body { font-family:var(--body); font-style:italic; font-size:13px; color:var(--muted); line-height:1.65; }
+.phi-body strong { font-style:normal; font-family:var(--display); font-size:13px; font-weight:700; color:var(--text); display:block; margin-bottom:3px; }
+
+/* ── THINKERS ── */
+.thinkers { display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--border); position:relative; z-index:1; }
+.thinker {
+  padding:24px 24px; border-right:1px solid var(--border); border-bottom:1px solid var(--border);
+  transition:background .2s;
+}
+.thinker:hover { background:var(--surface); }
+.thinker:nth-child(4n) { border-right:none; }
+.thinker-name { font-family:var(--display); font-size:15px; font-weight:700; margin-bottom:4px; }
+.thinker-tag { font-family:var(--mono); font-size:8px; letter-spacing:.1em; text-transform:uppercase; color:var(--violet); margin-bottom:8px; }
+.thinker-desc { font-family:var(--body); font-style:italic; font-size:12px; color:var(--muted); line-height:1.7; }
+
+/* ── FOOTER ── */
+footer {
+  background:var(--void); color:var(--text);
+  padding:40px 56px;
+  display:flex; justify-content:space-between; align-items:center;
+  border-top:2px solid var(--violet);
+  position:relative; z-index:1;
+}
+.footer-l { font-family:var(--mono); font-size:10px; letter-spacing:.06em; color:rgba(220,210,255,.25); line-height:2; }
+.footer-r { font-family:var(--display); font-size:26px; font-weight:800; letter-spacing:-.02em; color:rgba(220,210,255,.08); }
+
+@media(max-width:1000px){
+  .hero { grid-template-columns:1fr; padding:100px 28px 60px; }
+  nav, section, .phil { padding-left:28px; padding-right:28px; }
+  .track { grid-template-columns:1fr; }
+  .track-left,.track-mid { border-right:none; border-bottom:1px solid var(--border); }
+  .arc-grid { grid-template-columns:1fr 1fr; }
+  .concepts { grid-template-columns:1fr 1fr; }
+  .versus { grid-template-columns:1fr; }
+  .thinkers { grid-template-columns:1fr 1fr; }
+  .thinker:nth-child(2n) { border-right:none; }
+  .phil { grid-template-columns:1fr; }
+  footer { flex-direction:column; gap:14px; text-align:center; }
+}
+</style>
+</head>
+<body>
+
+<div class="math-floats" aria-hidden="true">
+  <span class="mf">θ := θ − α∇J(θ)</span>
+  <span class="mf">ŷ = σ(wᵀx + b)</span>
+  <span class="mf">L = −[y log(p) + (1−y)log(1−p)]</span>
+  <span class="mf">∂L/∂w = xᵀ(ŷ − y)</span>
+</div>
+
+<nav>
+  <a class="nav-home" href="index.html">← All Courses</a>
+  <span class="nav-label">ML Specialization · Community College Edition</span>
+</nav>
+
+<!-- HERO -->
+<section class="hero" style="padding-top:120px;">
+  <div class="hero-blob blob-1"></div>
+  <div class="hero-blob blob-2"></div>
+  <div style="position:relative;z-index:2;">
+    <div class="hero-tag"><span class="blink"></span>Machine Learning Specialization · Reimagined</div>
+    <div class="hero-h1">Every<br>algorithm<br>is a <em>choice.</em></div>
+    <p class="hero-sub">Andrew Ng's three-course ML specialization rebuilt for community college students. We derive every algorithm before we use it, implement from scratch before touching a library, and ask: optimized for what — and for whom?</p>
+    <div class="hero-bar">
+      <div class="hero-stat"><strong class="v">3</strong>Learning Tracks</div>
+      <div class="hero-stat"><strong class="l">18</strong>Weeks</div>
+      <div class="hero-stat"><strong class="a">6</strong>Major Projects</div>
+      <div class="hero-stat"><strong class="v">0</strong>Exams</div>
+    </div>
+  </div>
+  <div class="gd-container" style="position:relative;z-index:2;">
+    <div class="gd-label">Gradient Descent · Loss Over Iterations</div>
+    <svg class="gd-canvas" viewBox="0 0 380 200" xmlns="http://www.w3.org/2000/svg">
+      <!-- axes -->
+      <line class="gd-axis" x1="40" y1="170" x2="360" y2="170"/>
+      <line class="gd-axis" x1="40" y1="20" x2="40" y2="170"/>
+      <!-- loss curve (smooth convex) -->
+      <path class="loss-curve" d="M60,30 C90,55 130,110 160,135 C200,158 250,162 310,162 L350,162"/>
+      <!-- optimal marker -->
+      <circle cx="310" cy="162" r="4" fill="none" stroke="rgba(139,92,246,.4)" stroke-width="1"/>
+      <text class="gd-text" x="315" y="157">optimal</text>
+      <!-- animated ball rolling down -->
+      <circle class="gd-point" r="7" cx="60" cy="30"/>
+      <!-- labels -->
+      <text class="gd-text" x="42" y="188">iter 0</text>
+      <text class="gd-text" x="320" y="188">iter n</text>
+      <text class="gd-text" x="6" y="100" transform="rotate(-90,14,100)">loss J(θ)</text>
+      <!-- equation overlay -->
+      <text class="gd-eq" x="120" y="55">θ ← θ − α∇J(θ)</text>
+    </svg>
+    <div class="gd-label" style="font-size:8px;opacity:.6;">We derive this before we run it.</div>
+  </div>
+</section>
+
+<hr class="section-rule">
+
+<!-- WHAT'S DIFFERENT -->
+<section>
+  <div class="overline">This vs. Andrew Ng's Original</div>
+  <h2>Deeper foundations.<br><em>Community stakes.</em></h2>
+  <p class="lead">Andrew Ng's Machine Learning Specialization on Coursera is the gold standard introduction — rigorous, clear, and accessible. We use it as a launchpad, then push further: every algorithm is derived, every dataset is examined for bias, and every project is connected to a real community problem.</p>
+
+  <div class="versus">
+    <div class="versus-col theirs">
+      <div class="vs-label">Andrew Ng's Version</div>
+      <div class="vs-title">Concepts → Notebooks</div>
+      <ul class="vs-list">
+        <li>Video lectures followed by guided Jupyter notebooks</li>
+        <li>All datasets provided — no data collection or critique</li>
+        <li>Single track at fixed depth</li>
+        <li>Assessment: graded auto-checked assignments</li>
+        <li>Limited discussion of fairness or algorithmic harm</li>
+        <li>No community application requirement</li>
+      </ul>
+    </div>
+    <div class="versus-col ours">
+      <div class="vs-label">This Course</div>
+      <div class="vs-title">Problem → Derive → Build → Audit</div>
+      <ul class="vs-list">
+        <li>Every algorithm introduced through a real problem first</li>
+        <li>Derive the math before running the code</li>
+        <li>Three tracks from conceptual to from-scratch implementation</li>
+        <li>Assessment: six portfolio projects on real community data</li>
+        <li>Bias auditing is a required project — not optional extra credit</li>
+        <li>Capstone must serve a real, named community need</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<hr class="section-rule">
+
+<!-- TRACKS -->
+<section>
+  <div class="overline">Three Learning Tracks</div>
+  <h2>Same math.<br><em>Three depths.</em></h2>
+  <p class="lead">Depth is not fixed. You choose your track at the start of each unit. All tracks share the same readings, case studies, and community discussions. The divergence is in how far into the implementation you go.</p>
+
+  <div class="tracks">
+    <div class="track t1">
+      <div class="track-left">
+        <div>
+          <div class="track-badge">Track I</div>
+          <div class="track-num">I</div>
+          <div class="track-name">ML<br>Consumer</div>
+        </div>
+        <div class="track-prereq">Prereq: Basic stats concepts</div>
+      </div>
+      <div class="track-mid">
+        <div class="t-label">Focus</div>
+        <p class="t-desc">Understand what ML algorithms do, interpret model outputs, and identify failure modes. Use trained models confidently. Spot bias, evaluate benchmarks skeptically, and read ML papers without being overwhelmed by notation. Prepare for roles that use ML without building it.</p>
+      </div>
+      <div class="track-right">
+        <div class="t-label">Projects</div>
+        <ul class="proj-list">
+          <li><span class="proj-num">P1</span>Interpret rental price predictions from a trained regression model</li>
+          <li><span class="proj-num">P2</span>Audit a hiring classifier for disparate impact across groups</li>
+          <li><span class="proj-num">P3</span>Write a plain-language report explaining an ML system to a community board</li>
+        </ul>
+      </div>
+    </div>
+    <div class="track t2">
+      <div class="track-left">
+        <div>
+          <div class="track-badge">Track II</div>
+          <div class="track-num">II</div>
+          <div class="track-name">ML<br>Practitioner</div>
+        </div>
+        <div class="track-prereq">Prereq: Python · Intro statistics</div>
+      </div>
+      <div class="track-mid">
+        <div class="t-label">Focus</div>
+        <p class="t-desc">Build end-to-end ML pipelines using scikit-learn, pandas, and matplotlib. Clean and analyze real datasets. Train, validate, and tune models. Understand the bias-variance tradeoff in practice. Deploy simple models as APIs. Prepare for data analyst or ML engineer roles.</p>
+      </div>
+      <div class="track-right">
+        <div class="t-label">Projects</div>
+        <ul class="proj-list">
+          <li><span class="proj-num">P1</span>Predict rent prices using real census data from your city</li>
+          <li><span class="proj-num">P2</span>Build and compare classifiers on a real hiring dataset</li>
+          <li><span class="proj-num">P3</span>Cluster neighborhood demographic data — interpret ethically</li>
+          <li><span class="proj-num">P4</span>Deploy a model; document its failure modes and edge cases</li>
+        </ul>
+      </div>
+    </div>
+    <div class="track t3">
+      <div class="track-left">
+        <div>
+          <div class="track-badge">Track III</div>
+          <div class="track-num">III</div>
+          <div class="track-name">ML<br>Engineer</div>
+        </div>
+        <div class="track-prereq">Prereq: Python · Calculus · Linear Algebra</div>
+      </div>
+      <div class="track-mid">
+        <div class="t-label">Focus</div>
+        <p class="t-desc">Implement every algorithm from mathematical first principles using only NumPy. Derive gradient descent, backprop, the kernel trick, and EM from scratch before using any library. Understand every line of every model you deploy. Prepare for ML research and engineering roles.</p>
+      </div>
+      <div class="track-right">
+        <div class="t-label">Projects</div>
+        <ul class="proj-list">
+          <li><span class="proj-num">P1</span>Implement linear regression with gradient descent from scratch; verify against sklearn</li>
+          <li><span class="proj-num">P2</span>Build logistic regression + SVM from scratch; derive kernel trick</li>
+          <li><span class="proj-num">P3</span>Implement k-means and Gaussian Mixture Models; prove EM convergence</li>
+          <li><span class="proj-num">P4</span>Build a neural network from scratch with backpropagation in NumPy</li>
+          <li><span class="proj-num">P5</span>Full bias audit with statistical tests on a community dataset</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-rule">
+
+<!-- 18-WEEK ARC -->
+<section>
+  <div class="overline">18-Week Curriculum Arc</div>
+  <h2>Six units.<br><em>One coherent argument.</em></h2>
+  <p class="lead">Each unit starts with a community problem. Technical concepts arrive as tools to solve it — not as the point. The capstone unifies all six units into a single project that must serve a real, named need.</p>
+
+  <div class="arc-grid">
+    <div class="arc-block">
+      <div class="arc-week">Weeks 1–3</div>
+      <div class="arc-title">Regression</div>
+      <p class="arc-desc">Problem: Can we predict rent prices for next year? Derive linear regression. Implement gradient descent. Understand why "fit the data" is never neutral — what counts as normal in housing data?</p>
+      <div class="arc-tag">Project → Predict rent prices in your zip code</div>
+    </div>
+    <div class="arc-block">
+      <div class="arc-week">Weeks 4–6</div>
+      <div class="arc-title">Classification</div>
+      <p class="arc-desc">Problem: Should this job application proceed? Derive logistic regression and decision boundaries. Understand why false positive rates differ across groups — and why that matters more than overall accuracy.</p>
+      <div class="arc-tag">Project → Build + audit a hiring classifier</div>
+    </div>
+    <div class="arc-block">
+      <div class="arc-week">Weeks 7–9</div>
+      <div class="arc-title">Neural Networks</div>
+      <p class="arc-desc">Problem: Can a computer recognize handwritten rent checks? Derive perceptrons and multi-layer networks. Implement backpropagation from scratch. What features does the network learn, and why?</p>
+      <div class="arc-tag">Project → Build an image classifier from scratch</div>
+    </div>
+    <div class="arc-block">
+      <div class="arc-week">Weeks 10–12</div>
+      <div class="arc-title">Unsupervised Learning</div>
+      <p class="arc-desc">Problem: What patterns exist in neighborhood demographic data? Derive k-means and PCA. When we cluster people by data, what assumptions are we encoding? Whose similarities and differences are we measuring?</p>
+      <div class="arc-tag">Project → Cluster + ethically interpret community data</div>
+    </div>
+    <div class="arc-block">
+      <div class="arc-week">Weeks 13–15</div>
+      <div class="arc-title">Bias Audit</div>
+      <p class="arc-desc">Required for all tracks. Audit a real deployed algorithm — in lending, hiring, healthcare, or criminal justice. Quantify disparate impact using real data. Document findings. Propose a remedy. Present to a community audience.</p>
+      <div class="arc-tag">Project → Full algorithmic bias audit report</div>
+    </div>
+    <div class="arc-block">
+      <div class="arc-week">Weeks 16–18</div>
+      <div class="arc-title">Capstone</div>
+      <p class="arc-desc">Build an ML system that addresses a real problem named by your community. Not a toy dataset. Not a pre-cleaned benchmark. Real data, real stakes, real constraints. Documentation must include a harm analysis.</p>
+      <div class="arc-tag">Project → Community ML application + harm report</div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-rule">
+
+<!-- KEY CONCEPTS -->
+<section>
+  <div class="overline">Core Concepts · All Tracks</div>
+  <h2>What you'll<br><em>understand deeply.</em></h2>
+
+  <div class="concepts">
+    <div class="concept-tile"><div class="cn">01</div><div class="ct">Gradient Descent</div><p class="cb">The universal optimization engine. Derive it, implement it, understand when it fails. The math behind "learning."</p></div>
+    <div class="concept-tile"><div class="cn">02</div><div class="ct">Bias-Variance Tradeoff</div><p class="cb">Underfitting vs. overfitting. Why a model that memorizes training data fails on real people.</p></div>
+    <div class="concept-tile"><div class="cn">03</div><div class="ct">Loss Functions</div><p class="cb">What you optimize is what you get. Cross-entropy, MSE, and why the choice is a value judgment.</p></div>
+    <div class="concept-tile"><div class="cn">04</div><div class="ct">Regularization</div><p class="cb">L1, L2, dropout. Constraining complexity to prevent memorization. The math of generalization.</p></div>
+    <div class="concept-tile"><div class="cn">05</div><div class="ct">Confusion Matrix</div><p class="cb">True positives, false positives, precision, recall. The four cells that determine who gets hurt.</p></div>
+    <div class="concept-tile"><div class="cn">06</div><div class="ct">Disparate Impact</div><p class="cb">When a "neutral" algorithm produces outcomes that differ systematically across protected groups. This is a technical concept, not only a political one.</p></div>
+    <div class="concept-tile"><div class="cn">07</div><div class="ct">Feature Engineering</div><p class="cb">Choosing what to measure is choosing what to value. The most impactful part of ML — and the most overlooked.</p></div>
+    <div class="concept-tile"><div class="cn">08</div><div class="ct">Cross-Validation</div><p class="cb">Test on what you didn't train on. How we actually measure generalization in practice.</p></div>
+  </div>
+</section>
+
+<!-- PHILOSOPHY -->
+<div class="phil">
+  <div>
+    <div class="phil-eq">J(θ) = ???</div>
+    <div class="phil-quote">"Every ML algorithm is an answer to the question: what are we optimizing for? That question is never answered by the math. It is answered by the humans who choose the loss function."</div>
+    <div class="phil-source">Course Philosophy · Ko, Benjamin, Ng, Freire</div>
+  </div>
+  <div class="phil-items">
+    <div class="phi"><div class="phi-ico">📐</div><div class="phi-body"><strong>Derive Before You Compute</strong>You will implement gradient descent from scratch before you call optimizer.fit(). Understanding precedes convenience.</div></div>
+    <div class="phi"><div class="phi-ico">🔍</div><div class="phi-body"><strong>Audit Before You Deploy</strong>Every model you build must include a fairness analysis. Not as ethics theater — as engineering practice.</div></div>
+    <div class="phi"><div class="phi-ico">🌍</div><div class="phi-body"><strong>Community Data, Not Toy Data</strong>You will work with real datasets from real communities. The messiness is the point.</div></div>
+    <div class="phi"><div class="phi-ico">📂</div><div class="phi-body"><strong>Portfolio Over Exams</strong>Six projects you actually built. No auto-graded MCQs. Your grade is your GitHub.</div></div>
+  </div>
+</div>
+
+<hr class="section-rule">
+
+<!-- THINKERS -->
+<section>
+  <div class="overline">Intellectual Lineage</div>
+  <h2>Who we're <em>reading.</em></h2>
+  <div class="thinkers">
+    <div class="thinker"><div class="thinker-name">Andrew Ng</div><div class="thinker-tag">DeepLearning.AI</div><p class="thinker-desc">The original ML Specialization — whose conceptual clarity and mathematical rigor we build directly on and depart from.</p></div>
+    <div class="thinker"><div class="thinker-name">Amy J. Ko</div><div class="thinker-tag">UW CS Education</div><p class="thinker-desc">Equitable computing education. Read before implement. Student agency over assessment anxiety.</p></div>
+    <div class="thinker"><div class="thinker-name">Ruha Benjamin</div><div class="thinker-tag">Race After Technology</div><p class="thinker-desc">The "New Jim Code." When automation appears neutral but encodes and amplifies racial hierarchy.</p></div>
+    <div class="thinker"><div class="thinker-name">Solon Barocas</div><div class="thinker-tag">Fairness in ML</div><p class="thinker-desc">Formal mathematical definitions of fairness — and why no single definition is universally correct.</p></div>
+    <div class="thinker"><div class="thinker-name">Ziad Obermeyer</div><div class="thinker-tag">UC Berkeley</div><p class="thinker-desc">Hidden racial bias in a widely used healthcare algorithm. Case study in Weeks 13–15.</p></div>
+    <div class="thinker"><div class="thinker-name">Ian Goodfellow</div><div class="thinker-tag">Deep Learning Text</div><p class="thinker-desc">The foundational textbook — free online. Our Track III references for mathematical depth.</p></div>
+    <div class="thinker"><div class="thinker-name">Cathy O'Neil</div><div class="thinker-tag">Weapons of Math Destruction</div><p class="thinker-desc">How models targeting poor communities amplify inequality. Core reading for the bias audit unit.</p></div>
+    <div class="thinker"><div class="thinker-name">Jeff Anderson</div><div class="thinker-tag">Ungrading · Deep Learning</div><p class="thinker-desc">The 2-minute question rule. Ungrading. Deep learning over shallow performance. Foundational to this course's assessment philosophy.</p></div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-l">
+    Community College Computer Science<br>
+    Andrew Ng's ML Specialization · Reimagined for Community College<br>
+    No required textbooks · All datasets free · Portfolio assessment<br>
+    <a href="index.html" style="color:rgba(220,210,255,.4);text-decoration:underline;text-underline-offset:2px;">&larr; Teaching Computing Differently</a> · <a href="mailto:henry@henryfan.org" style="color:rgba(220,210,255,.4);">henry@henryfan.org</a>
+  </div>
+  <div class="footer-r">ML Spec</div>
+</footer>
+
+</body>
+</html>
